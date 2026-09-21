@@ -1,0 +1,16 @@
+name: vydra
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - git-lfs
+  # Install GPU-enabled torch and faiss from conda so they do not get replaced
+  # by the general-purpose pip requirements used by the Docker builds.
+  - pytorch
+  - pytorch-cuda=12.1
+  - faiss-gpu=1.14.1
+  - pip:
+      - -r requirements-vydra-gpu.txt

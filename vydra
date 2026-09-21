@@ -1,0 +1,17 @@
+#!/usr/bin/env python3
+"""Workspace launcher for the bundled Vydra CLI."""
+
+from __future__ import annotations
+
+import sys
+from pathlib import Path
+
+
+PACKAGE_DIR = Path(__file__).resolve().parent / "Vydra_Docker_HF"
+sys.path.insert(0, str(PACKAGE_DIR))
+
+from vydra_cli import main  # noqa: E402
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

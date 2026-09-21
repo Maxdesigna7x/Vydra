@@ -1,0 +1,21 @@
+__pycache__/
+*.py[cod]
+*.part
+.DS_Store
+.idea/
+.vscode/
+
+# Runtime output
+Vydra_Docker_HF/jobs/
+Vydra_Docker_HF/vydra_predictions.txt
+
+# Downloaded model and release artifacts
+Vydra_Docker_HF/models/prostt5/
+Vydra_Docker_HF/artifacts/Struct_prototype_bank.pt
+Vydra_Docker_HF/artifacts/Non_Struct_prototype_bank.pt
+
+# Local environments and research data are intentionally not distributed
+.venv/
+venv/
+data/
+results/

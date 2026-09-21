@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Vydra service page for hierarchical phage protein inference.">
+  <title>Vydra | Hierarchical inference</title>
+  <link rel="icon" type="image/webp" href="assets/Vydra_icon.webp">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="service-shell" id="app">
+    <section class="hero-panel">
+      <div class="hero-content">
+        <header class="topbar">
+          <a class="brand" href="../landing_page/index.html" aria-label="Vydra landing page">
+            <img src="assets/Vydra_icon.webp" alt="" loading="eager">
+            <span><strong>Vydra</strong><small data-i18n="brand.subtitle">Hierarchical Protein Annotation</small></span>
+          </a>
+        </header>
+
+        <div class="hero-copy">
+          <h1 data-i18n="hero.title">Inferencia jerarquica de <span>proteinas de fagos</span></h1>
+          <p data-i18n="hero.subtitle">Pipeline de IA para anotar secuencias proteicas con una ruta biologica interpretable: origen celular o viral, rama de fago, estado estructural y contexto de cluster.</p>
+        </div>
+
+        <div class="hero-actions">
+          <button class="btn primary" id="upload-trigger" type="button"><img src="assets/seq.webp" alt=""><span data-i18n="actions.upload">Subir Secuencias FASTA</span><span>&rarr;</span></button>
+          <input id="sequence-file" type="file" accept=".fasta,.fa,.faa,.txt" hidden>
+          <a class="btn download" id="download-results" href="#" download hidden><span data-i18n="actions.download">Descargar resultados</span><span>&darr;</span></a>
+        </div>
+
+        <section class="pipeline-strip" aria-label="Pipeline de inferencia">
+          <article><img src="assets/seq.webp" alt=""><strong data-i18n="pipeline.sequences">Secuencias</strong><span>FASTA</span></article>
+          <b>&rarr;</b>
+          <article><img src="assets/Embedding.webp" alt=""><strong>ProstT5</strong><span>Embeddings</span></article>
+          <b>&rarr;</b>
+          <article><img src="assets/MLP.webp" alt=""><strong data-i18n="pipeline.mlps">MLPs jerarquicos</strong><span data-i18n="pipeline.classification">Clasificacion</span></article>
+          <b>&rarr;</b>
+          <article><img src="assets/FAISS_Search.webp" alt=""><strong>FAISS</strong><span data-i18n="pipeline.similarity">Similitud</span></article>
+          <b>&rarr;</b>
+          <article><img src="assets/Cluster.webp" alt=""><strong data-i18n="pipeline.interpretation">Interpretacion</strong><span data-i18n="pipeline.biology">Biologia</span></article>
+        </section>
+      </div>
+
+      <aside class="schema-card" aria-label="Esquema de clasificacion jerarquica">
+        <div class="card-head">
+          <h2 data-i18n="schema.title">Esquema de clasificacion jerarquica</h2>
+          <div class="header-toggles">
+            <button class="theme-pill" id="lang-toggle" type="button" aria-label="Cambiar idioma">EN</button>
+            <button class="theme-pill" id="theme-toggle" type="button" aria-label="Cambiar tema">Dark</button>
+          </div>
+        </div>
+        <div class="tree-diagram">
+          <svg class="tree-lines" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+            <defs>
+              <marker id="tree-arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+                <path d="M 0 0 L 10 5 L 0 10 z"></path>
+              </marker>
+            </defs>
+            <path data-edge="protein-sequence cellular" d="M44.5 16.6 V20 H20.2 V23.4"></path>
+            <path data-edge="protein-sequence viral" d="M44.5 16.6 V20 H72.2 V23.4"></path>
+            <path data-edge="cellular bacteria" d="M20.2 36.2 V38 H11.3 V40"></path>
+            <path data-edge="cellular eukaryote-cellular" d="M20.2 36.2 V38 H24.8 V40"></path>
+            <path data-edge="cellular archaea" d="M20.2 36.2 V38 H38.7 V40"></path>
+            <path data-edge="viral eukaryote-viral" d="M72.2 36.2 V38 H58.2 V40"></path>
+            <path data-edge="viral phage" d="M72.2 36.2 V38 H83.4 V40"></path>
+            <path data-edge="phage structural" d="M83.4 52.8 V56 H66.6 V58"></path>
+            <path data-edge="phage non-structural" d="M83.4 52.8 V56 H85.6 V58"></path>
+            <path data-edge="structural structural-10-classes" d="M66.6 70.8 V74.1"></path>
+            <path data-edge="non-structural non-structural-clusters" d="M85.6 70.8 V74.1"></path>
+            <path data-edge="structural-10-classes structural-clusters" d="M66.6 86.9 V87.1"></path>
+          </svg>
+          <div class="node root protein-sequence" data-node="protein-sequence"><img src="assets/protein.webp" alt=""><strong>Seq</strong></div>
+          <div class="node cellular" data-node="cellular"><img src="assets/cell.webp" alt=""><strong data-i18n="node.cellular">Celular</strong></div>
+          <div class="node active viral" data-node="viral"><img src="assets/phage.webp" alt=""><strong>Viral</strong></div>
+          <div class="node small bacteria" data-node="bacteria"><img src="assets/bacteria.webp" alt=""><span>Bacteria</span></div>
+          <div class="node small eukaryote-cellular" data-node="eukaryote-cellular"><img src="assets/cell_euk.webp" alt=""><span data-i18n="node.eukaryote">Eukariota</span></div>
+          <div class="node small archaea" data-node="archaea"><img src="assets/archaea.webp" alt=""><span>Archaea</span></div>
+          <div class="node small eukaryote-viral" data-node="eukaryote-viral"><img src="assets/viral_euk.webp" alt=""><span data-i18n="node.eukaryote">Eukariota</span></div>
+          <div class="node small active phage" data-node="phage"><img src="assets/phage.webp" alt=""><span>Phage</span></div>
+          <div class="node active structural" data-node="structural"><img src="assets/Structural_Phage.webp" alt=""><strong>Struct</strong></div>
+          <div class="node non-structural" data-node="non-structural"><img src="assets/Non_Structural_Phage.webp" alt=""><strong>Non-Struct</strong></div>
+          <div class="node structural-10-classes" data-node="structural-10-classes"><img src="assets/Diagram.webp" alt=""><strong data-i18n="node.tenClasses">10 clases</strong></div>
+          <div class="node non-structural-clusters" data-node="non-structural-clusters"><img src="assets/Clustering.webp" alt=""><strong>Clusters</strong></div>
+          <div class="node structural-clusters" data-node="structural-clusters"><img src="assets/Clustering.webp" alt=""><strong>Clusters</strong></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="results-area" id="results-area">
+      <div class="results-header">
+        <h2 data-i18n="results.title">Resultado de inferencia</h2>
+        <span class="status-dot" data-i18n="status.demoComplete">Prediccion demo completa</span>
+        <div class="result-nav" id="result-nav" hidden>
+          <button id="prev-result" type="button" data-i18n="nav.previous">Anterior</button>
+          <span id="result-position">1 / 1</span>
+          <button id="next-result" type="button" data-i18n="nav.next">Siguiente</button>
+        </div>
+        <p><span data-i18n="results.queryId">ID de consulta</span>: <b>Q7X8...A2F3</b> - <span data-i18n="results.estimatedTime">Tiempo estimado</span>: <b>14.2 s</b></p>
+      </div>
+
+      <div class="empty-state" id="empty-state" hidden>
+        <img src="assets/seq.webp" alt="" loading="lazy">
+        <h3 data-i18n="empty.title">No hay inferencia ejecutada</h3>
+        <p data-i18n="empty.description">Sube un archivo FASTA para ejecutar Vydra. Aqui se mostrara el progreso de ProstT5 y luego los resultados por secuencia.</p>
+        <div class="progress-panel" id="progress-panel" hidden>
+          <div class="progress-copy"><span id="progress-label" data-i18n="progress.detectedZero">0 secuencias detectadas</span><b id="progress-count">0 / 0</b></div>
+          <div class="progress-track"><span id="progress-bar"></span></div>
+        </div>
+      </div>
+
+      <div class="result-grid" id="result-grid">
+        <article class="result-card prediction-card">
+          <div class="mini-title"><img src="assets/target.webp" alt=""><span data-i18n="cards.prediction">Prediccion principal</span></div>
+          <h3>Phage - Estructural</h3>
+          <div class="class-pill"><img src="assets/Structural_Phage.webp" alt=""><span data-i18n="labels.class">Clase</span>: Major capsid</div>
+          <img class="capsid-visual" src="assets/Parts/Major_Capsid.webp" alt="" loading="lazy">
+        </article>
+
+        <article class="result-card confidence-card">
+          <div class="mini-title"><img src="assets/seguridad.webp" alt=""><span data-i18n="cards.confidence">Confianza</span></div>
+          <div class="confidence-ring" data-confidence="96">
+            <svg viewBox="0 0 120 120" aria-hidden="true">
+              <circle class="confidence-track" cx="60" cy="60" r="46"></circle>
+              <circle class="confidence-progress" cx="60" cy="60" r="46"></circle>
+            </svg>
+            <div class="confidence-label"><strong>96%</strong><span data-i18n="confidence.veryHigh">Muy alta</span></div>
+          </div>
+        </article>
+
+        <article class="result-card classes-card">
+          <div class="mini-title"><img src="assets/MLP.webp" alt=""><span data-i18n="cards.topClasses">Top clases jerarquicas</span></div>
+          <ul>
+            <li><span class="dot coral"></span><b><span data-i18n="labels.level">Nivel</span> 1</b><em>Viral</em><strong>0.999</strong></li>
+            <li><span class="dot green"></span><b><span data-i18n="labels.level">Nivel</span> 2</b><em>Phage</em><strong>0.998</strong></li>
+            <li><span class="dot cyan"></span><b><span data-i18n="labels.level">Nivel</span> 3</b><em>Estructural</em><strong>0.979</strong></li>
+            <li><span class="dot blue"></span><b><span data-i18n="labels.level">Nivel</span> 4</b><em>Capsid proteins</em><strong>0.962</strong></li>
+            <li><span class="dot violet"></span><b><span data-i18n="labels.level">Nivel</span> 5</b><em>Major capsid</em><strong>0.955</strong></li>
+          </ul>
+        </article>
+
+        <article class="result-card cluster-card">
+          <div class="mini-title"><img src="assets/info.webp" alt=""><span data-i18n="cards.clusterInfo">Informacion del cluster</span></div>
+          <div class="cluster-cols">
+            <div><span data-i18n="cluster.assigned">Cluster asignado</span><strong>C2034</strong></div>
+            <div><span data-i18n="cluster.size">Tamano del cluster</span><strong>1,248</strong></div>
+          </div>
+          <button class="btn detail" id="cluster-open" type="button"><span data-i18n="cluster.viewDetail">Ver cluster en detalle</span> <span>&rarr;</span></button>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal" id="cluster-modal" aria-hidden="true">
+    <button class="modal-backdrop" type="button" aria-label="Cerrar detalle de cluster"></button>
+    <article class="cluster-detail" role="dialog" aria-modal="true" aria-label="Detalle de cluster">
+      <div class="detail-head">
+        <div><span data-i18n="modal.sequenceId">Sequence ID</span><strong id="cluster-detail-seq-id">query_major_capsid_01</strong></div>
+        <b id="cluster-detail-class">Structural</b>
+      </div>
+      <div class="path-demo" id="cluster-detail-path"><span>Viral</span><i>&rarr;</i><span>Phage</span><i>&rarr;</i><span>Structural</span><i>&rarr;</i><span>Major capsid</span></div>
+      <div class="cluster-pill-demo" id="cluster-detail-pill">Cluster 1842 - structural / major_capsid - sim 0.982</div>
+      <section class="bio-panel-demo">
+        <h3 data-i18n="modal.bioContext">Biological cluster context</h3>
+        <div class="bio-grid-demo" id="cluster-detail-cards"></div>
+      </section>
+    </article>
+  </div>
+
+  <div class="modal info-modal" id="cluster-info-modal" aria-hidden="true">
+    <button class="modal-backdrop info-backdrop" type="button" aria-label="Cerrar informacion de cluster"></button>
+    <article class="cluster-info-detail" role="dialog" aria-modal="true" aria-label="Informacion de cluster">
+      <span id="cluster-info-title">Cluster detail</span>
+      <p id="cluster-info-content">N/A</p>
+    </article>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

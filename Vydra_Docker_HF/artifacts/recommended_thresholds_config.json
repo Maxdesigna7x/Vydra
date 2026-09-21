@@ -1,0 +1,20 @@
+{
+  "config": {
+    "k": 50,
+    "min_cluster_size": 2,
+    "use_gpu": true
+  },
+  "thresholds_by_class": {
+    "phage_non_struct": 0.95,
+    "baseplate": 0.995,
+    "collar": 0.97,
+    "head-tail_joining": 0.985,
+    "major_capsid": 0.99,
+    "major_tail": 0.99,
+    "minor_capsid": 0.99,
+    "minor_tail": 0.995,
+    "portal": 0.995,
+    "tail_fiber": 0.995,
+    "tail_sheath": 0.995
+  }
+}

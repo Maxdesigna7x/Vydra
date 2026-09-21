@@ -1,0 +1,981 @@
+class_number,cluster_rep_sequence_accession,family_label_ncbi_2021,families_in_class_2021,family_label_ncbi_2023,sequences_per_class,sequences_percent,max_length,mean_length,std_length,kmers_per_class,kmers_percent,protein_description,protein_function_class,host,molecule_type,genus
+0,NP_663784.1,Retroviridae,Retroviridae,Retroviridae,12256,1.1925113865571975,1550.0,334.67,176.88,54473,0.284,pol protein,Structural-Envelope,Homo sapiens,ssRNA-RT,Lentivirus
+1,YP_009072438.1,Coronaviridae,Coronaviridae-Herpesviridae-Orthomyxoviridae-Filoviridae-Flaviviridae-Astroviridae-Caliciviridae-Paramyxoviridae-Reoviridae-Retroviridae,Coronaviridae,12115,1.1787920567999712,7247.0,6770.29,1370.92,2946590,15.384,ORF1ab polyprotein,Other-Functions,Homo sapiens,ssRNA(+),Betacoronavirus
+2,AKZ15547.1,Retroviridae,Retroviridae-Coronaviridae,Retroviridae,70061,6.816950085964736,968.0,332.57,266.54,426594,2.227,envelope glycoprotein,Structural-Envelope,Homo sapiens,ssRNA-RT,Lentivirus
+3,7LX5_B,Coronaviridae,Coronaviridae-Reoviridae,Coronaviridae,7401,0.7201188619378116,1317.0,1221.58,228.16,242609,1.267,surface glycoprotein,Structural-Envelope,Homo sapiens,ssRNA(+),Betacoronavirus
+4,QIB02547.1,Orthomyxoviridae,Orthomyxoviridae,Orthomyxoviridae,43152,4.1986987069774955,495.0,452.71,55.58,361220,1.886,neuraminidase,Other-Functions,Homo sapiens,ssRNA(-),Alphainfluenzavirus
+5,AFD32428.2,Orthomyxoviridae,Orthomyxoviridae,Orthomyxoviridae,42254,4.1113231174598415,573.0,509.19,109.48,481956,2.516,hemagglutinin,Hemagglutinin,Homo sapiens,ssRNA(-),Alphainfluenzavirus
+6,6T0W_A,Orthomyxoviridae,Orthomyxoviridae,Orthomyxoviridae,36012,3.503975200122209,741.0,631.97,179.43,626212,3.269,polymerase PA,Replication-Transcription,Homo sapiens,ssRNA(-),Alphainfluenzavirus
+7,ACA25446.1,Hepadnaviridae,Hepadnaviridae,Hepadnaviridae,33626,3.2718168965708485,1007.0,410.39,278.03,290813,1.518,polymerase,Replication-Transcription,Homo sapiens,dsDNA-RT,Orthohepadnavirus
+8,ACF39684.1,Hepadnaviridae,Hepadnaviridae,Hepadnaviridae,33301,3.2401943279814973,582.0,259.76,93.98,54858,0.286,large S protein,Replication-Transcription,Homo sapiens,dsDNA-RT,Orthohepadnavirus
+9,AQW44516.1,Flaviviridae,Flaviviridae-Coronaviridae-Hepadnaviridae,Flaviviridae,81816,7.960714066788811,3105.0,469.15,597.64,1027786,5.366,polyprotein-NS5B-NS5A-NS3-4A,Polyprotein,Homo sapiens,ssRNA(+),Hepacivirus
+10,BAG82822.1,Picornaviridae,Picornaviridae-Retroviridae,Picornaviridae,32162,3.1293693876022015,2438.0,641.3,786.52,673593,3.517,polyprotein,Polyprotein,Homo sapiens,ssRNA(+),Enterovirus
+11,6SZU_C,Orthomyxoviridae,Orthomyxoviridae,Orthomyxoviridae,29461,2.8665615175719315,782.0,735.33,101.22,645787,3.372,polymerase PB2,Replication-Transcription,Homo sapiens,ssRNA(-),Alphainfluenzavirus
+12,6SZU_B,Orthomyxoviridae,Orthomyxoviridae,Orthomyxoviridae,25982,2.5280540833493066,767.0,737.59,89.47,570971,2.981,polymerase PB1,Replication-Transcription,Homo sapiens,ssRNA(-),Alphainfluenzavirus
+13,QOE76806.1,Orthomyxoviridae,Orthomyxoviridae,Orthomyxoviridae,22160,2.156172676738536,576.0,513.49,108.76,257074,1.342,hemagglutinin,Hemagglutinin,Homo sapiens,ssRNA(-),Alphainfluenzavirus
+14,QSM12402.1,Coronaviridae,Coronaviridae,Coronaviridae,21781,2.1192958967528,427.0,407.62,55.0,114247,0.596,nucleocapsid phosphoprotein,Structural-Envelope,Homo sapiens,ssRNA(+),Betacoronavirus
+15,QLC45894.1,Flaviviridae,Flaviviridae-Coronaviridae-Togaviridae-Phenuiviridae-Herpesviridae,Flaviviridae,20504,1.9950435272494107,3661.0,1908.01,1489.75,1659395,8.663,polyprotein,Polyprotein,Homo sapiens,ssRNA(+),Orthoflavivirus
+16,AAP76556.1,Retroviridae,Retroviridae,Retroviridae,20310,1.976167286306844,1288.0,329.74,125.7,81419,0.425,pol protein,Structural-Envelope,Homo sapiens,ssRNA-RT,Lentivirus
+17,ACY94426.1,Retroviridae,Retroviridae,Retroviridae,19189,1.8670937497263431,993.0,620.55,295.26,343006,1.791,envelope glycoprotein,Structural-Envelope,Macaca mulatta,ssRNA-RT,Lentivirus
+18,AHK22794.1,Flaviviridae,Flaviviridae-Pneumoviridae-Herpesviridae-Poxviridae-Picornaviridae-Paramyxoviridae-Baculoviridae-Adenoviridae,Flaviviridae,16025,1.559235881982628,3247.0,275.0,431.76,75951,0.397,polyprotein,Polyprotein,Homo sapiens,ssRNA(+),Hepacivirus
+19,QOE76828.1,Orthomyxoviridae,Orthomyxoviridae,Orthomyxoviridae,12829,1.2482644074854998,656.0,495.66,57.97,130678,0.682,nucleocapsid protein,Structural-Envelope,Homo sapiens,ssRNA(-),Alphainfluenzavirus
+20,QKF95578.1,Potyviridae,Potyviridae-Tymoviridae-Secoviridae-Closteroviridae-Alphaflexiviridae,Potyviridae,12451,1.2114849277108082,3553.0,1017.07,1216.18,470308,2.455,polyprotein,Polyprotein,Homo sapiens,ssRNA(+),Potyvirus
+21,7KJR_A,Coronaviridae,Coronaviridae,Coronaviridae,12086,1.1759703506796906,279.0,268.77,31.58,8962,0.047,ORF3a protein,Other-Functions,Homo sapiens,ssRNA(+),Betacoronavirus
+22,AKT71995.1,Reoviridae,Reoviridae,Sedoreoviridae,10204,0.9928513534945856,338.0,284.55,51.09,12875,0.067,VP7,Structural-Envelope,Homo sapiens,dsRNA,Rotavirus
+23,ARB49194.1,Reoviridae,Reoviridae,Sedoreoviridae,7726,0.7517414305271628,783.0,458.85,261.36,78453,0.41,VP4,Structural-Envelope,Homo sapiens,dsRNA,Rotavirus
+24,6IN5_A,Orthomyxoviridae,Orthomyxoviridae-Paramyxoviridae,Orthomyxoviridae,7397,0.7197296610936349,576.0,528.19,104.86,92273,0.482,hemagglutinin,Hemagglutinin,Gallus gallus,ssRNA(-),Alphainfluenzavirus
+25,AAT01719.1,Picornaviridae,Picornaviridae,Picornaviridae,7066,0.6875232912380187,2350.0,585.44,748.2,126885,0.662,VP1,Polyprotein,Bos taurus,ssRNA(+),Aphthovirus
+26,QLQ34863.1,Caliciviridae,Caliciviridae-Reoviridae,Caliciviridae,6754,0.6571656253922414,900.0,411.87,178.7,55941,0.292,VP1,Structural-Envelope,Homo sapiens,ssRNA(+),Norovirus
+27,QOE76814.1,Orthomyxoviridae,Orthomyxoviridae,Orthomyxoviridae,6385,0.6212618475169472,587.0,475.5,139.19,63048,0.329,hemagglutinin,Hemagglutinin,Homo sapiens,ssRNA(-),Betainfluenzavirus
+28,QDY92359.1,Coronaviridae,Coronaviridae,Coronaviridae,5418,0.5271725434372467,1180.0,477.99,306.28,64345,0.336,spike glycoprotein,Structural-Envelope,Gallus gallus,ssRNA(+),Gammacoronavirus
+29,QSC88236.1,Pneumoviridae,Pneumoviridae,Pneumoviridae,5119,0.4980797803350435,366.0,223.52,73.84,2676,0.014,attachment glycoprotein,Structural-Envelope,Homo sapiens,ssRNA(-),Orthopneumovirus
+30,YP_010087836.1,Geminiviridae,Geminiviridae-Caulimoviridae-Alphasatellitidae,Geminiviridae,5087,0.4949661735816305,283.0,238.72,35.47,4017,0.021,coat protein,Other-Functions,Solanum lycopersicum,ssDNA(+/-),Begomovirus
+31,QFR36400.1,Geminiviridae,Geminiviridae-Virgaviridae-Caulimoviridae-Alphasatellitidae,Geminiviridae,8286,0.8062295487118911,469.0,293.71,98.16,19963,0.104,replication-associated protein,Replication-Transcription,Solanum lycopersicum,ssDNA(+/-),Begomovirus
+32,AVM87625.1,Orthomyxoviridae,Orthomyxoviridae,Orthomyxoviridae,4547,0.4424240596177853,472.0,454.45,42.65,38468,0.201,neuraminidase,Other-Functions,Homo sapiens,ssRNA(-),Betainfluenzavirus
+33,AAA43314.1,Orthomyxoviridae,Orthomyxoviridae,Orthomyxoviridae,4401,0.42821822880533833,326.0,243.82,25.13,3743,0.02,matrix protein 1,Structural-Envelope,Homo sapiens,ssRNA(-),Alphainfluenzavirus
+34,BBJ34935.1,Pneumoviridae,Pneumoviridae,Pneumoviridae,4091,0.39805516338164937,328.0,208.48,84.99,1787,0.009,attachment glycoprotein,Structural-Envelope,Homo sapiens,ssRNA(-),Orthopneumovirus
+35,QVI17106.1,Caliciviridae,Caliciviridae,Caliciviridae,5197,0.5056691967964879,1801.0,899.11,720.98,168376,0.879,nonstructural polyprotein,Non-structural,Homo sapiens,ssRNA(+),Norovirus
+36,ALK28765.1,Coronaviridae,Coronaviridae,Coronaviridae,3663,0.3564106730547498,1582.0,1066.59,453.08,145780,0.761,spike protein,Structural-Envelope,Sus scrofa,ssRNA(+),Alphacoronavirus
+37,YP_008378665.1,Paramyxoviridae,Paramyxoviridae,Paramyxoviridae,3554,0.34580495005093664,2279.0,1535.69,949.33,228329,1.192,RNA-dependent RNA polymerase,Replication-Transcription,Homo sapiens,ssRNA(-),Orthoavulavirus
+38,ACN88111.1,Adenoviridae,Adenoviridae,Adenoviridae,3608,0.3510591614473212,992.0,412.26,305.21,32328,0.169,hexon,Other-Functions,Homo sapiens,dsDNA,Mastadenovirus
+39,AGW31675.1,Arteriviridae,Arteriviridae,Arteriviridae,3424,0.33315592261519617,3996.0,1392.65,984.31,191039,0.997,nonstructural protein 2,Non-structural,Sus scrofa,ssRNA(+),Betaarterivirus
+40,AAA43764.1,Orthomyxoviridae,Orthomyxoviridae,Orthomyxoviridae,3207,0.3120417768186139,340.0,252.72,60.79,2633,0.014,nonstructural protein 1,Non-structural,Homo sapiens,ssRNA(-),Betainfluenzavirus
+41,CAA32488.1,Retroviridae,Retroviridae,Retroviridae,3200,0.3113606753413048,309.0,254.59,22.61,2800,0.015,nef protein,Regulation-Control,Simiiformes,ssRNA-RT,Lentivirus
+42,QBJ02252.1,Reoviridae,Reoviridae,Sedoreoviridae,3195,0.310874174286084,1103.0,979.87,276.35,111994,0.585,VP1,Other-Functions,Homo sapiens,dsRNA,Rotavirus
+43,QCF24330.1,Rhabdoviridae,Rhabdoviridae,Rhabdoviridae,3129,0.3044523603571696,545.0,488.87,92.4,32961,0.172,glycoprotein,Glycoprotein,Canis lupus familiaris,ssRNA(-),Lyssavirus
+44,AVM87430.1,Togaviridae,Togaviridae-Flaviviridae,Togaviridae,3099,0.3015333540258449,1363.0,805.53,461.49,83272,0.435,structural polyprotein,Structural-Envelope,Homo sapiens,ssRNA(+),Alphavirus
+45,P35956.2,Retroviridae,Retroviridae,Retroviridae,3027,0.2945277388306655,1506.0,336.12,298.37,17916,0.094,gag protein,Structural-Envelope,Ovis aries,ssRNA-RT,Lentivirus
+46,AAD10459.1,Rhabdoviridae,Rhabdoviridae,Rhabdoviridae,3027,0.2945277388306655,481.0,354.42,131.15,15662,0.082,nucleoprotein,Structural-Envelope,Canis lupus familiaris,ssRNA(-),Lyssavirus
+47,YP_009091837.1,Paramyxoviridae,Paramyxoviridae,Paramyxoviridae,2898,0.28197601160596913,662.0,411.16,197.84,25011,0.131,fusion protein,Structural-Envelope,Gallus gallus,ssRNA(-),Orthoavulavirus
+48,QAA77599.1,Reoviridae,Reoviridae,Sedoreoviridae,2843,0.2766244999985405,851.0,751.85,192.5,66333,0.346,VP3,Other-Functions,Homo sapiens,dsRNA,Rotavirus
+49,YP_009094332.1,Paramyxoviridae,Paramyxoviridae,Paramyxoviridae,2823,0.27467849577765735,542.0,226.47,151.58,6898,0.036,nucleoprotein,Structural-Envelope,Homo sapiens,ssRNA(-),Morbillivirus
+50,ADW11143.1,Reoviridae,Reoviridae,Sedoreoviridae,2771,0.2696188848033611,517.0,471.74,58.7,25916,0.135,NSP1,Non-structural,Homo sapiens,dsRNA,Rotavirus
+51,ADM15528.1,Reoviridae,Reoviridae,Sedoreoviridae,2656,0.25842936053328297,441.0,339.47,99.68,9971,0.052,VP6,Other-Functions,Homo sapiens,dsRNA,Rotavirus
+52,YP_003896047.1,Reoviridae,Reoviridae,Sedoreoviridae,2626,0.2555103542019583,913.0,802.12,213.3,68220,0.356,VP2,Other-Functions,Homo sapiens,dsRNA,Rotavirus
+53,AAF82566.1,Flaviviridae,Flaviviridae,Flaviviridae,2623,0.2552184535688258,4040.0,402.95,864.17,28566,0.149,polyprotein,Polyprotein,Homo sapiens,ssRNA(+),Hepacivirus
+54,QIH29414.1,Pneumoviridae,Pneumoviridae-Coronaviridae,Pneumoviridae,2689,0.2616402674977402,589.0,428.82,185.31,23833,0.124,fusion protein,Structural-Envelope,Homo sapiens,ssRNA(-),Orthopneumovirus
+55,AAZ39526.1,Papillomaviridae,Papillomaviridae,Papillomaviridae,2496,0.24286132676621777,647.0,346.02,189.31,15278,0.08,L1,Other-Functions,Homo sapiens,dsDNA,Alphapapillomavirus
+56,QCF29645.1,Hepeviridae,Hepeviridae,Hepeviridae,2478,0.24110992296742292,677.0,291.7,230.42,13053,0.068,capsid protein,Structural-Envelope,Homo sapiens,ssRNA(+),Paslahepevirus
+57,QFX66041.1,Flaviviridae,Flaviviridae-Baculoviridae-Mimiviridae-Phycodnaviridae-Marseilleviridae,Flaviviridae,2785,0.27098108775797936,5068.0,490.35,922.59,40437,0.211,polyprotein,Polyprotein,Bos taurus,ssRNA(+),Pestivirus
+58,AXU24940.1,Potyviridae,Potyviridae-Bromoviridae,Potyviridae,2319,0.22563918941140185,3535.0,920.9,1179.68,77011,0.402,polyprotein,Polyprotein,Glycine max,ssRNA(+),Potyvirus
+59,AFU32554.1,Retroviridae,Retroviridae,Retroviridae,2233,0.21727137126160428,939.0,520.55,46.23,26085,0.136,pol protein,Polyprotein,Homo sapiens,ssRNA-RT,Lentivirus
+60,NP_077121.1,Papillomaviridae,Papillomaviridae,Papillomaviridae,2223,0.21629836915116268,524.0,467.84,27.74,19387,0.101,L2,Other-Functions,Homo sapiens,dsDNA,Alphapapillomavirus
+61,QXQ21752.1,Parvoviridae,Parvoviridae,Parvoviridae,2214,0.21542266725176526,785.0,464.17,199.22,22996,0.12,capsid protein,Structural-Envelope,Canis lupus familiaris,ssDNA(+/-),Protoparvovirus
+62,QJI53616.1,Circoviridae,Circoviridae,Circoviridae,2129,0.20715214931301185,369.0,281.8,53.91,1724,0.009,replication-associated protein,Replication-Transcription,Sus scrofa,ssDNA(+/-),Circovirus
+63,QCY50220.1,Picornaviridae,Picornaviridae,Picornaviridae,2030,0.19751942841964026,2208.0,558.56,728.89,33307,0.174,polyprotein,Polyprotein,Homo sapiens,ssRNA(+),Parechovirus
+64,AFM55839.1,Paramyxoviridae,Paramyxoviridae,Paramyxoviridae,2023,0.19683832694233117,637.0,541.94,149.93,26934,0.141,hemagglutinin,Hemagglutinin,Canis lupus familiaris,ssRNA(-),Morbillivirus
+65,QAA77604.1,Reoviridae,Reoviridae,Sedoreoviridae,1996,0.1942112212441389,336.0,307.29,34.38,1922,0.01,NSP2,Other-Functions,Homo sapiens,dsRNA,Rotavirus
+66,ASV45868.1,Rhabdoviridae,Rhabdoviridae,Rhabdoviridae,1992,0.19382202039996227,2803.0,1923.98,582.05,163641,0.854,polymerase,Replication-Transcription,Canis lupus familiaris,ssRNA(-),Lyssavirus
+67,QAA79499.1,Flaviviridae,Flaviviridae,Flaviviridae,1987,0.19333551934474147,3433.0,3183.98,646.75,286961,1.498,polyprotein,Polyprotein,Corvus brachyrhynchos,ssRNA(+),Orthoflavivirus
+68,CAX33877.1,Birnaviridae,Birnaviridae,Birnaviridae,1843,0.17932428895438274,1060.0,313.93,247.22,8481,0.044,VP2,Polyprotein,Gallus gallus,dsRNA,Avibirnavirus
+69,CAB65340.1,Retroviridae,Retroviridae-Poxviridae,Retroviridae,1809,0.1760160817788814,2378.0,375.68,294.63,14062,0.073,envelope protein,Structural-Envelope,Phascolarctos cinereus,ssRNA-RT,Gammaretrovirus
+70,AWK57622.1,Caliciviridae,Caliciviridae,Caliciviridae,1751,0.17037266953832023,2305.0,588.03,794.77,34397,0.18,polyprotein,Polyprotein,Homo sapiens,ssRNA(+),Sapovirus
+71,BBC83614.1,Papillomaviridae,Papillomaviridae,Papillomaviridae,1834,0.17844858705498534,671.0,561.49,176.37,23161,0.121,E1,Other-Functions,Homo sapiens,dsDNA,Alphapapillomavirus
+72,AMQ09749.1,Paramyxoviridae,Paramyxoviridae,Paramyxoviridae,1742,0.1694969676389228,626.0,560.32,86.28,23920,0.125,hemagglutinin-neuraminidase,Hemagglutinin,Gallus gallus,ssRNA(-),Orthoavulavirus
+73,YP_009215303.1,Parvoviridae,Parvoviridae,Parvoviridae,1770,0.17222137354815922,724.0,390.79,221.76,13964,0.073,VP1,Structural-Envelope,Homo sapiens,ssDNA(+/-),Bocaparvovirus
+74,AAB19548.2,Retroviridae,Retroviridae,Retroviridae,1689,0.16434005645358246,999.0,332.76,211.81,8938,0.047,envelope glycoprotein,Structural-Envelope,Ovis aries,ssRNA-RT,Lentivirus
+75,QVW10123.1,Astroviridae,Astroviridae,Astroviridae,1611,0.15675063999213815,1415.0,283.03,356.5,9837,0.051,RNA-dependent RNA polymerase,Replication-Transcription,Sus scrofa,ssRNA(+),Mamastrovirus
+76,QFX69115.1,Pneumoviridae,Pneumoviridae-Paramyxoviridae,Pneumoviridae,1592,0.15490193598229915,2411.0,2105.03,262.22,144926,0.757,RNA-directed RNA polymerase L,Replication-Transcription,Homo sapiens,ssRNA(-),Orthopneumovirus
+77,CAG29088.1,Geminiviridae,Geminiviridae-Potyviridae,Geminiviridae,1585,0.15422083450499002,368.0,290.94,20.15,1611,0.008,movement protein,Transport,Manihot esculenta,ssDNA(+/-),Begomovirus
+78,WP_016044687.1,Papillomaviridae,Papillomaviridae,Papillomaviridae,1560,0.15178832922888608,594.0,334.79,186.0,8901,0.046,capsid L1,Structural-Envelope,Homo sapiens,dsDNA,Deltapapillomavirus
+79,YP_009094180.1,Rhabdoviridae,Rhabdoviridae,Rhabdoviridae,1542,0.15003692543009126,305.0,278.6,46.03,1303,0.007,phosphoprotein,Other-Functions,Canis lupus familiaris,ssRNA(-),Lyssavirus
+80,YP_009505611.1,Picornaviridae,Picornaviridae-Hepeviridae,Picornaviridae,1503,0.1462422171993691,2302.0,469.81,655.1,19104,0.1,polyprotein-capsid,Polyprotein,Homo sapiens,ssRNA(+),Hepatovirus
+81,ACX32354.1,Papillomaviridae,Papillomaviridae,Papillomaviridae,1532,0.14906392331964968,424.0,360.09,37.86,5574,0.029,early E2,Regulation-Control,Homo sapiens,dsDNA,Alphapapillomavirus
+82,NP_941983.1,Hantaviridae,Hantaviridae,Hantaviridae,1373,0.13359318976362858,1148.0,670.87,454.66,29426,0.154,glycoprotein precursor,Glycoprotein,Rattus norvegicus,ssRNA(-),Orthohantavirus
+83,ATP66731.1,Coronaviridae,Coronaviridae,Coronaviridae,1446,0.14069610516985212,7467.0,2842.48,3122.38,188544,0.984,RNA-dependent RNA polymerase,Replication-Transcription,Homo sapiens,ssRNA(+),Betacoronavirus
+84,QFE31727.1,Retroviridae,Retroviridae,Retroviridae,1354,0.1317444857537896,884.0,328.51,208.33,7049,0.037,envelope protein,Structural-Envelope,Equus caballus,ssRNA-RT,Lentivirus
+85,QOI17587.1,Papillomaviridae,Papillomaviridae,Papillomaviridae,1349,0.1312579846985688,677.0,535.31,170.38,17871,0.093,early E1,Replication-Transcription,Homo sapiens,dsDNA,Alphapapillomavirus
+86,ABZ03979.1,Geminiviridae,Geminiviridae,Geminiviridae,1312,0.127657876889935,394.0,313.25,48.32,2656,0.014,replication-associated protein,Replication-Transcription,Cicer arietinum,ssDNA(+/-),Mastrevirus
+87,0905196A,Adenoviridae,Adenoviridae,Adenoviridae,1288,0.12532267182487516,1977.0,786.96,393.05,33473,0.175,DNA polymerase,Replication-Transcription,Homo sapiens,dsDNA,Mastadenovirus
+88,YP_009505804.1,Arenaviridae,Arenaviridae,Arenaviridae,1282,0.12473887055861024,593.0,430.11,177.08,11219,0.059,nucleoprotein,Structural-Envelope,Homo sapiens,ssRNA(+/-),Mammarenavirus
+89,QKI28857.1,Alphasatellitidae,Alphasatellitidae-Nanoviridae-Geminiviridae,Alphasatellitidae,1282,0.12473887055861024,342.0,295.7,34.01,1216,0.006,replication associated protein,Replication-Transcription,Gossypium hirsutum,ssDNA,Colecusatellite
+90,AKZ66193.1,Arteriviridae,Arteriviridae,Arteriviridae,1273,0.12386316865921282,290.0,255.47,8.88,1256,0.007,GP3,Structural-Envelope,Sus scrofa,ssRNA(+),Betaarterivirus
+91,NP_062875.1,Caliciviridae,Caliciviridae,Caliciviridae,1249,0.12152796359415305,2344.0,1080.72,941.41,51917,0.271,polyprotein,Polyprotein,Oryctolagus cuniculus,ssRNA(+),Lagovirus
+92,QGM78573.1,Orthomyxoviridae,Orthomyxoviridae,Orthomyxoviridae,1247,0.12133336317206472,498.0,475.04,66.4,10975,0.057,nucleocapsid protein,Structural-Envelope,Homo sapiens,ssRNA(-),Alphainfluenzavirus
+93,QCZ35343.1,Caliciviridae,Caliciviridae,Caliciviridae,1222,0.11890085789596078,2643.0,369.9,434.01,10949,0.057,major capsid protein,Structural-Envelope,Felis catus,ssRNA(+),Vesivirus
+94,YP_008439200.1,Coronaviridae,Coronaviridae,Coronaviridae,1217,0.11841435684073999,6825.0,4612.19,2983.05,265459,1.386,polyprotein,Replication-Transcription,Sus scrofa,ssRNA(+),Alphacoronavirus
+95,AAD30534.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,1207,0.11744135473029842,302.0,220.15,63.69,511,0.003,K1 glycoprotein,Other-Functions,Homo sapiens,dsDNA,Rhadinovirus
+96,AXE73510.1,Paramyxoviridae,Paramyxoviridae,Paramyxoviridae,1206,0.11734405451925425,553.0,315.41,197.64,6271,0.033,fusion protein,Structural-Envelope,Gallus gallus,ssRNA(-),Orthoavulavirus
+97,YP_009448192.1,Picornaviridae,Picornaviridae,Picornaviridae,1203,0.11705215388612177,2668.0,508.95,715.75,16778,0.088,polyprotein,Polyprotein,Sus scrofa,ssRNA(+),Kobuvirus
+98,AAD31543.1,Flaviviridae,Flaviviridae,Flaviviridae,1201,0.11685755346403347,2942.0,638.13,923.68,24691,0.129,polyprotein,Polyprotein,Homo sapiens,ssRNA(+),Pegivirus
+99,ACA52156.1,Coronaviridae,Coronaviridae,Coronaviridae,1195,0.1162737521977685,6988.0,1168.96,2112.44,59077,0.308,RNA-dependent RNA polymerase,Replication-Transcription,Felis catus,ssRNA(+),Alphacoronavirus
+100,YP_010086240.1,Phenuiviridae,Phenuiviridae-Peribunyaviridae,Phenuiviridae,1192,0.11598185156463604,2210.0,1583.19,821.89,78852,0.412,RNA-dependent RNA polymerase,Replication-Transcription,Homo sapiens,ssRNA(+/-),Bandavirus
+101,CAA24906.1,Pneumoviridae,Pneumoviridae,Pneumoviridae,1186,0.11539805029837108,467.0,229.66,124.08,2129,0.011,N protein,Other-Functions,Homo sapiens,ssRNA(-),Orthopneumovirus
+102,QTJ01860.1,Solemoviridae,Solemoviridae-Luteoviridae-Tombusviridae,Solemoviridae,1162,0.11306284523331131,1101.0,551.43,330.13,17005,0.089,RNA-dependent RNA polymerase,Replication-Transcription,Saccharum sp.,ssRNA(+),Polerovirus
+103,AHC95553.1,Arenaviridae,Arenaviridae,Arenaviridae,1154,0.11228444354495805,526.0,414.47,114.3,7983,0.042,glycoprotein precursor,Glycoprotein,Homo sapiens,ssRNA(+/-),Mammarenavirus
+104,AVM87655.1,Hantaviridae,Hantaviridae,Hantaviridae,1149,0.11179794248973726,474.0,304.33,124.91,3820,0.02,nucleocapsid protein,Structural-Envelope,Myodes glareolus,ssRNA(-),Orthohantavirus
+105,ABX25838.1,Retroviridae,Retroviridae,Retroviridae,1132,0.11014383890198658,896.0,392.4,279.49,8834,0.046,envelope glycoprotein,Structural-Envelope,Felis catus,ssRNA-RT,Lentivirus
+106,ADI60318.1,Arteriviridae,Arteriviridae,Arteriviridae,1128,0.10975463805780994,257.0,254.12,5.3,1118,0.006,GP2,Other-Functions,Sus scrofa,ssRNA(+),Betaarterivirus
+107,QBX91018.1,Caliciviridae,Caliciviridae,Caliciviridae,1070,0.1041112258172488,269.0,263.81,15.93,1033,0.005,VP2,Structural-Envelope,Homo sapiens,ssRNA(+),Norovirus
+108,AJO72803.1,Paramyxoviridae,Paramyxoviridae,Paramyxoviridae,1037,0.1009003188527916,687.0,478.48,195.23,11739,0.061,fusion protein,Structural-Envelope,Homo sapiens,ssRNA(-),Morbillivirus
+109,AYI50358.1,Togaviridae,Togaviridae,Togaviridae,1026,0.09983001653130585,2511.0,1808.89,931.6,78482,0.41,non-structural polyprotein precursor P1234,Non-structural,Homo sapiens,ssRNA(+),Alphavirus
+110,YP_009361853.1,Hantaviridae,Hantaviridae,Hantaviridae,1010,0.09827321315459933,2158.0,949.35,956.51,37384,0.195,RNA-dependent RNA polymerase,Replication-Transcription,Rattus norvegicus,ssRNA(-),Orthohantavirus
+111,AAK74119.1,Reoviridae,Reoviridae,Sedoreoviridae,1009,0.09817591294355517,599.0,304.82,30.89,1016,0.005,NSP3,Non-structural,Homo sapiens,dsRNA,Rotavirus
+112,QEO75949.1,Peribunyaviridae,Peribunyaviridae,Peribunyaviridae,972,0.09457580513492134,1469.0,1179.05,468.03,44071,0.23,polyprotein,Polyprotein,Homo sapiens,ssRNA(-),Orthobunyavirus
+113,YP_009094360.1,Paramyxoviridae,Paramyxoviridae,Paramyxoviridae,1087,0.10576532940499948,439.0,389.27,33.42,5207,0.027,phosphoprotein,Other-Functions,Gallus gallus,ssRNA(-),Orthoavulavirus
+114,QPB10708.1,Coronaviridae,Coronaviridae,Coronaviridae,958,0.09321360218030313,6707.0,3305.46,2939.11,146500,0.765,ORF1ab,Other-Functions,Gallus gallus,ssRNA(+),Gammacoronavirus
+115,QSD99081.1,Hepeviridae,Hepeviridae,Hepeviridae,948,0.09224060006986155,1783.0,512.82,635.31,15140,0.079,polyprotein,Other-Functions,Homo sapiens,ssRNA(+),Paslahepevirus
+116,YP_009345142.1,Tospoviridae,Tospoviridae-Peribunyaviridae,Tospoviridae,927,0.09019729563793424,281.0,254.63,34.05,781,0.004,nucleocapsid protein,Structural-Envelope,Solanum lycopersicum,ssRNA(+/-),Orthotospovirus
+117,QKO28323.1,Rhabdoviridae,Rhabdoviridae,Rhabdoviridae,918,0.08932159373853682,557.0,436.01,139.21,7942,0.041,glycoprotein,Glycoprotein,Oncorhynchus mykiss,ssRNA(-),Novirhabdovirus
+118,YP_052942.1,Reoviridae,Reoviridae,Sedoreoviridae,916,0.0891269933164485,1345.0,1201.37,303.65,42313,0.221,RNA-dependent RNA polymerase,Replication-Transcription,Ovis aries,dsRNA,Orbivirus
+119,ATP66856.1,Flaviviridae,Flaviviridae,Flaviviridae,906,0.08815399120600692,4023.0,1290.44,1544.75,45999,0.24,polyprotein,Polyprotein,Sus scrofa,ssRNA(+),Pestivirus
+120,AND80849.1,Togaviridae,Togaviridae,Togaviridae,901,0.08766749015078613,2543.0,2218.99,678.41,86331,0.451,nonstructural polyprotein,Non-structural,Homo sapiens,ssRNA(+),Alphavirus
+121,NP_044929.1,Retroviridae,Retroviridae,Retroviridae,890,0.0865971878293004,1220.0,342.67,403.69,7566,0.04,integrase,Polyprotein,Homo sapiens,ssRNA-RT,Spumavirus
+122,QDY92366.1,Coronaviridae,Coronaviridae,Coronaviridae,890,0.0865971878293004,418.0,360.44,97.67,4234,0.022,nucleocapsid protein,Structural-Envelope,Gallus gallus,ssRNA(+),Gammacoronavirus
+123,QSJ02954.1,Coronaviridae,Coronaviridae,Coronaviridae,886,0.08620798698512376,1383.0,894.55,539.15,28721,0.15,spike glycoprotein,Structural-Envelope,Homo sapiens,ssRNA(+),Betacoronavirus
+124,AGO86045.1,Iflaviridae,Iflaviridae-Dicistroviridae,Iflaviridae,878,0.08542958529677051,2895.0,382.24,649.13,8364,0.044,polyprotein,Polyprotein,Apis mellifera,ssRNA(+),Iflavirus
+125,AJE30400.1,Paramyxoviridae,Paramyxoviridae,Paramyxoviridae,853,0.08299708002066657,510.0,412.11,150.98,6638,0.035,phosphoprotein,Other-Functions,Homo sapiens,ssRNA(-),Morbillivirus
+126,QIM73742.1,Arenaviridae,Arenaviridae,Arenaviridae,817,0.07949427242307688,2290.0,1871.97,751.0,64891,0.339,polymerase,Replication-Transcription,Homo sapiens,ssRNA(+/-),Mammarenavirus
+127,QCC62316.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,816,0.07939697221203272,426.0,261.49,118.88,1851,0.01,latent membrane protein 1,Structural-Envelope,Homo sapiens,dsDNA,Lymphocryptovirus
+128,QKN88761.1,Parvoviridae,Parvoviridae,Parvoviridae,815,0.07929967200098857,747.0,543.81,238.93,12194,0.064,capsid protein,Structural-Envelope,Homo sapiens,ssDNA(+/-),Dependoparvovirus
+129,AMB66138.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,812,0.0790077713678561,1324.0,1009.62,383.66,30000,0.157,DNA polymerase,Replication-Transcription,Homo sapiens,dsDNA,Simplexvirus
+130,NP_042860.2,Closteroviridae,Closteroviridae,Closteroviridae,810,0.07881317094576779,3582.0,532.62,904.18,13488,0.07,polyprotein,Polyprotein,Citrus x paradisi,ssRNA(+),Closterovirus
+131,QBK47249.1,Paramyxoviridae,Paramyxoviridae,Paramyxoviridae,805,0.078326669890547,400.0,355.44,43.17,3087,0.016,matrix protein,Structural-Envelope,Gallus gallus,ssRNA(-),Orthoavulavirus
+132,QRN45811.1,Reoviridae,Reoviridae,Sedoreoviridae,797,0.07754826820219372,964.0,824.63,272.4,21741,0.114,VP2,Structural-Envelope,Ovis aries,dsRNA,Orbivirus
+133,AST08162.1,Hepeviridae,Hepeviridae,Hepeviridae,783,0.07618606524757553,1722.0,1293.26,675.82,40732,0.213,polyprotein,Polyprotein,Homo sapiens,ssRNA(+),Paslahepevirus
+134,AVO64743.1,Reoviridae,Reoviridae,Sedoreoviridae,771,0.07501846271504563,654.0,624.62,79.33,13183,0.069,VP4-capping,Structural-Envelope,Bos taurus,dsRNA,Orbivirus
+135,QBL55999.1,Astroviridae,Astroviridae,Astroviridae,755,0.0734616593383391,843.0,365.59,302.15,6240,0.033,capsid protein,Structural-Envelope,Homo sapiens,ssRNA(+),Mamastrovirus
+136,YP_009361877.1,Parvoviridae,Parvoviridae,Parvoviridae,754,0.07336435912729496,641.0,265.06,219.97,3374,0.018,nonstructural protein 1,Non-structural,Neovison vison,ssDNA(+/-),Amdoparvovirus
+137,Q65030.1,Secoviridae,Secoviridae,Secoviridae,753,0.0732670589162508,1131.0,547.61,324.63,10558,0.055,coat protein,Polyprotein,Vitis vinifera,ssRNA(+),Nepovirus
+138,YP_009329838.1,Polyomaviridae,Polyomaviridae,Polyomaviridae,753,0.0732670589162508,499.0,262.85,113.95,1534,0.008,VP1,Structural-Envelope,Homo sapiens,dsDNA,Betapolyomavirus
+139,NP_049560.1,Retroviridae,Retroviridae,Retroviridae,747,0.07268325764998584,1217.0,311.65,143.19,2799,0.015,envelope glycoprotein,Replication-Transcription,Homo sapiens,ssRNA-RT,Deltaretrovirus
+140,YP_009094449.1,Paramyxoviridae,Paramyxoviridae,Paramyxoviridae,740,0.07200215617267673,576.0,495.32,139.41,8179,0.043,hemagglutinin-neuraminidase,Hemagglutinin,Homo sapiens,ssRNA(-),Respirovirus
+141,NP_813799.1,Closteroviridae,Closteroviridae,Closteroviridae,738,0.07180755575058842,549.0,265.18,153.04,2169,0.011,heat shock protein 70-like protein,Other-Functions,Vitis vinifera,ssRNA(+),Ampelovirus
+142,AGN54067.1,Tombusviridae,Tombusviridae-Solemoviridae-Luteoviridae,Tombusviridae,737,0.07171025553954427,673.0,319.19,202.5,3669,0.019,coat protein,Other-Functions,Triticum aestivum,ssRNA(+),Luteovirus
+143,QLA47022.1,Peribunyaviridae,Peribunyaviridae-Hantaviridae,Peribunyaviridae,735,0.07151565511745596,2296.0,1789.44,845.57,56036,0.293,RNA-dependent RNA polymerase,Replication-Transcription,Homo sapiens,ssRNA(-),Orthobunyavirus
+144,QIS60240.1,Geminiviridae,Geminiviridae,Geminiviridae,730,0.07102915406223516,299.0,256.05,14.58,720,0.004,nuclear shuttle protein,Other-Functions,Solanum lycopersicum,ssDNA(+/-),Begomovirus
+145,YP_009507713.1,Reoviridae,Reoviridae,Sedoreoviridae,722,0.0702507523738819,981.0,813.66,226.01,19446,0.102,VP3,Other-Functions,Bos taurus,dsRNA,Orbivirus
+146,NP_987087.2,Astroviridae,Astroviridae,Astroviridae,711,0.06918045005239616,1638.0,388.73,386.83,6421,0.034,polymerase,Replication-Transcription,Gallus gallus,ssRNA(+),Avastrovirus
+147,BBA66889.1,Paramyxoviridae,Paramyxoviridae,Paramyxoviridae,700,0.06811014773091043,615.0,534.85,126.04,9136,0.048,hemagglutinin-neuraminidase,Hemagglutinin,Homo sapiens,ssRNA(-),Orthorubulavirus
+148,AGC97158.1,Paramyxoviridae,Paramyxoviridae,Paramyxoviridae,695,0.06762364667568964,570.0,463.58,95.84,6378,0.033,nucleoprotein,Structural-Envelope,Gallus gallus,ssRNA(-),Orthoavulavirus
+149,AGM61335.1,Retroviridae,Retroviridae,Retroviridae,692,0.06733174604255716,649.0,380.34,48.04,2997,0.016,gag protein,Structural-Envelope,Macaca mulatta,ssRNA-RT,Spumavirus
+150,AZS32960.1,Caliciviridae,Caliciviridae,Caliciviridae,692,0.06733174604255716,279.0,253.22,16.76,653,0.003,VP2 structural,Structural-Envelope,Homo sapiens,ssRNA(+),Norovirus
+151,YP_003084394.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,690,0.06713714562046885,1000.0,736.56,300.12,16626,0.087,glycoprotein B,Other-Functions,Homo sapiens,dsDNA,Varicellovirus
+152,AHF71065.1,Phenuiviridae,Phenuiviridae,Phenuiviridae,673,0.06548304203271817,1080.0,935.37,313.72,22151,0.116,membrane glycoprotein polyprotein,Structural-Envelope,Homo sapiens,ssRNA(+/-),Bandavirus
+153,NP_690583.1,Filoviridae,Filoviridae,Filoviridae,673,0.06548304203271817,677.0,538.19,188.98,8252,0.043,virion spike glycoprotein precursor,Structural-Envelope,Homo sapiens,ssRNA(-),Orthoebolavirus
+154,Q67726.1,Astroviridae,Astroviridae,Astroviridae,667,0.06489924076645323,1436.0,369.64,340.87,5593,0.029,RNA-dependent RNA polymerase,Replication-Transcription,Homo sapiens,ssRNA(+),Mamastrovirus
+155,QKO01647.1,Matonaviridae,Matonaviridae,Matonaviridae,663,0.06451003992227658,1098.0,448.05,300.07,6411,0.033,structural polyprotein,Structural-Envelope,Homo sapiens,ssRNA(+),Rubivirus
+156,AAV48581.1,Filoviridae,Filoviridae,Filoviridae,648,0.06305053675661423,2213.0,2163.4,297.89,58763,0.307,polymerase,Replication-Transcription,Homo sapiens,ssRNA(-),Orthoebolavirus
+157,AIF74221.1,Parvoviridae,Parvoviridae,Parvoviridae,648,0.06305053675661423,748.0,492.71,218.03,7852,0.041,VP2 capsid,Structural-Envelope,Neovison vison,ssDNA(+/-),Amdoparvovirus
+158,YP_009552475.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,647,0.06295323654557007,1034.0,421.32,300.69,6194,0.032,glycoprotein B,Glycoprotein,Equus caballus,dsDNA,Percavirus
+159,YP_010086571.1,Parvoviridae,Parvoviridae,Parvoviridae,632,0.0614937333799077,843.0,395.73,279.69,5742,0.03,VP1-capsid,Structural-Envelope,Homo sapiens,ssDNA(+/-),Erythroparvovirus
+160,QTE03611.1,Genomoviridae,Genomoviridae-Circoviridae,Genomoviridae,744,0.07239135701685337,401.0,306.85,45.71,1151,0.006,replication-associated protein,Replication-Transcription,Pteropus tonganus,ssDNA,Gemycircularvirus
+161,CAN89112.1,Reoviridae,Reoviridae,Sedoreoviridae,630,0.061299132957819386,362.0,329.43,15.64,1279,0.007,VP6,Structural-Envelope,Ovis aries,dsRNA,Orbivirus
+162,YP_031678.1,Retroviridae,Retroviridae,Retroviridae,629,0.06120183274677524,1125.0,456.81,136.6,5534,0.029,envelope protein,Structural-Envelope,Gallus gallus,ssRNA-RT,Alpharetrovirus
+163,BAA00921.1,Paramyxoviridae,Paramyxoviridae,Paramyxoviridae,629,0.06120183274677524,615.0,511.55,113.3,7043,0.037,phosphoprotein,Other-Functions,Homo sapiens,ssRNA(-),Respirovirus
+164,ALE20411.1,Reoviridae,Reoviridae,Sedoreoviridae,625,0.06081263190259859,337.0,322.44,38.19,1125,0.006,capsid glycoprotein VP7,Structural-Envelope,Sus scrofa,dsRNA,Rotavirus
+165,NP_056907.1,Retroviridae,Retroviridae,Retroviridae,624,0.06071533169155444,1468.0,688.89,419.1,13292,0.069,gag protein,Structural-Envelope,Homo sapiens,ssRNA-RT,Deltaretrovirus
+166,NP_044335.1,Betaflexiviridae,Betaflexiviridae,Betaflexiviridae,623,0.06061803148051028,2105.0,408.66,580.94,6120,0.032,coat protein,Polyprotein,Malus domestica,ssRNA(+),Capillovirus
+167,AAB19495.1,Paramyxoviridae,Paramyxoviridae,Paramyxoviridae,621,0.06042343105842196,943.0,491.35,93.04,6252,0.033,fusion protein,Structural-Envelope,Homo sapiens,ssRNA(-),Orthorubulavirus
+168,QKU35692.1,Mimiviridae,Mimiviridae-Marseilleviridae,Mimiviridae,619,0.06022883063633365,755.0,353.0,128.36,2889,0.015,putative ankyrin repeat protein,Other-Functions,Acanthamoeba castellanii,dsDNA,Mimivirus
+169,6BK6_A,Paramyxoviridae,Paramyxoviridae,Paramyxoviridae,613,0.0596450293700687,367.0,324.56,57.03,1366,0.007,matrix protein,Structural-Envelope,Homo sapiens,ssRNA(-),Morbillivirus
+170,QGU18502.1,Reoviridae,Reoviridae,Sedoreoviridae,599,0.058282826415450496,563.0,514.88,61.88,6941,0.036,VP5-outer capsid,Structural-Envelope,Ovis aries,dsRNA,Orbivirus
+171,AGU09694.1,Betaflexiviridae,Betaflexiviridae,Betaflexiviridae,597,0.058088225993362184,2188.0,971.13,828.83,21368,0.112,replicase,Replication-Transcription,Vitis vinifera,ssRNA(+),Foveavirus
+172,NP_777385.2,Retroviridae,Retroviridae,Retroviridae,596,0.05799092578231802,515.0,281.55,156.94,2012,0.011,envelope glycoprotein,Structural-Envelope,Bos taurus,ssRNA-RT,Deltaretrovirus
+173,NP_116409.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,594,0.0577963253602297,944.0,551.15,344.97,9457,0.049,glycoprotein B,Structural-Envelope,Homo sapiens,dsDNA,Cytomegalovirus
+174,YP_009179299.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,588,0.05721252409396476,1084.0,598.52,389.85,10580,0.055,DNA polymerase,Replication-Transcription,Homo sapiens,dsDNA,Lymphocryptovirus
+175,AGO32039.1,Reoviridae,Reoviridae,Spinareoviridae,587,0.0571152238829206,339.0,300.26,39.97,732,0.004,sigma C,Cellular-Regulation,Gallus gallus,dsRNA,Orthoreovirus
+176,AOR17474.1,Picornaviridae,Picornaviridae-Coronaviridae,Picornaviridae,574,0.05585032113934655,2188.0,275.03,151.64,730,0.004,VP1,Structural-Envelope,Homo sapiens,ssRNA(+),Enterovirus
+177,AAV48848.3,Birnaviridae,Birnaviridae,Birnaviridae,570,0.05546112029516992,980.0,521.05,302.19,7412,0.039,polyprotein,Polyprotein,Oncorhynchus mykiss,dsRNA,Aquabirnavirus
+178,CAX33878.1,Birnaviridae,Birnaviridae,Birnaviridae,565,0.05497461923994913,1045.0,540.33,320.74,8305,0.043,VP1- RNA-dependent RNA polymerase,Replication-Transcription,Gallus gallus,dsRNA,Avibirnavirus
+179,0711245A,Retroviridae,Retroviridae,Retroviridae,553,0.053807016707419233,2514.0,693.97,514.32,12125,0.063,gag-pol polyprotein gPr80,Structural-Envelope,Mus musculus,ssRNA-RT,Gammaretrovirus
+180,APC23164.1,Parvoviridae,Parvoviridae,Parvoviridae,549,0.0534178158632426,693.0,340.3,240.96,3585,0.019,non-structural protein NS1,Non-structural,Homo sapiens,ssDNA(+/-),Erythroparvovirus
+181,ACO92353.1,Picornaviridae,Picornaviridae,Picornaviridae,547,0.05322321544115429,2322.0,791.65,896.32,15272,0.08,polyprotein,Polyprotein,Homo sapiens,ssRNA(+),Cardiovirus
+182,QHW16755.1,Poxviridae,Poxviridae,Poxviridae,542,0.05273671438593351,408.0,300.19,90.05,1259,0.007,major envelope protein,Structural-Envelope,Capra hircus,dsDNA,Parapoxvirus
+183,QUP51759.1,Betaflexiviridae,Betaflexiviridae,Betaflexiviridae,538,0.05234751354175687,467.0,282.77,56.46,637,0.003,coat protein,Structural-Envelope,Solanum tuberosum,ssRNA(+),Carlavirus
+184,CAR56929.1,Orthomyxoviridae,Orthomyxoviridae,Orthomyxoviridae,532,0.051763712275491924,420.0,356.5,77.1,2213,0.012,hemagglutinin esterase,Hemagglutinin,Salmo salar,ssRNA(-),Isavirus
+185,QQM99855.1,Picobirnaviridae,Picobirnaviridae,Picobirnaviridae,528,0.051374511431315294,594.0,352.67,164.91,2978,0.016,RNA-dependent RNA polymerase,Replication-Transcription,Macaca mulatta,dsRNA,Picobirnavirus
+186,YP_004895090.1,Mimiviridae,Mimiviridae,Mimiviridae,626,0.060909932113642755,729.0,398.2,171.13,4834,0.025,putative F-box and FNIP repeat-containing protein,Other-Functions,Acanthamoeba castellanii,dsDNA,Mimivirus
+187,AJT39532.1,Parvoviridae,Parvoviridae,Parvoviridae,506,0.04923390678834382,1037.0,691.17,326.52,10767,0.056,structural protein,Structural-Envelope,Sus scrofa,ssDNA(+/-),Tetraparvovirus
+188,AZQ00683.1,Potyviridae,Potyviridae,Potyviridae,503,0.048942006155211354,2628.0,765.66,851.74,12567,0.066,polyprotein,Polyprotein,Triticum aestivum,ssRNA(+),Bymovirus
+189,AGC36402.1,Picornaviridae,Picornaviridae,Picornaviridae,498,0.04845550509999057,2446.0,530.05,747.18,7845,0.041,polyprotein,Polyprotein,Homo sapiens,ssRNA(+),Kobuvirus
+190,QUS52949.1,Adenoviridae,Adenoviridae,Adenoviridae,497,0.048358204888946404,709.0,433.24,126.24,3970,0.021,penton base,Structural-Envelope,Homo sapiens,dsDNA,Mastadenovirus
+191,5FSG_A,Hantaviridae,Hantaviridae-Paramyxoviridae-Retroviridae-Flaviviridae,Hantaviridae,490,0.0476771034116373,430.0,318.53,140.03,2131,0.011,nucleocapsid protein,Structural-Envelope,Rattus norvegicus,ssRNA(-),Orthohantavirus
+192,NP_056886.1,Retroviridae,Retroviridae,Retroviridae,489,0.04757980320059314,1603.0,725.65,266.49,11259,0.059,gag protein,Structural-Envelope,Gallus gallus,ssRNA-RT,Alpharetrovirus
+193,QRG45927.1,Nairoviridae,Nairoviridae,Nairoviridae,488,0.04748250298954899,1700.0,887.35,759.93,16285,0.085,glycoprotein precursor,Glycoprotein,Homo sapiens,ssRNA(-),Orthonairovirus
+194,YP_009508797.1,Parvoviridae,Parvoviridae,Parvoviridae,486,0.04728790256746067,891.0,485.2,256.14,5547,0.029,NS1,Non-structural,Sus scrofa,ssDNA(+/-),Bocaparvovirus
+195,AKI18383.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,476,0.04631490045701909,876.0,823.41,54.54,12740,0.067,tegument protein TRS1,Structural-Envelope,Homo sapiens,dsDNA,Cytomegalovirus
+196,AGB67759.1,Picornaviridae,Picornaviridae,Picornaviridae,469,0.04563379897970999,2238.0,765.64,825.86,12406,0.065,polyprotein,Polyprotein,Sus scrofa,ssRNA(+),Teschovirus
+197,YP_009351861.1,Flaviviridae,Flaviviridae,Flaviviridae,462,0.04495269750240088,3416.0,1024.45,1234.58,17648,0.092,non-structural protein,Non-structural,Aedes aegypti,ssRNA(+),Flavivirus
+198,AKZ66476.1,Coronaviridae,Coronaviridae,Coronaviridae,458,0.04456349665822425,1481.0,459.03,514.21,6100,0.032,spike protein,Structural-Envelope,Felis catus,ssRNA(+),Alphacoronavirus
+199,YP_006468898.1,Tospoviridae,Tospoviridae-Peribunyaviridae,Tospoviridae,456,0.044368896236135935,2932.0,1497.06,1300.69,28034,0.146,RNA-dependent RNA polymerase,Replication-Transcription,Arachis hypogaea,ssRNA(+/-),Orthotospovirus
+200,7M5E_A,Coronaviridae,Coronaviridae,Coronaviridae,454,0.04417429581404762,1359.0,1093.45,474.83,18799,0.098,Spike protein,Structural-Envelope,Homo sapiens,ssRNA(+),Betacoronavirus
+201,YP_009552729.1,Polyomaviridae,Polyomaviridae,Polyomaviridae,454,0.04417429581404762,359.0,285.16,62.51,645,0.003,VP2-capsid,Structural-Envelope,Homo sapiens,dsDNA,Betapolyomavirus
+202,ADJ18278.1,Anelloviridae,Anelloviridae,Anelloviridae,452,0.043979695391959304,455.0,396.89,98.42,2827,0.015,VP1-capsid,Structural-Envelope,Gallus gallus,ssDNA(-),Gyrovirus
+203,QQP29627.1,Flaviviridae,Flaviviridae,Flaviviridae,823,0.08007807368934183,3387.0,500.47,368.03,9149,0.048,polyprotein,Polyprotein,Homo sapiens,ssRNA(+),Orthoflavivirus
+204,AET72462.1,Picornaviridae,Picornaviridae-Coronaviridae,Picornaviridae,446,0.04339589412569436,2159.0,593.71,792.12,9017,0.047,polyprotein,Polyprotein,Homo sapiens,ssRNA(+),Enterovirus
+205,NP_598314.1,Coronaviridae,Coronaviridae,Coronaviridae,444,0.04320129370360604,441.0,431.03,35.02,3325,0.017,nucleocapsid protein,Structural-Envelope,Sus scrofa,ssRNA(+),Alphacoronavirus
+206,YP_009345901.1,Picornaviridae,Picornaviridae,Picornaviridae,430,0.04183909074898784,2480.0,857.36,950.43,13496,0.07,polyprotein,Polyprotein,Sus scrofa,ssRNA(+),Sapelovirus
+207,AGX86088.1,Reoviridae,Reoviridae,Sedoreoviridae,430,0.04183909074898784,378.0,352.1,24.96,1287,0.007,NS2,Non-structural,Ovis aries,dsRNA,Orbivirus
+208,ARU09832.1,Solemoviridae,Solemoviridae-Luteoviridae-Geminiviridae,Solemoviridae,429,0.04174179053794368,696.0,369.91,226.5,3003,0.016,coat protein,Structural-Envelope,Cucurbitaceae,ssRNA(+),Polerovirus
+209,QAG21139.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,427,0.04154719011585536,3201.0,3106.13,363.76,59255,0.309,BPLF1,Structural-Envelope,Homo sapiens,dsDNA,Lymphocryptovirus
+210,YP_010085063.1,Tospoviridae,Tospoviridae-Peribunyaviridae,Tospoviridae,413,0.040184987161237154,1195.0,1000.17,315.37,14878,0.078,glycoprotein precursor,Glycoprotein,Solanum lycopersicum,ssRNA(+/-),Orthotospovirus
+211,AQX34698.1,Reoviridae,Reoviridae,Sedoreoviridae,412,0.040087686950193,563.0,525.23,88.36,4938,0.026,NS1,Non-structural,Ovis aries,dsRNA,Orbivirus
+212,QVW56497.1,Genomoviridae,Genomoviridae-Circoviridae,Genomoviridae,581,0.056531422616655655,388.0,304.2,21.19,623,0.003,capsid protein,Structural-Envelope,Pteropus tonganus,ssDNA,Gemycircularvirus
+213,QOR29584.1,Dicistroviridae,Dicistroviridae,Dicistroviridae,409,0.039795786317060516,2495.0,361.64,456.86,3639,0.019,capsid protein,Structural-Envelope,Apis mellifera,ssRNA(+),Triatovirus
+214,YP_009513193.1,Nairoviridae,Nairoviridae-Peribunyaviridae,Nairoviridae,409,0.039795786317060516,673.0,296.43,165.62,1819,0.009,nucleoprotein,Structural-Envelope,Homo sapiens,ssRNA(-),Orthonairovirus
+215,APG77540.1,Virgaviridae,Virgaviridae,Virgaviridae,408,0.03969848610601636,1637.0,1223.75,551.35,19254,0.101,RNA-dependent RNA polymerase,Replication-Transcription,Solanum lycopersicum,ssRNA(+),Tobamovirus
+216,AYA94517.1,Papillomaviridae,Papillomaviridae,Papillomaviridae,407,0.039601185894972205,541.0,510.79,43.43,4543,0.024,L2 protein-capsid,Other-Functions,Homo sapiens,dsDNA,Gammapapillomavirus
+217,ATZ76094.1,Hypoviridae,Hypoviridae,Hypoviridae,406,0.03950388568392805,624.0,301.15,132.6,1215,0.006,ORFA,Other-Functions,Cryphonectria parasitica,ssRNA(+),Alphahypovirus
+218,QSJ02959.1,Coronaviridae,Coronaviridae,Coronaviridae,405,0.03940658547288389,457.0,384.25,118.28,2494,0.013,nucleocapsid protein,Structural-Envelope,Homo sapiens,ssRNA(+),Betacoronavirus
+219,BAW81815.1,Bromoviridae,Bromoviridae,Bromoviridae,402,0.03911468483975142,861.0,595.74,336.89,7093,0.037,2a protein- RNA-dependent RNA polymerase,Replication-Transcription,Capsicum annuum,ssRNA(+),Cucumovirus
+220,ATE46284.1,Potyviridae,Potyviridae,Potyviridae,394,0.03833628315139816,3133.0,629.02,671.64,7083,0.037,polyprotein,Polyprotein,Saccharum officinarum,ssRNA(+),Poacevirus
+221,YP_004089623.1,Betaflexiviridae,Betaflexiviridae,Betaflexiviridae,392,0.03814168272930984,421.0,374.07,70.95,1821,0.01,coat protein,Structural-Envelope,Pyrus communis,ssRNA(+),Foveavirus
+222,YP_009513274.1,Filoviridae,Filoviridae,Filoviridae,386,0.037557881463044895,739.0,711.81,122.3,7888,0.041,nucleoprotein,Structural-Envelope,Homo sapiens,ssRNA(-),Orthoebolavirus
+223,QJD34359.1,Papillomaviridae,Papillomaviridae,Papillomaviridae,386,0.037557881463044895,470.0,458.33,29.23,2783,0.015,L2-late protein,Other-Functions,Homo sapiens,dsDNA,Alphapapillomavirus
+224,YP_009666113.1,Nairoviridae,Nairoviridae-Peribunyaviridae,Nairoviridae,384,0.03736328104095658,4010.0,2483.1,1834.32,43020,0.225,RNA-dependent RNA polymerase,Replication-Transcription,Homo sapiens,ssRNA(-),Orthonairovirus
+225,CAC80000.1,Bromoviridae,Bromoviridae,Bromoviridae,383,0.03726598082991242,1009.0,775.28,334.2,9567,0.05,1a protein-helicase-replicase,Replication-Transcription,Capsicum annuum,ssRNA(+),Cucumovirus
+226,QMP82847.1,Parvoviridae,Parvoviridae,Parvoviridae,381,0.03707138040782411,860.0,401.23,268.35,3483,0.018,NS1,Non-structural,Homo sapiens,ssDNA(+/-),Bocaparvovirus
+227,ACE80203.1,Picornaviridae,Picornaviridae-Hepadnaviridae,Picornaviridae,380,0.036974080196779946,2252.0,967.25,958.05,13741,0.072,polyprotein,Polyprotein,Anatidae,ssRNA(+),Avihepatovirus
+228,AFO11486.1,Caulimoviridae,Caulimoviridae,Caulimoviridae,377,0.03668217956364748,1953.0,371.54,466.92,2949,0.015,polyprotein,Polyprotein,Saccharum,dsDNA-RT,Badnavirus
+229,ARC95292.1,Picornaviridae,Picornaviridae,Picornaviridae,376,0.036584879352603315,2391.0,534.35,672.88,5271,0.028,VP1 protein,Polyprotein,Sus scrofa,ssRNA(+),Enterovirus
+230,ABX25829.1,Retroviridae,Retroviridae,Retroviridae,372,0.036195678508426685,502.0,294.93,152.51,1444,0.008,gag protein,Structural-Envelope,Feliformia,ssRNA-RT,Lentivirus
+231,QBN85124.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,370,0.036001078086338366,890.0,779.1,175.93,9307,0.049,helicase-primase helicase subunit,Replication-Transcription,Homo sapiens,dsDNA,Lymphocryptovirus
+232,AMB65767.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,370,0.036001078086338366,424.0,344.58,79.89,1269,0.007,thymidine kinase,Hypothetical,Homo sapiens,dsDNA,Simplexvirus
+233,AWW11242.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,369,0.03590377787529421,3164.0,2861.39,735.45,47701,0.249,UL36- large tegument protein,Other-Functions,Homo sapiens,dsDNA,Simplexvirus
+234,YP_007906023.1,Adenoviridae,Adenoviridae,Adenoviridae,365,0.03551457703111758,612.0,410.96,180.85,2970,0.016,fiber,Structural-Envelope,Homo sapiens,dsDNA,Mastadenovirus
+235,YP_010085229.1,Poxviridae,Poxviridae,Poxviridae,361,0.03512537618694095,709.0,334.27,225.61,2219,0.012,4b core protein,Structural-Envelope,Gallus gallus,dsDNA,Avipoxvirus
+236,QJI53447.1,Iflaviridae,Iflaviridae-Totiviridae-Dicistroviridae,Iflaviridae,359,0.03493077576485264,3763.0,853.39,1133.07,11428,0.06,polyprotein,Polyprotein,Apis mellifera,ssRNA(+),Iflavirus
+237,BBG62182.2,Polyomaviridae,Polyomaviridae,Polyomaviridae,358,0.034833475553808474,744.0,596.78,216.41,6061,0.032,large T antigen,Replication-Transcription,Homo sapiens,dsDNA,Betapolyomavirus
+238,YP_009824993.1,Coronaviridae,Coronaviridae,Coronaviridae,356,0.03463887513172016,470.0,351.01,90.57,1455,0.008,nucleocapsid protein,Structural-Envelope,Felis catus,ssRNA(+),Alphacoronavirus
+239,YP_002308464.1,Alphaflexiviridae,Alphaflexiviridae,Alphaflexiviridae,355,0.034541574920676,1507.0,1428.44,184.36,20140,0.105,RNA-dependent RNA polymerase,Replication-Transcription,Solanum tuberosum,ssRNA(+),Potexvirus
+240,AHV84051.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,354,0.03444427470963184,981.0,828.9,187.42,9638,0.05,helicase-primase helicase subunit,Replication-Transcription,Homo sapiens,dsDNA,Simplexvirus
+241,NP_041242.1,Parvoviridae,Parvoviridae,Parvoviridae,353,0.03434697449858769,721.0,581.11,169.24,5423,0.028,NS1,Non-structural,Canis lupus familiaris,ssDNA(+/-),Protoparvovirus
+242,YP_052956.1,Reoviridae,Reoviridae,Sedoreoviridae,350,0.03405507386545521,353.0,336.31,44.92,956,0.005,VP7-capsid,Structural-Envelope,Bos taurus,dsRNA,Orbivirus
+243,NP_957802.1,Poxviridae,Poxviridae,Poxviridae,349,0.03395777365441106,1012.0,666.37,378.09,7104,0.037,DNA polymerase,Replication-Transcription,Homo sapiens,dsDNA,Avipoxvirus
+244,QGY64368.1,Adenoviridae,Adenoviridae,Adenoviridae,344,0.03347127259919027,1067.0,759.04,83.55,8083,0.042,hexon-assembly-100K,Other-Functions,Homo sapiens,dsDNA,Mastadenovirus
+245,NP_045004.1,Closteroviridae,Closteroviridae,Closteroviridae,343,0.033373972388146114,618.0,357.96,199.42,2254,0.012,heat shock protein 70,Stress-Response,Solanum lycopersicum,ssRNA(+),Crinivirus
+246,QPZ88447.1,Tospoviridae,Tospoviridae,Tospoviridae,343,0.033373972388146114,492.0,445.92,64.2,2811,0.015,NSs non-structural protein,Non-structural,Capsicum,ssRNA(+/-),Orthotospovirus
+247,ACK77584.1,Rhabdoviridae,Rhabdoviridae,Rhabdoviridae,341,0.033179371966057795,750.0,389.53,171.24,2474,0.013,glycoprotein,Structural-Envelope,Cyprinus carpio,ssRNA(-),Vesiculovirus
+248,NP_044188.1,Adenoviridae,Adenoviridae,Adenoviridae,339,0.03298477154396948,502.0,411.57,87.48,2302,0.012,IVa2-maturation,Hypothetical,Homo sapiens,dsDNA,Mastadenovirus
+249,QOE76799.1,Orthomyxoviridae,Orthomyxoviridae,Orthomyxoviridae,338,0.03288747133292532,693.0,598.11,149.91,5508,0.029,hemagglutinin-esterase,Hemagglutinin,Homo sapiens,ssRNA(-),Gammainfluenzavirus
+250,AAN04389.1,Poxviridae,Poxviridae-Phycodnaviridae-Baculoviridae-Mimiviridae-Asfarviridae-Nimaviridae-Alloherpesviridae-Nudiviridae-Hytrosaviridae-Caulimoviridae,Poxviridae,336,0.032692870910837,939.0,746.86,143.04,7774,0.041,ribonucleotide reductase large subunit,Other-Functions,Homo sapiens,dsDNA,Orthopoxvirus
+251,BAV53465.1,Solemoviridae,Solemoviridae-Luteoviridae-Geminiviridae,Solemoviridae,335,0.032595570699792846,738.0,362.18,240.06,2339,0.012,coat protein,Structural-Envelope,Solanum tuberosum,ssRNA(+),Polerovirus
+252,AMB66415.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,333,0.032400970277704534,1443.0,1254.98,351.39,16513,0.086,major capsid protein,Structural-Envelope,Homo sapiens,dsDNA,Simplexvirus
+253,CAA01837.1,Arteriviridae,Arteriviridae,Arteriviridae,331,0.032206369855616215,3859.0,1700.25,763.67,23526,0.123,polyprotein pp1a,Polyprotein,Sus scrofa,ssRNA(+),Betaarterivirus
+254,QBK85816.1,Iridoviridae,Iridoviridae-Marseilleviridae,Iridoviridae,327,0.031817169011439585,527.0,344.49,136.82,1616,0.008,major capsid protein,Structural-Envelope,Lates calcarifer,dsDNA,Ranavirus
+255,AID16660.1,Coronaviridae,Coronaviridae,Coronaviridae,325,0.03162256858935127,441.0,386.64,99.65,1982,0.01,hemagglutinin-esterase,Hemagglutinin,Homo sapiens,ssRNA(+),Betacoronavirus
+256,ARX74206.1,Paramyxoviridae,Paramyxoviridae,Paramyxoviridae,319,0.031038767323086323,565.0,500.76,121.28,3589,0.019,fusion protein,Structural-Envelope,Homo sapiens,ssRNA(-),Respirovirus
+257,AAA46204.1,Retroviridae,Retroviridae,Retroviridae,317,0.030844166900998008,544.0,309.96,76.74,717,0.004,tax protein,Glycoprotein,Homo sapiens,ssRNA-RT,Deltaretrovirus
+258,QED45302.1,Potyviridae,Potyviridae,Potyviridae,315,0.030649566478909693,3415.0,1244.39,1406.21,15629,0.082,polyprotein,Polyprotein,Allium sativum,ssRNA(+),Potyvirus
+259,ATZ69454.1,Caulimoviridae,Caulimoviridae,Caulimoviridae,575,0.05594762135039071,2031.0,488.91,638.35,8261,0.043,polyprotein- putative movement protein,Transport,Theobroma cacao,dsDNA-RT,Badnavirus
+260,BBG62110.2,Polyomaviridae,Polyomaviridae,Polyomaviridae,311,0.030260365634733062,495.0,320.96,117.94,1120,0.006,VP1-capsid,Structural-Envelope,Homo sapiens,dsDNA,Alphapolyomavirus
+261,YP_009351850.1,Reoviridae,Reoviridae,Spinareoviridae,310,0.030163065423688906,1275.0,1069.43,414.47,12468,0.065,RNA-dependent RNA polymerase,Replication-Transcription,Gallus gallus,dsRNA,Orthoreovirus
+262,BAB33175.1,Retroviridae,Retroviridae,Retroviridae,309,0.030065765212644747,1000.0,838.94,252.76,8614,0.045,envelope protein,Structural-Envelope,Puma concolor,ssRNA-RT,Spumavirus
+263,YP_006272973.1,Adenoviridae,Adenoviridae,Adenoviridae,306,0.029773864579512276,443.0,279.45,107.63,653,0.003,fiber protein,Structural-Envelope,Homo sapiens,dsDNA,Mastadenovirus
+264,QBH76564.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,305,0.029676564368468113,1240.0,1006.56,177.66,10913,0.057,helicase-primase -UL52,Replication-Transcription,Homo sapiens,dsDNA,Simplexvirus
+265,ASA48525.1,Anelloviridae,Anelloviridae,Anelloviridae,305,0.029676564368468113,524.0,463.81,45.96,2659,0.014,ORF1,Other-Functions,Leptonychotes weddellii,ssDNA(-),Lambdatorquevirus
+266,QYA72637.1,Potyviridae,Potyviridae-Mimiviridae,Potyviridae,301,0.029287363524291482,2916.0,1049.44,1098.46,11681,0.061,polyprotein,Polyprotein,Manihot esculenta,ssRNA(+),Ipomovirus
+267,P03364.3,Retroviridae,Retroviridae,Retroviridae,299,0.029092763102203167,1880.0,537.98,368.23,4214,0.022,pol protein,Polyprotein,Capra hircus,ssRNA-RT,Betaretrovirus
+268,AYV99177.1,Flaviviridae,Flaviviridae,Flaviviridae,296,0.028800862469070695,3663.0,1293.05,1473.8,15374,0.08,polyprotein,Polyprotein,Sus scrofa,ssRNA(+),Pestivirus
+269,QQG34656.1,Tymoviridae,Tymoviridae-Picornaviridae,Tymoviridae,294,0.02860626204698238,2168.0,551.1,732.79,5097,0.027,polyprotein,Polyprotein,Vitis vinifera,ssRNA(+),Marafivirus
+270,AMB66209.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,294,0.02860626204698238,1312.0,1128.34,243.71,12451,0.065,single-stranded DNA-binding protein,Binding-Protein,Homo sapiens,dsDNA,Simplexvirus
+271,AQW44800.1,Secoviridae,Secoviridae,Secoviridae,292,0.028411661624894065,2376.0,1510.31,935.06,18260,0.095,polyprotein,Polyprotein,Vitis vinifera,ssRNA(+),Nepovirus
+272,QNJ57194.1,Anelloviridae,Anelloviridae,Anelloviridae,292,0.028411661624894065,649.0,432.0,188.25,2503,0.013,ORF1,Other-Functions,Sus scrofa,ssDNA(-),Iotatorquevirus
+273,YP_009664807.1,Closteroviridae,Closteroviridae,Closteroviridae,292,0.028411661624894065,611.0,386.24,224.08,2334,0.012,heat shock protein 70,Other-Functions,Vitis vinifera,ssRNA(+),Closterovirus
+274,QYA72453.1,Secoviridae,Secoviridae,Secoviridae,291,0.02831436141384991,1940.0,1245.75,774.24,14387,0.075,polyprotein,Polyprotein,Prunus avium,ssRNA(+),Fabavirus
+275,YP_009505443.1,Paramyxoviridae,Paramyxoviridae,Paramyxoviridae,291,0.02831436141384991,391.0,282.57,98.52,632,0.003,phosphoprotein,Other-Functions,Homo sapiens,ssRNA(-),Orthorubulavirus
+276,NP_944422.2,Herpesviridae,Herpesviridae,Orthoherpesviridae,289,0.028119760991761594,795.0,521.79,250.52,3909,0.02,DNA packaging terminase subunit 1,Other-Functions,Homo sapiens,dsDNA,Simplexvirus
+277,BBG62074.2,Polyomaviridae,Polyomaviridae,Polyomaviridae,288,0.02802246078071743,801.0,351.17,232.78,1865,0.01,large T antigen,Other-Functions,Homo sapiens,dsDNA,Deltapolyomavirus
+278,YP_392514.1,Reoviridae,Reoviridae,Sedoreoviridae,288,0.02802246078071743,744.0,578.58,227.94,4413,0.023,VP4,Structural-Envelope,Sus scrofa,dsRNA,Rotavirus
+279,YP_009507774.1,Reoviridae,Reoviridae,Spinareoviridae,286,0.027827860358629115,588.0,538.96,77.09,3537,0.018,major capsid protein,Structural-Envelope,Oryza sativa,dsRNA,Fijivirus
+280,AGE49692.1,Phycodnaviridae,Phycodnaviridae,Phycodnaviridae,283,0.027535959725496644,939.0,306.31,237.91,1231,0.006,DNA polymerase,Replication-Transcription,Chlorella variabilis,dsDNA,Chlorovirus
+281,AMB66386.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,283,0.027535959725496644,779.0,577.87,179.19,4193,0.022,envelope glycoprotein G,Structural-Envelope,Homo sapiens,dsDNA,Simplexvirus
+282,AYA83039.1,Filoviridae,Filoviridae,Filoviridae,282,0.027438659514452485,373.0,313.05,78.71,641,0.003,VP35,Structural-Envelope,Homo sapiens,ssRNA(-),Orthoebolavirus
+283,ABX25833.1,Retroviridae,Retroviridae,Retroviridae,280,0.027244059092364173,870.0,509.6,259.97,3339,0.017,env protein,Structural-Envelope,Puma concolor,ssRNA-RT,Lentivirus
+284,QOL70884.1,Orthomyxoviridae,Orthomyxoviridae,Orthomyxoviridae,280,0.027244059092364173,455.0,385.75,86.97,1547,0.008,fusion protein,Structural-Envelope,Salmo salar,ssRNA(-),Isavirus
+285,BCK34805.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,275,0.026757558037143383,1206.0,927.85,122.4,8737,0.046,EBNA-3B- nuclear antigen,Other-Functions,Homo sapiens,dsDNA,Lymphocryptovirus
+286,QAD37909.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,274,0.026660257826099227,978.0,854.67,220.34,7886,0.041,EBNA-3A-nuclear antigen,Other-Functions,Homo sapiens,dsDNA,Lymphocryptovirus
+287,YP_009448179.1,Astroviridae,Astroviridae,Astroviridae,271,0.026368357192966756,1389.0,466.95,434.57,3488,0.018,ORF1ab,Non-structural,Sus scrofa,ssRNA(+),Mamastrovirus
+288,QGY64372.1,Adenoviridae,Adenoviridae,Adenoviridae,265,0.025784555926701803,626.0,452.65,106.91,2318,0.012,E1B 55K-large T antigen,Regulation-Control,Homo sapiens,dsDNA,Mastadenovirus
+289,YP_002268402.1,Picornaviridae,Picornaviridae,Picornaviridae,264,0.025687255715657647,2181.0,1830.06,757.25,20691,0.108,polyprotein,Polyprotein,Sus scrofa,ssRNA(+),Senecavirus
+290,YP_009552848.1,Tombusviridae,Tombusviridae-Luteoviridae-Solemoviridae,Tombusviridae,264,0.025687255715657647,953.0,663.32,273.86,5097,0.027,RNA-dependent RNA polymerase,Replication-Transcription,Triticum aestivum,ssRNA(+),Luteovirus
+291,SBS69695.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,264,0.025687255715657647,792.0,485.92,281.73,3107,0.016,ubiquitin E3 ligase ICP0,Other-Functions,Homo sapiens,dsDNA,Simplexvirus
+292,CBG22680.1,Adenoviridae,Adenoviridae,Adenoviridae,264,0.025687255715657647,617.0,446.16,178.08,2562,0.013,penton base,Other-Functions,Homo sapiens,dsDNA,Mastadenovirus
+293,YP_010086221.1,Phenuiviridae,Phenuiviridae-Peribunyaviridae,Phenuiviridae,422,0.04106068906063457,1464.0,958.59,476.54,14610,0.076,glycoprotein,Structural-Envelope,Homo sapiens,ssRNA(+/-),Phlebovirus
+294,ARA91676.1,Anelloviridae,Anelloviridae,Anelloviridae,257,0.025006154238348545,643.0,446.3,182.54,2357,0.012,ORF1,Other-Functions,Sus scrofa,ssDNA(-),Iotatorquevirus
+295,AIE40966.1,Poxviridae,Poxviridae,Poxviridae,256,0.024908854027304386,496.0,323.71,78.45,695,0.004,CPXV217 protein-IL-1 convertase,Other-Functions,Homo sapiens,dsDNA,Orthopoxvirus
+296,YP_009352936.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,252,0.02451965318312775,859.0,737.96,143.92,5729,0.03,DNA packaging terminase subunit 2,Replication-Transcription,Homo sapiens,dsDNA,Simplexvirus
+297,AZR67740.1,Adenoviridae,Adenoviridae,Adenoviridae,252,0.02451965318312775,406.0,344.72,29.88,723,0.004,pV-core protein,Structural-Envelope,Homo sapiens,dsDNA,Mastadenovirus
+298,AMB66203.1,Herpesviridae,Herpesviridae-Rhabdoviridae,Orthoherpesviridae,249,0.024227752549995284,961.0,464.6,160.38,2442,0.013,DNA packaging tegument protein UL25,Other-Functions,Homo sapiens,dsDNA,Simplexvirus
+299,AMJ52831.2,Herpesviridae,Herpesviridae,Orthoherpesviridae,249,0.024227752549995284,642.0,638.45,3.3,4234,0.022,protein UL150,Non-structural,Homo sapiens,dsDNA,Cytomegalovirus
+300,AMB61086.1,Adenoviridae,Adenoviridae,Adenoviridae,249,0.024227752549995284,618.0,558.26,84.96,3448,0.018,pIIIa-capsid protein,Structural-Envelope,Homo sapiens,dsDNA,Mastadenovirus
+301,AYA49804.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,248,0.02413045233895112,1261.0,1229.05,98.25,11689,0.061,BOLF1-tegument,Structural-Envelope,Homo sapiens,dsDNA,Lymphocryptovirus
+302,QTE03943.1,Parvoviridae,Parvoviridae,Parvoviridae,248,0.02413045233895112,676.0,538.35,166.08,3365,0.018,Rep 78 protein,Replication-Transcription,Homo sapiens,ssDNA(+/-),Dependoparvovirus
+303,AID55207.1,Astroviridae,Astroviridae,Astroviridae,245,0.02383855170581865,745.0,478.68,245.78,2686,0.014,capsid protein,Structural-Envelope,Gallus gallus,ssRNA(+),Avastrovirus
+304,AZK35897.1,Anelloviridae,Anelloviridae,Anelloviridae,244,0.023741251494774494,824.0,379.41,264.8,1872,0.01,ORF1,Hypothetical,Homo sapiens,ssDNA(-),Alphatorquevirus
+305,AWW13352.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,242,0.02354665107268618,1318.0,1048.0,397.07,8006,0.042,transcriptional regulator ICP4,Other-Functions,Homo sapiens,dsDNA,Simplexvirus
+306,ACU01783.1,Arteriviridae,Arteriviridae,Arteriviridae,239,0.023254750439553704,2433.0,1034.64,949.0,9110,0.048,polyprotein 1a,Replication-Transcription,Sus scrofa,ssRNA(+),Betaarterivirus
+307,7LBE_C,Herpesviridae,Herpesviridae,Orthoherpesviridae,238,0.023157450228509544,472.0,279.04,152.61,832,0.004,glycoprotein O,Structural-Envelope,Homo sapiens,dsDNA,Cytomegalovirus
+308,AMB66406.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,237,0.023060150017465388,914.0,820.08,134.14,6306,0.033,DNA replication origin-binding helicase,Replication-Transcription,Homo sapiens,dsDNA,Simplexvirus
+309,ADJ00320.1,Reoviridae,Reoviridae,Spinareoviridae,236,0.02296284980642123,709.0,661.9,111.38,4482,0.023,muB - outer shell,Structural-Envelope,Gallus gallus,dsRNA,Orthoreovirus
+310,YP_009214659.1,Arteriviridae,Arteriviridae,Arteriviridae,234,0.022768249384332914,4054.0,1581.93,1155.93,15512,0.081,polyprotein,Polyprotein,Equus caballus,ssRNA(+),Alphaarterivirus
+311,BCK34806.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,234,0.022768249384332914,1089.0,874.94,260.9,6155,0.032,nuclear antigen EBNA-3C,Other-Functions,Homo sapiens,dsDNA,Lymphocryptovirus
+312,AAA43011.1,Retroviridae,Retroviridae,Retroviridae,234,0.022768249384332914,512.0,339.81,144.32,1109,0.006,gag protein,Structural-Envelope,Equus caballus,ssRNA-RT,Lentivirus
+313,QBA84868.1,Parvoviridae,Parvoviridae,Parvoviridae,232,0.0225736489622446,1190.0,871.05,310.65,6851,0.036,capsid protein,Structural-Envelope,Sus scrofa,ssDNA(+/-),Copiparvovirus
+314,AMB66268.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,232,0.0225736489622446,756.0,672.78,112.44,4608,0.024,DNA packaging tegument protein UL17,Structural-Envelope,Homo sapiens,dsDNA,Simplexvirus
+315,QAD27837.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,232,0.0225736489622446,561.0,473.52,57.98,2181,0.011,EBNA-2,Other-Functions,Homo sapiens,dsDNA,Lymphocryptovirus
+316,AAA46240.1,Rhabdoviridae,Rhabdoviridae,Rhabdoviridae,231,0.02247634875120044,413.0,316.08,117.14,853,0.004,nucleoprotein,Structural-Envelope,Oncorhynchus mykiss,ssRNA(-),Novirhabdovirus
+317,NP_612691.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,230,0.022379048540156283,2275.0,2224.49,141.0,22342,0.117,large tegument protein,Structural-Envelope,Homo sapiens,dsDNA,Cytomegalovirus
+318,QYC92650.1,Baculoviridae,Baculoviridae,Baculoviridae,230,0.022379048540156283,1172.0,945.16,242.78,7825,0.041,DNA polymerase,Replication-Transcription,Lymantria dispar,dsDNA,Alphabaculovirus
+319,YP_009666846.1,Paramyxoviridae,Paramyxoviridae,Paramyxoviridae,230,0.022379048540156283,854.0,506.91,131.85,2583,0.013,hemagglutinin-neuraminidase,Other-Functions,Homo sapiens,ssRNA(-),Respirovirus
+320,YP_006200960.1,Rhabdoviridae,Rhabdoviridae,Rhabdoviridae,229,0.022281748329112123,662.0,519.0,138.66,2798,0.015,glycoprotein G,Structural-Envelope,Bos taurus,ssRNA(-),Ephemerovirus
+321,ACN81881.1,Poxviridae,Poxviridae,Poxviridae,227,0.02208714790702381,1321.0,1113.48,388.64,9533,0.05,DNA-dependent RNA polymerase subunit rpo147,Replication-Transcription,Homo sapiens,dsDNA,Orthopoxvirus
+322,AMB66419.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,226,0.021989847695979652,413.0,332.84,56.72,606,0.003,thymidine kinase,Other-Functions,Homo sapiens,dsDNA,Simplexvirus
+323,AYA93568.1,Papillomaviridae,Papillomaviridae,Papillomaviridae,320,0.03113606753413048,412.0,390.06,33.94,1623,0.008,E2 protein,Replication-Transcription,Homo sapiens,dsDNA,Gammapapillomavirus
+324,AKH48996.1,Arenaviridae,Arenaviridae,Arenaviridae,224,0.021795247273891337,2088.0,1935.8,492.1,18573,0.097,L polymerase,Replication-Transcription,Boa constrictor,ssRNA(+/-),Reptarenavirus
+325,AMB65784.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,224,0.021795247273891337,1299.0,1093.59,171.44,9030,0.047,UL39,Other-Functions,Homo sapiens,dsDNA,Simplexvirus
+326,ASA40120.1,Caulimoviridae,Caulimoviridae-Phycodnaviridae,Caulimoviridae,223,0.02169794706284718,2005.0,435.17,609.28,2678,0.014,polyprotein,Other-Functions,Dioscorea cayenensis subsp. rotundata,dsDNA-RT,Badnavirus
+327,DAC85029.1,Betaflexiviridae,Betaflexiviridae,Betaflexiviridae,222,0.02160064685180302,1868.0,1636.58,566.24,15080,0.079,RdRp,Replication-Transcription,Vitis vinifera,ssRNA(+),Trichovirus
+328,AKI08798.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,219,0.021308746218670547,710.0,535.41,215.49,2942,0.015,capsid maturation protease,Structural-Envelope,Homo sapiens,dsDNA,Cytomegalovirus
+329,YP_009026384.1,Picornaviridae,Picornaviridae,Picornaviridae,218,0.02121144600762639,2550.0,703.73,812.9,5230,0.027,polyprotein,Polyprotein,Homo sapiens,ssRNA(+),Cosavirus
+330,YP_009021566.1,Parvoviridae,Parvoviridae,Parvoviridae,216,0.021016845585538076,662.0,488.7,186.19,2464,0.013,replicase,Non-structural,Sus scrofa,ssDNA(+/-),Copiparvovirus
+331,YP_009268819.1,Poxviridae,Poxviridae,Poxviridae,215,0.02091954537449392,919.0,857.12,149.39,6136,0.032,CPXV142 protein,Other-Functions,Homo sapiens,dsDNA,Orthopoxvirus
+332,ADR30470.1,Reoviridae,Reoviridae,Spinareoviridae,215,0.02091954537449392,368.0,334.25,57.89,640,0.003,sigma B protein,Other-Functions,Gallus gallus,dsRNA,Orthoreovirus
+333,AGZ95200.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,213,0.0207249449524056,711.0,446.24,238.5,2134,0.011,BGRF1/BDRF1,Other-Functions,Homo sapiens,dsDNA,Lymphocryptovirus
+334,NP_258306.1,Baculoviridae,Baculoviridae,Baculoviridae,210,0.02043304431927313,918.0,515.02,330.07,2832,0.015,lef-8,Other-Functions,Lymantria dispar,dsDNA,Alphabaculovirus
+335,YP_003084389.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,210,0.02043304431927313,653.0,578.46,81.44,3033,0.016,DNA packaging protein UL32,Other-Functions,Homo sapiens,dsDNA,Simplexvirus
+336,AAU06813.1,Retroviridae,Retroviridae,Retroviridae,209,0.02033574410822897,628.0,473.16,148.52,2041,0.011,envelope protein,Structural-Envelope,Gallus gallus,ssRNA-RT,Alpharetrovirus
+337,SNB54148.1,Poxviridae,Poxviridae,Poxviridae,207,0.020141143686140655,1295.0,657.08,448.91,4253,0.022,cowpox A-type inclusion protein,Other-Functions,Homo sapiens,dsDNA,Orthopoxvirus
+338,QCG99665.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,207,0.020141143686140655,914.0,787.8,224.41,4630,0.024,glycoprotein 350,Other-Functions,Homo sapiens,dsDNA,Lymphocryptovirus
+339,NP_041192.1,Bromoviridae,Bromoviridae,Bromoviridae,205,0.01994654326405234,1126.0,869.54,361.95,6114,0.032,replicase,Replication-Transcription,Malus domestica,ssRNA(+),Ilarvirus
+340,AMB66133.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,205,0.01994654326405234,743.0,527.61,155.45,2445,0.013,UL26,Structural-Envelope,Homo sapiens,dsDNA,Simplexvirus
+341,YP_001468087.1,Potyviridae,Potyviridae,Potyviridae,203,0.019751942841964024,3109.0,875.96,1060.63,6069,0.032,polyprotein,Polyprotein,Triticum aestivum,ssRNA(+),Tritimovirus
+342,QBL75902.1,Dicistroviridae,Dicistroviridae-Nyamiviridae,Dicistroviridae,203,0.019751942841964024,936.0,347.93,319.06,1560,0.008,capsid protein,Structural-Envelope,Apis mellifera,ssRNA(+),Aparavirus
+343,AWW09923.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,202,0.019654642630919865,859.0,658.07,107.6,3758,0.02,capsid portal protein,Other-Functions,Homo sapiens,dsDNA,Simplexvirus
+344,QED44889.1,Alphaflexiviridae,Alphaflexiviridae,Alphaflexiviridae,201,0.01955734241987571,1524.0,768.74,620.13,5386,0.028,RNA-dependent RNA polymerase,Replication-Transcription,Solanum lycopersicum,ssRNA(+),Potexvirus
+345,AXS01083.1,Baculoviridae,Baculoviridae,Baculoviridae,201,0.01955734241987571,746.0,630.06,108.02,3470,0.018,p74,Other-Functions,Lymantria dispar,dsDNA,Alphabaculovirus
+346,QQD79885.1,Hantaviridae,Hantaviridae,Hantaviridae,199,0.019362741997787394,429.0,303.31,134.27,706,0.004,nucleocapsid protein,Structural-Envelope,Apodemus agrarius,ssRNA(-),Orthohantavirus
+347,YP_003331568.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,198,0.019265441786743238,606.0,475.45,106.66,1898,0.01,tegument serine/threonine protein kinase,Structural-Envelope,Homo sapiens,dsDNA,Simplexvirus
+348,YP_009507950.1,Closteroviridae,Closteroviridae,Closteroviridae,196,0.01907084136465492,2505.0,960.4,850.73,6726,0.035,ORF1a,Polyprotein,Rubus,ssRNA(+),Crinivirus
+349,QBJ02351.1,Reoviridae,Reoviridae,Sedoreoviridae,195,0.01897354115361076,432.0,388.73,49.66,1080,0.006,NSP3,Other-Functions,Sus scrofa,dsRNA,Rotavirus
+350,YP_009552520.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,194,0.018876240942566604,921.0,850.81,93.55,5425,0.028,BSLF1- helicase-primase primase subunit,Replication-Transcription,Homo sapiens,dsDNA,Lymphocryptovirus
+351,AMB66418.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,194,0.018876240942566604,881.0,808.43,126.46,5036,0.026,UL22,Structural-Envelope,Homo sapiens,dsDNA,Simplexvirus
+352,AJD79548.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,194,0.018876240942566604,580.0,489.66,155.17,2092,0.011,glycoprotein E,Other-Functions,Sus scrofa,dsDNA,Varicellovirus
+353,QBH77049.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,194,0.018876240942566604,564.0,494.72,58.51,2025,0.011,envelope glycoprotein C,Other-Functions,Homo sapiens,dsDNA,Simplexvirus
+354,SNB57926.1,Poxviridae,Poxviridae,Poxviridae,194,0.018876240942566604,548.0,430.72,143.42,1650,0.009,cowpox A-type inclusion protein,Other-Functions,Homo sapiens,dsDNA,Orthopoxvirus
+355,YP_001129436.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,194,0.018876240942566604,497.0,380.02,116.32,1034,0.005,LMP-2B-latent membrane protein 2A,Structural-Envelope,Homo sapiens,dsDNA,Lymphocryptovirus
+356,AKH03074.1,Reoviridae,Reoviridae,Spinareoviridae,193,0.018778940731522448,374.0,334.91,60.28,583,0.003,nonstructural protein sigma NS,Cellular-Regulation,Gallus gallus,dsRNA,Orthoreovirus
+357,AVX53302.1,Picobirnaviridae,Picobirnaviridae,Picobirnaviridae,192,0.01868164052047829,553.0,284.25,162.33,696,0.004,RNA-dependent RNA polymerase,Replication-Transcription,Macaca mulatta,dsRNA,Picobirnavirus
+358,QBJ27544.1,Betaflexiviridae,Betaflexiviridae,Betaflexiviridae,191,0.018584340309434132,2007.0,1856.89,424.52,14985,0.078,replicase,Replication-Transcription,Solanum tuberosum,ssRNA(+),Carlavirus
+359,NP_612729.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,191,0.018584340309434132,770.0,526.7,230.73,2519,0.013,tegument serine/threonine protein kinase,Structural-Envelope,Homo sapiens,dsDNA,Cytomegalovirus
+360,QKG86287.1,Tombusviridae,Tombusviridae-Solemoviridae-Luteoviridae,Tombusviridae,191,0.018584340309434132,723.0,346.28,229.27,1217,0.006,coat protein,Structural-Envelope,Trifolium repens,ssRNA(+),Luteovirus
+361,BCT22704.1,Poxviridae,Poxviridae,Poxviridae,190,0.018487040098389973,707.0,575.8,233.42,3514,0.018,RNA-helicase,Replication-Transcription,Homo sapiens,dsDNA,Orthopoxvirus
+362,QAG21155.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,190,0.018487040098389973,582.0,526.91,60.26,2224,0.012,BRRF2,Other-Functions,Homo sapiens,dsDNA,Lymphocryptovirus
+363,QIZ12955.1,Betaflexiviridae,Betaflexiviridae,Betaflexiviridae,189,0.018389739887345817,1735.0,684.46,713.16,4442,0.023,replicase,Replication-Transcription,Vitis vinifera,ssRNA(+),Vitivirus
+364,QED44253.1,Alphaflexiviridae,Alphaflexiviridae-Betaflexiviridae,Alphaflexiviridae,189,0.018389739887345817,1641.0,1460.3,357.59,11171,0.058,replicase,Replication-Transcription,Allium sativum,ssRNA(+),Allexivirus
+365,QWT72249.1,Astroviridae,Astroviridae,Astroviridae,189,0.018389739887345817,890.0,379.58,299.49,1588,0.008,capsid,Structural-Envelope,Sus scrofa,ssRNA(+),Mamastrovirus
+366,AMB66001.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,188,0.018292439676301658,1268.0,1080.63,169.03,7469,0.039,UL37,Structural-Envelope,Homo sapiens,dsDNA,Simplexvirus
+367,QTE03873.1,Parvoviridae,Parvoviridae,Parvoviridae,187,0.018195139465257498,599.0,431.14,120.2,1469,0.008,capsid protein,Structural-Envelope,Sus scrofa,ssDNA(+/-),Chaphamaparvovirus
+368,ALM00070.1,Reoviridae,Reoviridae,Sedoreoviridae,185,0.018000539043169183,1060.0,913.92,306.59,5841,0.03,VP2,Structural-Envelope,Equus caballus,dsRNA,Orbivirus
+369,YP_008378253.1,Baculoviridae,Baculoviridae,Baculoviridae,185,0.018000539043169183,980.0,520.18,338.28,2507,0.013,lef-8,Other-Functions,Bombyx mori,dsDNA,Alphabaculovirus
+370,YP_009252248.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,184,0.017903238832125027,3176.0,2273.77,1062.33,18537,0.097,ORF22,Structural-Envelope,Homo sapiens,dsDNA,Varicellovirus
+371,ADZ29764.1,Poxviridae,Poxviridae,Poxviridae,184,0.017903238832125027,642.0,458.09,206.69,2054,0.011,ankyrin-like protein,Other-Functions,Homo sapiens,dsDNA,Orthopoxvirus
+372,AGE53312.1,Phycodnaviridae,Phycodnaviridae,Phycodnaviridae,184,0.017903238832125027,450.0,340.39,70.04,611,0.003,hypothetical protein,Hypothetical,Chlorella heliozoae,dsDNA,Chlorovirus
+373,QTE76099.1,Reoviridae,Reoviridae,Sedoreoviridae,184,0.017903238832125027,401.0,367.53,60.69,794,0.004,inner capsid protein VP6,Structural-Envelope,Sus scrofa,dsRNA,Rotavirus
+374,YP_010088065.1,Fimoviridae,Fimoviridae,Fimoviridae,181,0.017611338198992556,2340.0,1724.64,931.58,13267,0.069,RNA-dependent RNA polymerase,Replication-Transcription,Rosa sp.,ssRNA(-),Emaravirus
+375,YP_008603282.1,Retroviridae,Retroviridae,Retroviridae,181,0.017611338198992556,699.0,363.94,96.91,750,0.004,envelope glycoprotein,Structural-Envelope,Homo sapiens,ssRNA-RT,Betaretrovirus
+376,YP_009121900.1,Baculoviridae,Baculoviridae,Baculoviridae,181,0.017611338198992556,543.0,441.06,138.69,1584,0.008,lef-9 - late expression factor 9,Regulation-Control,Lymantria dispar,dsDNA,Alphabaculovirus
+377,BCT22673.1,Poxviridae,Poxviridae,Poxviridae,180,0.017514037987948396,1176.0,1081.69,251.22,7259,0.038,DNA-dependent RNA polymerase subunit rpo132,Replication-Transcription,Homo sapiens,dsDNA,Orthopoxvirus
+378,QHW17751.1,Poxviridae,Poxviridae,Poxviridae,180,0.017514037987948396,835.0,499.76,75.29,1908,0.01,DNA helicase,Replication-Transcription,Homo sapiens,dsDNA,Orthopoxvirus
+379,YP_249764.1,Reoviridae,Reoviridae,Spinareoviridae,179,0.017416737776904237,594.0,571.37,86.02,2551,0.013,P8,Hypothetical,Zea mays,dsRNA,Fijivirus
+380,QED21575.1,Asfarviridae,Asfarviridae,Asfarviridae,179,0.017416737776904237,548.0,473.44,104.38,1739,0.009,hypothetical protein,Other-Functions,Sus scrofa,dsDNA,Asfivirus
+381,2VAK_A,Reoviridae,Reoviridae,Spinareoviridae,179,0.017416737776904237,421.0,370.16,94.48,873,0.005,sigma A protein,Structural-Envelope,Gallus gallus,dsRNA,Orthoreovirus
+382,QRE02508.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,178,0.01731943756586008,1419.0,1263.69,346.12,8966,0.047,BcLF1,Structural-Envelope,Homo sapiens,dsDNA,Lymphocryptovirus
+383,AMB65898.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,178,0.01731943756586008,1205.0,742.49,78.07,4008,0.021,UL8,Replication-Transcription,Homo sapiens,dsDNA,Simplexvirus
+384,YP_006589925.2,Solemoviridae,Solemoviridae,Solemoviridae,177,0.01722213735481592,1001.0,568.84,275.9,2681,0.014,RNA-dependent RNA polymerase,Polyprotein,Carica papaya,ssRNA(+),Sobemovirus
+385,QHR82581.1,Poxviridae,Poxviridae,Poxviridae,177,0.01722213735481592,696.0,614.51,153.79,3025,0.016,hypothetical protein,Hypothetical,Homo sapiens,dsDNA,Orthopoxvirus
+386,YP_009551997.1,Closteroviridae,Closteroviridae,Closteroviridae,177,0.01722213735481592,554.0,494.35,110.2,1853,0.01,p61,Stress-Response,Vitis vinifera,ssRNA(+),Closterovirus
+387,CAZ67989.1,Adenoviridae,Adenoviridae,Adenoviridae,177,0.01722213735481592,464.0,382.98,41.25,840,0.004,encapsidation protein- 52K,Structural-Envelope,Homo sapiens,dsDNA,Mastadenovirus
+388,QBJ02180.1,Reoviridae,Reoviridae,Sedoreoviridae,177,0.01722213735481592,404.0,383.06,43.52,843,0.004,NSP1,Non-structural,Sus scrofa,dsRNA,Rotavirus
+389,QBH84453.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,176,0.017124837143771766,744.0,683.86,131.09,3507,0.018,UL46,Structural-Envelope,Homo sapiens,dsDNA,Simplexvirus
+390,YP_009508520.1,Paramyxoviridae,Paramyxoviridae,Paramyxoviridae,176,0.017124837143771766,574.0,511.89,117.43,2079,0.011,fusion protein,Structural-Envelope,Anas platyrhynchos,ssRNA(-),Paraavulavirus
+391,YP_009112799.1,Poxviridae,Poxviridae,Poxviridae,175,0.017027536932727606,807.0,749.9,150.26,4034,0.021,CPXV113 protein,Replication-Transcription,Homo sapiens,dsDNA,Orthopoxvirus
+392,YP_009094442.1,Paramyxoviridae,Paramyxoviridae,Paramyxoviridae,175,0.017027536932727606,526.0,489.34,94.55,1827,0.01,nucleoprotein,Structural-Envelope,Homo sapiens,ssRNA(-),Respirovirus
+393,AOS89842.1,Closteroviridae,Closteroviridae,Closteroviridae,174,0.01693023672168345,2775.0,1231.91,908.47,8271,0.043,RNA-dependent RNA polymerase,Replication-Transcription,Vitis vinifera,ssRNA(+),Ampelovirus
+394,AQY17018.1,Poxviridae,Poxviridae,Poxviridae,173,0.01683293651063929,955.0,809.65,161.28,4634,0.024,mRNA capping enzyme large subunit,Other-Functions,Homo sapiens,dsDNA,Orthopoxvirus
+395,APQ41671.1,Astroviridae,Astroviridae,Astroviridae,172,0.016735636299595135,822.0,442.2,263.74,1621,0.008,capsid protein,Other-Functions,Homo sapiens,ssRNA(+),Mamastrovirus
+396,YP_009362118.1,Rhabdoviridae,Rhabdoviridae,Rhabdoviridae,171,0.016638336088550976,451.0,385.97,101.73,1026,0.005,nucleoprotein,Structural-Envelope,Bos taurus,ssRNA(-),Vesiculovirus
+397,YP_008877635.1,Secoviridae,Secoviridae,Secoviridae,169,0.01644373566646266,1096.0,637.51,386.62,3292,0.017,polyprotein,Polyprotein,Capsicum annuum,ssRNA(+),Fabavirus
+398,QUD39720.1,Anelloviridae,Anelloviridae,Anelloviridae,304,0.029579264157423957,825.0,602.13,220.26,5015,0.026,ORF1,Other-Functions,Homo sapiens,ssDNA(-),Alphatorquevirus
+399,AWW13559.1,Coronaviridae,Coronaviridae,Coronaviridae,168,0.0163464354554185,1366.0,1078.48,406.91,6713,0.035,spike glycoprotein,Structural-Envelope,Homo sapiens,ssRNA(+),Betacoronavirus
+400,QOI58523.1,Solemoviridae,Solemoviridae-Luteoviridae,Solemoviridae,168,0.0163464354554185,678.0,387.64,198.98,1161,0.006,putative aphid transmission factor,Other-Functions,Saccharum sp.,ssRNA(+),Polerovirus
+401,QAU10393.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,167,0.016249135244374345,860.0,467.96,218.99,1622,0.008,RL2_2,Other-Functions,Homo sapiens,dsDNA,Simplexvirus
+402,GBG35356.1,Poxviridae,Poxviridae-Baculoviridae-Nimaviridae-Caulimoviridae,Poxviridae,167,0.016249135244374345,806.0,546.77,71.12,2169,0.011,DNA ligase,Other-Functions,Homo sapiens,dsDNA,Orthopoxvirus
+403,QOE76820.1,Orthomyxoviridae,Orthomyxoviridae,Orthomyxoviridae,166,0.016151835033330186,715.0,665.93,149.12,3244,0.017,polymerase 3,Replication-Transcription,Bos taurus,ssRNA(-),Gammainfluenzavirus
+404,AWW12516.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,165,0.01605453482228603,491.0,298.8,125.46,535,0.003,envelope glycoprotein I,Structural-Envelope,Homo sapiens,dsDNA,Simplexvirus
+405,ARQ83868.1,Betaflexiviridae,Betaflexiviridae,Betaflexiviridae,164,0.015957234611241874,2345.0,1766.62,915.59,12273,0.064,polyprotein,Polyprotein,Prunus,ssRNA(+),Capillovirus
+406,AOW42758.1,Baculoviridae,Baculoviridae,Baculoviridae,164,0.015957234611241874,587.0,393.93,49.11,874,0.005,p47,Other-Functions,Lymantria dispar,dsDNA,Alphabaculovirus
+407,QVY47431.1,Solemoviridae,Solemoviridae-Luteoviridae-Geminiviridae,Solemoviridae,163,0.015859934400197714,1142.0,516.53,364.5,2227,0.012,RNA-dependent RNA polymerase,Structural-Envelope,Capsicum annuum,ssRNA(+),Polerovirus
+408,ANW09681.1,Baculoviridae,Baculoviridae-Nudiviridae,Baculoviridae,163,0.015859934400197714,637.0,551.27,79.03,2176,0.011,chitinase,Other-Functions,Bombyx mori,dsDNA,Alphabaculovirus
+409,AYM45057.1,Togaviridae,Togaviridae,Togaviridae,162,0.01576263418915356,2535.0,2183.01,789.55,15433,0.081,nonstructural polyprotein,Non-structural,Cricetulus griseus,ssRNA(+),Alphavirus
+410,AMB66229.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,162,0.01576263418915356,951.0,407.89,126.88,975,0.005,transactivating tegument protein VP16,Structural-Envelope,Homo sapiens,dsDNA,Simplexvirus
+411,AAR01970.1,Mitoviridae,Mitoviridae,Mitoviridae,162,0.01576263418915356,744.0,331.07,249.7,1013,0.005,RNA-dependent RNA polymerase,Replication-Transcription,Hymenoscyphus fraxineus,ssRNA(+),Unuamitovirus
+412,YP_009227279.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,160,0.01556803376706524,710.0,677.67,58.62,3083,0.016,UL47,Structural-Envelope,Homo sapiens,dsDNA,Simplexvirus
+413,YP_009272568.1,Caliciviridae,Caliciviridae,Caliciviridae,159,0.015470733556021082,2226.0,536.19,534.18,2436,0.013,RNA-dependent RNA polymerase,Polyprotein,Bos taurus,ssRNA(+),Nebovirus
+414,NP_957860.1,Poxviridae,Poxviridae,Poxviridae,159,0.015470733556021082,841.0,694.3,102.0,3241,0.017,CPXV139 protein,Other-Functions,Homo sapiens,dsDNA,Orthopoxvirus
+415,YP_009255267.1,Baculoviridae,Baculoviridae,Baculoviridae,159,0.015470733556021082,385.0,358.25,35.07,552,0.003,ODV-E56,Other-Functions,Bombyx mori,dsDNA,Alphabaculovirus
+416,YP_003717771.1,Reoviridae,Reoviridae,Spinareoviridae,156,0.01517883292288861,1297.0,1135.87,347.18,6815,0.036,core shell protein,Structural-Envelope,Salmo salar,dsRNA,Orthoreovirus
+417,YP_009054933.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,156,0.01517883292288861,1221.0,736.76,485.02,3870,0.02,DNA polymerase,Replication-Transcription,Equus caballus,dsDNA,Varicellovirus
+418,AQR59059.1,Parvoviridae,Parvoviridae,Parvoviridae,156,0.01517883292288861,695.0,412.66,250.07,1424,0.007,nonstructural protein,Non-structural,Gallus gallus,ssDNA(+/-),Aveparvovirus
+419,QRE02555.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,155,0.015081532711844453,1386.0,632.78,528.54,3042,0.016,ORF75,Structural-Envelope,Homo sapiens,dsDNA,Rhadinovirus
+420,CBY88601.1,Retroviridae,Retroviridae,Retroviridae,155,0.015081532711844453,929.0,272.86,237.05,597,0.003,extra-membrane envelope protein,Structural-Envelope,Simiiformes,ssRNA-RT,Lentivirus
+421,QHG62585.1,Poxviridae,Poxviridae,Poxviridae,155,0.015081532711844453,661.0,623.06,71.51,2577,0.013,EEV maturation protein,Other-Functions,Homo sapiens,dsDNA,Orthopoxvirus
+422,YP_009666679.1,Baculoviridae,Baculoviridae,Baculoviridae,155,0.015081532711844453,646.0,514.84,53.94,1755,0.009,per os infectivity factor 1,Other-Functions,Anticarsia gemmatalis,dsDNA,Alphabaculovirus
+423,YP_717920.1,Tospoviridae,Tospoviridae-Peribunyaviridae-Phenuiviridae,Tospoviridae,155,0.015081532711844453,469.0,439.93,30.63,1133,0.006,nonstructural protein,Non-structural,Solanum lycopersicum,ssRNA(+/-),Orthotospovirus
+424,NP_733922.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,154,0.014984232500800295,1321.0,1306.92,102.24,7780,0.041,BNRF1 tegument protein,Other-Functions,Homo sapiens,dsDNA,Lymphocryptovirus
+425,YP_009553669.1,Caulimoviridae,Caulimoviridae,Caulimoviridae,153,0.014886932289756138,2129.0,642.21,270.06,2762,0.014,reverse transcriptase,Replication-Transcription,Brassica oleracea var. botrytis,dsDNA-RT,Caulimovirus
+426,CAN89114.1,Reoviridae,Reoviridae,Sedoreoviridae,152,0.014789632078711978,987.0,774.98,332.23,3848,0.02,VP2 protein,Structural-Envelope,Bos taurus,dsRNA,Orbivirus
+427,QDZ38037.1,Astroviridae,Astroviridae,Astroviridae,152,0.014789632078711978,837.0,575.39,247.41,2343,0.012,ORF2,Structural-Envelope,Bos taurus,ssRNA(+),Mamastrovirus
+428,APG38313.1,Partitiviridae,Partitiviridae,Partitiviridae,152,0.014789632078711978,469.0,364.07,81.91,705,0.004,coat protein,Structural-Envelope,Pseudogymnoascus destructans,dsRNA,Gammapartitivirus
+429,YP_009408570.1,Poxviridae,Poxviridae,Poxviridae,151,0.01469233186766782,815.0,677.44,180.09,3044,0.016,CPXV011 protein,Other-Functions,Homo sapiens,dsDNA,Orthopoxvirus
+430,AHM96206.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,151,0.01469233186766782,635.0,592.17,67.3,2325,0.012,deoxyribonuclease,Other-Functions,Homo sapiens,dsDNA,Simplexvirus
+431,YP_010085169.1,Poxviridae,Poxviridae,Poxviridae,151,0.01469233186766782,571.0,551.93,71.39,2035,0.011,hypothetical protein,Other-Functions,Homo sapiens,dsDNA,Orthopoxvirus
+432,QGA30603.1,Rhabdoviridae,Rhabdoviridae,Rhabdoviridae,150,0.014595031656623663,2011.0,1932.03,284.5,12376,0.065,RNA-dependent RNA polymerase,Replication-Transcription,Oncorhynchus mykiss,ssRNA(-),Novirhabdovirus
+433,YP_249763.1,Reoviridae,Reoviridae,Spinareoviridae,149,0.014497731445579505,1002.0,929.64,67.3,4716,0.025,P5-1,Other-Functions,Zea mays,dsRNA,Fijivirus
+434,YP_908760.1,Virgaviridae,Virgaviridae,Virgaviridae,148,0.014400431234535348,1672.0,1436.17,470.99,8553,0.045,186K protein,Replication-Transcription,Nicotiana benthamiana,ssRNA(+),Tobamovirus
+435,YP_009246467.1,Reoviridae,Reoviridae,Spinareoviridae,148,0.014400431234535348,761.0,716.01,76.85,3148,0.016,muA,Structural-Envelope,Gallus gallus,dsRNA,Orthoreovirus
+436,NP_620651.1,Alphaflexiviridae,Alphaflexiviridae,Alphaflexiviridae,148,0.014400431234535348,380.0,356.01,32.38,540,0.003,TGB3,Hypothetical,Allium sativum,ssRNA(+),Allexivirus
+437,BBM13211.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,147,0.01430313102349119,1264.0,797.57,170.62,3798,0.02,ribonucleotide reductase subunit 1,Other-Functions,Sus scrofa,dsDNA,Varicellovirus
+438,AFR56081.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,147,0.01430313102349119,560.0,523.36,32.78,1712,0.009,protein UL95,Other-Functions,Homo sapiens,dsDNA,Cytomegalovirus
+439,QPZ44655.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,147,0.01430313102349119,491.0,444.26,79.28,1152,0.006,envelope glycoprotein UL37,Structural-Envelope,Homo sapiens,dsDNA,Cytomegalovirus
+440,QYA72502.1,Betaflexiviridae,Betaflexiviridae,Betaflexiviridae,146,0.014205830812447032,1860.0,1741.56,429.76,10602,0.055,viral replicase,Replication-Transcription,Glycine max,ssRNA(+),Carlavirus
+441,QBH77738.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,146,0.014205830812447032,1429.0,713.51,387.65,3044,0.016,RS1_2,Other-Functions,Homo sapiens,dsDNA,Simplexvirus
+442,SNB53750.1,Poxviridae,Poxviridae,Poxviridae,146,0.014205830812447032,674.0,434.47,248.82,1545,0.008,ankyrin-like protein,Other-Functions,Homo sapiens,dsDNA,Orthopoxvirus
+443,QJB18543.1,Paramyxoviridae,Paramyxoviridae,Paramyxoviridae,146,0.014205830812447032,600.0,543.08,84.49,1883,0.01,phosphoprotein,Other-Functions,Homo sapiens,ssRNA(-),Respirovirus
+444,NP_612746.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,146,0.014205830812447032,505.0,429.31,141.94,1230,0.006,regulatory protein IE1,Regulation-Control,Homo sapiens,dsDNA,Cytomegalovirus
+445,NP_041091.1,Hypoviridae,Hypoviridae,Hypoviridae,145,0.014108530601402875,3165.0,539.53,864.58,2190,0.011,OrfB,Hypothetical,Cryphonectria parasitica,ssRNA(+),Alphahypovirus
+446,AHJ83120.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,144,0.014011230390358715,672.0,599.08,91.49,2241,0.012,DNA packaging protein UL32,Other-Functions,Homo sapiens,dsDNA,Cytomegalovirus
+447,S32991,Herpesviridae,Herpesviridae,Orthoherpesviridae,144,0.014011230390358715,657.0,585.89,51.07,2149,0.011,BFRF2,Hypothetical,Homo sapiens,dsDNA,Lymphocryptovirus
+448,AEV92974.1,Adenoviridae,Adenoviridae,Adenoviridae,144,0.014011230390358715,445.0,361.06,98.52,691,0.004,CR1-beta,Other-Functions,Homo sapiens,dsDNA,Mastadenovirus
+449,ARB50244.1,Poxviridae,Poxviridae,Poxviridae,143,0.013913930179314558,1040.0,454.55,225.04,1437,0.008,ankyrin-like protein,Other-Functions,Homo sapiens,dsDNA,Orthopoxvirus
+450,YP_003517878.1,Baculoviridae,Baculoviridae,Baculoviridae,143,0.013913930179314558,509.0,336.06,112.49,590,0.003,pif-2,Other-Functions,Chrysodeixis includens,dsDNA,Alphabaculovirus
+451,QYC92672.1,Baculoviridae,Baculoviridae,Baculoviridae,143,0.013913930179314558,466.0,386.47,34.31,691,0.004,hypothetical protein,Other-Functions,Chrysodeixis includens,dsDNA,Alphabaculovirus
+452,AII79810.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,142,0.0138166299682704,1294.0,1032.35,123.3,5296,0.028,tegument protein pp150,Structural-Envelope,Homo sapiens,dsDNA,Cytomegalovirus
+453,6XZG_CP1,Orthomyxoviridae,Orthomyxoviridae-Baculoviridae,Orthomyxoviridae,142,0.0138166299682704,779.0,708.96,184.29,3075,0.016,polymerase PB2,Replication-Transcription,Homo sapiens,ssRNA(-),Gammainfluenzavirus
+454,AKI14471.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,142,0.0138166299682704,751.0,739.67,29.11,3233,0.017,multifunctional expression regulator,Regulation-Control,Homo sapiens,dsDNA,Cytomegalovirus
+455,ABF22025.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,142,0.0138166299682704,658.0,564.51,21.94,1932,0.01,ORF14,Structural-Envelope,Homo sapiens,dsDNA,Varicellovirus
+456,YP_009255322.1,Baculoviridae,Baculoviridae,Baculoviridae,142,0.0138166299682704,465.0,377.54,41.27,643,0.003,VLF-1,Other-Functions,Chrysodeixis includens,dsDNA,Alphabaculovirus
+457,NP_064204.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,141,0.013719329757226242,737.0,675.02,49.2,2701,0.014,capsid portal protein,Structural-Envelope,Homo sapiens,dsDNA,Cytomegalovirus
+458,YP_009508762.1,Papillomaviridae,Papillomaviridae,Papillomaviridae,141,0.013719329757226242,698.0,510.49,214.42,1781,0.009,E1,Other-Functions,Homo sapiens,dsDNA,Alphapapillomavirus
+459,QUS52858.1,Sinhaliviridae,Sinhaliviridae-Tombusviridae,Sinhaliviridae,141,0.013719329757226242,677.0,318.67,212.49,755,0.004,RNA-dependent RNA polymerase,Replication-Transcription,Apis mellifera,ssRNA(+),Sinaivirus
+460,SMZ64733.1,Poxviridae,Poxviridae,Poxviridae,141,0.013719329757226242,532.0,336.94,169.4,751,0.004,hypothetical protein,DNA-Binding,Homo sapiens,dsDNA,Orthopoxvirus
+461,QDJ95070.1,Poxviridae,Poxviridae,Poxviridae,141,0.013719329757226242,445.0,428.84,41.18,982,0.005,hypothetical protein,Other-Functions,Homo sapiens,dsDNA,Orthopoxvirus
+462,AXQ65588.1,Anelloviridae,Anelloviridae,Anelloviridae,140,0.013622029546182086,698.0,635.19,91.94,2444,0.013,ORF1,Other-Functions,Homo sapiens,ssDNA(-),Betatorquevirus
+463,QEV82322.1,Hepeviridae,Hepeviridae,Hepeviridae,139,0.013524729335137929,1644.0,717.27,679.36,3314,0.017,polyprotein,Non-structural,Rattus norvegicus,ssRNA(+),Paslahepevirus
+464,QHA79250.1,Adenoviridae,Adenoviridae,Adenoviridae,139,0.013524729335137929,572.0,504.64,73.7,1516,0.008,fiber protein,Structural-Envelope,Gallus gallus,dsDNA,Aviadenovirus
+465,NP_044000.1,Poxviridae,Poxviridae,Poxviridae,139,0.013524729335137929,515.0,413.21,58.28,926,0.005,viral core cysteine proteinase,Structural-Envelope,Homo sapiens,dsDNA,Orthopoxvirus
+466,YP_009227224.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,139,0.013524729335137929,395.0,347.52,110.48,588,0.003,envelope glycoprotein D,Structural-Envelope,Homo sapiens,dsDNA,Simplexvirus
+467,NP_112022.1,Paramyxoviridae,Paramyxoviridae,Paramyxoviridae,138,0.013427429124093771,709.0,513.93,179.61,1642,0.009,phosphoprotein,Other-Functions,Homo sapiens,ssRNA(-),Henipavirus
+468,QED42846.1,Caulimoviridae,Caulimoviridae,Caulimoviridae,138,0.013427429124093771,540.0,507.49,65.18,1569,0.008,inclusion body protein,Structural-Envelope,Brassica oleracea var. botrytis,dsDNA-RT,Caulimovirus
+469,QIM55854.1,Betaflexiviridae,Betaflexiviridae,Betaflexiviridae,138,0.013427429124093771,465.0,361.87,127.75,756,0.004,putative movement protein,Transport,Prunus avium,ssRNA(+),Capillovirus
+470,BAQ19498.1,Reoviridae,Reoviridae,Spinareoviridae,137,0.013330128913049613,642.0,620.02,74.93,2253,0.012,mu NS,Non-structural,Gallus gallus,dsRNA,Orthoreovirus
+471,QPD01922.1,Baculoviridae,Baculoviridae,Baculoviridae,137,0.013330128913049613,587.0,483.06,73.39,1365,0.007,ecdysteroid UDP-glucosyltransferase,Other-Functions,Lymantria dispar,dsDNA,Alphabaculovirus
+472,BBJ36015.1,Coronaviridae,Coronaviridae,Coronaviridae,137,0.013330128913049613,434.0,399.58,78.1,822,0.004,N protein,Structural-Envelope,Homo sapiens,ssRNA(+),Betacoronavirus
+473,AMZ00406.1,Arenaviridae,Arenaviridae,Arenaviridae,136,0.013232828702005456,2215.0,1707.14,807.94,9879,0.052,L protein,Replication-Transcription,Homo sapiens,ssRNA(+/-),Mammarenavirus
+474,AGE61316.1,Baculoviridae,Baculoviridae-Ascoviridae,Baculoviridae,265,0.025784555926701803,549.0,326.45,84.99,771,0.004,BRO-B,Other-Functions,Lymantria dispar,dsDNA,Alphabaculovirus
+475,QJI52174.1,Dicistroviridae,Dicistroviridae,Dicistroviridae,135,0.013135528490961296,2009.0,689.51,806.46,3295,0.017,polymerase polyprotein,Non-structural,Apis mellifera,ssRNA(+),Aparavirus
+476,AKH03065.1,Reoviridae,Reoviridae,Spinareoviridae,135,0.013135528490961296,1289.0,1269.53,103.37,6643,0.035,lambda C,Other-Functions,Gallus gallus,dsRNA,Orthoreovirus
+477,ADZ55759.1,Secoviridae,Secoviridae,Secoviridae,135,0.013135528490961296,1102.0,642.09,380.89,2599,0.014,polyprotein,Polyprotein,Vigna unguiculata,ssRNA(+),Comovirus
+478,NP_612623.1,Virgaviridae,Virgaviridae,Virgaviridae,135,0.013135528490961296,931.0,542.12,298.02,2002,0.01,coat protein,Structural-Envelope,Solanum tuberosum,ssRNA(+),Pomovirus
+479,YP_004821364.1,Poxviridae,Poxviridae,Poxviridae,135,0.013135528490961296,518.0,407.16,149.18,1002,0.005,kelch-like protein,Other-Functions,Homo sapiens,dsDNA,Orthopoxvirus
+480,QBJ02267.1,Reoviridae,Reoviridae,Sedoreoviridae,134,0.013038228279917139,1190.0,907.1,394.15,4222,0.022,VP1,Other-Functions,Sus scrofa,dsRNA,Rotavirus
+481,CAA35386.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,134,0.013038228279917139,1062.0,938.54,24.99,4368,0.023,helicase-primase primase subunit,Replication-Transcription,Homo sapiens,dsDNA,Cytomegalovirus
+482,QGN68033.1,Poxviridae,Poxviridae,Poxviridae,134,0.013038228279917139,749.0,699.22,130.87,2752,0.014,hypothetical protein,Other-Functions,Homo sapiens,dsDNA,Orthopoxvirus
+483,6BEB_A,Poxviridae,Poxviridae,Poxviridae,134,0.013038228279917139,567.0,516.57,119.62,1673,0.009,CPXV131 protein,Structural-Envelope,Homo sapiens,dsDNA,Orthopoxvirus
+484,BBG06509.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,134,0.013038228279917139,493.0,363.32,124.75,697,0.004,glycoprotein C,Glycoprotein,Sus scrofa,dsDNA,Varicellovirus
+485,QEQ13291.1,Reoviridae,Reoviridae,Spinareoviridae,133,0.012940928068872981,1306.0,1245.41,219.82,6376,0.033,lambda A-core shell,Structural-Envelope,Gallus gallus,dsRNA,Orthoreovirus
+486,YP_654692.1,Iridoviridae,Iridoviridae-Ascoviridae,Iridoviridae,133,0.012940928068872981,1141.0,718.46,384.3,3075,0.016,DNA polymerase,Replication-Transcription,Ambystoma tigrinum,dsDNA,Ranavirus
+487,YP_002213852.1,Adenoviridae,Adenoviridae,Adenoviridae,133,0.012940928068872981,518.0,484.82,34.27,1285,0.007,DBP,Binding-Protein,Homo sapiens,dsDNA,Mastadenovirus
+488,YP_009551523.1,Secoviridae,Secoviridae,Secoviridae,132,0.012843627857828823,1366.0,698.86,433.86,2788,0.015,coat protein,Structural-Envelope,Robinia pseudoacacia,ssRNA(+),Nepovirus
+489,ADZ30417.1,Poxviridae,Poxviridae,Poxviridae,132,0.012843627857828823,904.0,715.17,191.17,2883,0.015,CPXV019 protein,Other-Functions,Homo sapiens,dsDNA,Orthopoxvirus
+490,QOE76821.1,Orthomyxoviridae,Orthomyxoviridae,Orthomyxoviridae,132,0.012843627857828823,600.0,514.43,119.27,1577,0.008,nucleoprotein,Structural-Envelope,Bos taurus,ssRNA(-),Gammainfluenzavirus
+491,QRE02502.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,132,0.012843627857828823,598.0,553.7,60.63,1772,0.009,BVRF1,Structural-Envelope,Homo sapiens,dsDNA,Lymphocryptovirus
+492,QOS02566.1,Caliciviridae,Caliciviridae,Caliciviridae,131,0.012746327646784666,1701.0,1258.76,668.96,6573,0.034,polyprotein,Non-structural,Mus musculus,ssRNA(+),Norovirus
+493,QPB10704.1,Astroviridae,Astroviridae,Astroviridae,131,0.012746327646784666,1660.0,324.07,299.17,755,0.004,RNA-dependent RNA polymerase,Replication-Transcription,Meleagris gallopavo,ssRNA(+),Avastrovirus
+494,WP_016023246.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,131,0.012746327646784666,707.0,423.67,208.17,1301,0.007,capsid scaffold protein,Structural-Envelope,Homo sapiens,dsDNA,Varicellovirus
+495,YP_009255312.1,Baculoviridae,Baculoviridae,Baculoviridae,131,0.012746327646784666,562.0,462.73,41.86,1142,0.006,LEF-4,Other-Functions,Chrysodeixis includens,dsDNA,Alphabaculovirus
+496,YP_008658501.1,Poxviridae,Poxviridae,Poxviridae,130,0.012649027435740508,791.0,751.95,140.27,3098,0.016,NTPase,Other-Functions,Homo sapiens,dsDNA,Orthopoxvirus
+497,AWO71750.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,130,0.012649027435740508,676.0,508.79,107.98,1472,0.008,tegument protein UL21,Structural-Envelope,Homo sapiens,dsDNA,Simplexvirus
+498,NP_612725.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,130,0.012649027435740508,606.0,575.36,63.74,1857,0.01,DNA packaging tegument protein UL17,Structural-Envelope,Homo sapiens,dsDNA,Cytomegalovirus
+499,YP_249762.1,Reoviridae,Reoviridae,Spinareoviridae,129,0.01255172722469635,1470.0,1411.4,227.68,7281,0.038,P1,Replication-Transcription,Zea mays,dsRNA,Fijivirus
+500,YP_009389359.1,Poxviridae,Poxviridae,Poxviridae,129,0.01255172722469635,638.0,598.57,114.06,2034,0.011,CPXV128 protein,Replication-Transcription,Homo sapiens,dsDNA,Orthopoxvirus
+501,QGM48758.1,Poxviridae,Poxviridae,Poxviridae,128,0.012454427013652193,1953.0,1773.77,401.45,9517,0.05,hypothetical protein,Other-Functions,Homo sapiens,dsDNA,Orthopoxvirus
+502,YP_009552473.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,128,0.012454427013652193,1219.0,1060.04,239.68,4975,0.026,BALF2,DNA-Binding,Homo sapiens,dsDNA,Lymphocryptovirus
+503,AGV92854.1,Retroviridae,Retroviridae-Poxviridae,Retroviridae,128,0.012454427013652193,609.0,443.4,176.94,1178,0.006,envelope glycoprotein,Structural-Envelope,Gallus gallus,ssRNA-RT,Gammaretrovirus
+504,ANN83939.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,128,0.012454427013652193,536.0,455.14,74.9,1062,0.006,tegument host shutoff protein,Structural-Envelope,Homo sapiens,dsDNA,Simplexvirus
+505,YP_006666504.1,Dicistroviridae,Dicistroviridae,Dicistroviridae,127,0.012357126802608037,1030.0,458.07,224.89,1173,0.006,capsid protein 2,Structural-Envelope,Penaeidae,ssRNA(+),Aparavirus
+506,QLC36818.1,Partitiviridae,Partitiviridae,Partitiviridae,127,0.012357126802608037,775.0,691.6,113.5,2575,0.013,RNA-dependent RNA polymerase,Replication-Transcription,Rosellinia necatrix,dsRNA,Betapartitivirus
+507,NP_612708.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,127,0.012357126802608037,767.0,684.2,178.06,2665,0.014,envelope glycoprotein H,Structural-Envelope,Homo sapiens,dsDNA,Cytomegalovirus
+508,YP_009507388.1,Parvoviridae,Parvoviridae,Parvoviridae,127,0.012357126802608037,679.0,598.57,145.4,2065,0.011,nonstructural protein,Non-structural,Sus scrofa,ssDNA(+/-),Tetraparvovirus
+509,DAC85375.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,127,0.012357126802608037,557.0,484.83,139.38,1330,0.007,US8,Structural-Envelope,Homo sapiens,dsDNA,Simplexvirus
+510,YP_009325844.1,Phycodnaviridae,Phycodnaviridae,Phycodnaviridae,127,0.012357126802608037,525.0,419.44,103.91,940,0.005,major capsid protein VP54,Structural-Envelope,Chlorella heliozoae,dsDNA,Chlorovirus
+511,ALN38790.1,Potyviridae,Potyviridae,Potyviridae,126,0.012259826591563876,3174.0,679.41,986.03,2790,0.015,polyprotein,Polyprotein,Cucumis sativus,ssRNA(+),Ipomovirus
+512,AVP32822.1,Hepeviridae,Hepeviridae,Hepeviridae,126,0.012259826591563876,666.0,575.81,149.78,1904,0.01,capsid protein,Structural-Envelope,Rattus norvegicus,ssRNA(+),Avihepevirus
+513,YP_009112869.1,Poxviridae,Poxviridae,Poxviridae,125,0.01216252638051972,504.0,445.51,36.0,965,0.005,Ser/Thr kinase,Other-Functions,Homo sapiens,dsDNA,Orthopoxvirus
+514,YP_009824971.1,Coronaviridae,Coronaviridae,Coronaviridae,125,0.01216252638051972,433.0,352.28,87.54,509,0.003,nucleocapsid protein,Other-Functions,Homo sapiens,ssRNA(+),Alphacoronavirus
+515,AAF26709.1,Matonaviridae,Matonaviridae,Matonaviridae,124,0.01206522616947556,2129.0,1594.19,821.24,8089,0.042,non-structural polyprotein p200,Non-structural,Homo sapiens,ssRNA(+),Rubivirus
+516,AKI19639.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,124,0.01206522616947556,986.0,973.2,73.26,4277,0.022,tegument protein UL37,Structural-Envelope,Homo sapiens,dsDNA,Cytomegalovirus
+517,QBI22252.1,Fimoviridae,Fimoviridae,Fimoviridae,124,0.01206522616947556,528.0,472.25,18.23,1151,0.006,p7,Hypothetical,Rosa sp.,ssRNA(-),Emaravirus
+518,QBH77804.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,124,0.01206522616947556,522.0,453.35,63.19,1074,0.006,capsid triplex subunit 1,Other-Functions,Homo sapiens,dsDNA,Simplexvirus
+519,YP_008136231.1,Reoviridae,Reoviridae,Sedoreoviridae,123,0.011967925958431404,991.0,795.93,277.4,3183,0.017,VP2,Other-Functions,Sus scrofa,dsRNA,Rotavirus
+520,AYA49857.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,123,0.011967925958431404,621.0,491.2,164.59,1407,0.007,BVRF2,Hypothetical,Homo sapiens,dsDNA,Lymphocryptovirus
+521,QJQ40211.1,Poxviridae,Poxviridae,Poxviridae,123,0.011967925958431404,468.0,381.86,34.69,606,0.003,hypothetical protein,Hypothetical,Homo sapiens,dsDNA,Orthopoxvirus
+522,QBH77810.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,123,0.011967925958431404,462.0,415.25,24.01,751,0.004,UL43,Other-Functions,Homo sapiens,dsDNA,Simplexvirus
+523,YP_081515.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,122,0.011870625747387247,850.0,803.33,164.32,3169,0.017,DNA packaging terminase subunit 2,Other-Functions,Homo sapiens,dsDNA,Cytomegalovirus
+524,AFU08308.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,122,0.011870625747387247,837.0,551.57,125.96,1626,0.008,BBRF1,Other-Functions,Homo sapiens,dsDNA,Lymphocryptovirus
+525,AMB65754.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,122,0.011870625747387247,651.0,448.79,71.68,1000,0.005,envelope glycoprotein M,Structural-Envelope,Homo sapiens,dsDNA,Simplexvirus
+526,YP_010085845.1,Poxviridae,Poxviridae,Poxviridae,122,0.011870625747387247,569.0,478.52,168.86,1364,0.007,kelch-like protein,Hypothetical,Homo sapiens,dsDNA,Orthopoxvirus
+527,NP_612671.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,121,0.01177332553634309,640.0,572.38,103.01,1743,0.009,protein UL27,Other-Functions,Homo sapiens,dsDNA,Cytomegalovirus
+528,QHX39861.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,121,0.01177332553634309,489.0,472.31,5.83,1087,0.006,protein UL13,Other-Functions,Homo sapiens,dsDNA,Cytomegalovirus
+529,YP_009112862.1,Poxviridae,Poxviridae,Poxviridae,120,0.01167602532529893,571.0,471.12,139.68,1303,0.007,ankyrin/F-box protein,Other-Functions,Capra hircus,dsDNA,Parapoxvirus
+530,QFU18869.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,120,0.01167602532529893,545.0,499.21,55.54,1298,0.007,BFLF1,Other-Functions,Homo sapiens,dsDNA,Lymphocryptovirus
+531,YP_009507723.1,Reoviridae,Reoviridae,Sedoreoviridae,120,0.01167602532529893,519.0,486.2,62.42,1202,0.006,outer capsid protein,Other-Functions,Equus caballus,dsRNA,Orbivirus
+532,AWV66923.1,Tobaniviridae,Tobaniviridae,Tobaniviridae,119,0.011578725114254772,6857.0,1389.98,2200.24,6909,0.036,polyprotein 1a,Polyprotein,Sus scrofa,ssRNA(+),Torovirus
+533,NP_068342.1,Tombusviridae,Tombusviridae,Tombusviridae,119,0.011578725114254772,992.0,744.71,286.03,2814,0.015,RNA-dependent RNA polymerase,Replication-Transcription,Zea mays,ssRNA(+),Machlomovirus
+534,AKI19523.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,119,0.011578725114254772,686.0,664.08,79.03,2264,0.012,protein UL112,Other-Functions,Homo sapiens,dsDNA,Cytomegalovirus
+535,YP_010085700.1,Poxviridae,Poxviridae,Poxviridae,119,0.011578725114254772,475.0,362.68,149.27,760,0.004,CPXV039 protein,Other-Functions,Homo sapiens,dsDNA,Orthopoxvirus
+536,NP_038453.1,Tombusviridae,Tombusviridae-Solemoviridae,Tombusviridae,118,0.011481424903210614,888.0,580.66,258.42,1912,0.01,RNA-dependent RNA polymerase,Replication-Transcription,Jasminum sambac,ssRNA(+),Alphacarmovirus
+537,AQN73081.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,118,0.011481424903210614,877.0,865.97,70.56,3384,0.018,helicase-primase subunit,Replication-Transcription,Homo sapiens,dsDNA,Cytomegalovirus
+538,NP_599247.1,Nodaviridae,Nodaviridae,Nodaviridae,117,0.011384124692166457,983.0,653.35,383.55,2377,0.012,RNA-dependent RNA polymerase,Replication-Transcription,Dicentrarchus labrax,ssRNA(+),Betanodavirus
+539,YP_009162462.1,Poxviridae,Poxviridae,Poxviridae,117,0.011384124692166457,736.0,621.57,78.33,1925,0.01,m81R,Replication-Transcription,Homo sapiens,dsDNA,Orthopoxvirus
+540,YP_005090504.1,Parvoviridae,Parvoviridae,Parvoviridae,117,0.011384124692166457,692.0,556.69,143.37,1559,0.008,nonstructural protein,Non-structural,Sus scrofa,ssDNA(+/-),Tetraparvovirus
+541,YP_010086617.1,Baculoviridae,Baculoviridae,Baculoviridae,117,0.011384124692166457,510.0,474.05,15.41,1088,0.006,P49,Other-Functions,Lymantria dispar,dsDNA,Alphabaculovirus
+542,AST24354.1,Closteroviridae,Closteroviridae,Closteroviridae,117,0.011384124692166457,478.0,460.32,50.49,985,0.005,divergent coat protein,Structural-Envelope,Vitis vinifera,ssRNA(+),Ampelovirus
+543,QIX04702.1,Bornaviridae,Bornaviridae,Bornaviridae,116,0.0112868244811223,1737.0,1359.75,623.33,6331,0.033,polymerase,Replication-Transcription,Callosciurus prevostii,ssRNA(-),Orthobornavirus
+544,AYD61665.1,Totiviridae,Totiviridae,Totiviridae,116,0.0112868244811223,1640.0,630.64,326.53,2259,0.012,RNA-dependent RNA polymerase,Replication-Transcription,Leishmania guyanensis,dsRNA,Leishmaniavirus
+545,NP_612719.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,116,0.0112868244811223,1386.0,1239.22,359.53,5577,0.029,major capsid protein,Structural-Envelope,Homo sapiens,dsDNA,Cytomegalovirus
+546,YP_009133219.1,Baculoviridae,Baculoviridae,Baculoviridae,116,0.0112868244811223,760.0,673.76,65.68,2236,0.012,ODV-E66,Other-Functions,Spodoptera frugiperda,dsDNA,Alphabaculovirus
+547,AQN73394.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,116,0.0112868244811223,648.0,630.49,14.82,1951,0.01,DNA packaging tegument protein UL25,Structural-Envelope,Homo sapiens,dsDNA,Cytomegalovirus
+548,QSR83623.1,Tobaniviridae,Tobaniviridae,Tobaniviridae,115,0.011189524270078141,1587.0,816.21,681.23,3345,0.017,spike protein,Structural-Envelope,Sus scrofa,ssRNA(+),Torovirus
+549,DAB41733.1,Amalgaviridae,Amalgaviridae-Totiviridae,Amalgaviridae,115,0.011189524270078141,1071.0,652.61,369.51,2204,0.012,fusion protein,Structural-Envelope,Solanum lycopersicum,dsRNA,Amalgavirus
+550,WP_016053677.1,Baculoviridae,Baculoviridae-Poxviridae-Ascoviridae,Baculoviridae,115,0.011189524270078141,530.0,384.63,137.98,849,0.004,alkaline exonuclease,Other-Functions,Lymantria dispar,dsDNA,Alphabaculovirus
+551,QBH79984.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,114,0.011092224059033984,848.0,395.68,155.24,632,0.003,RL2_3-ICP0 (Infected Cell Protein 0),Replication-Transcription,Homo sapiens,dsDNA,Simplexvirus
+552,ACA42573.1,Hepadnaviridae,Hepadnaviridae,Hepadnaviridae,114,0.011092224059033984,841.0,724.22,173.43,2494,0.013,polymerase,Replication-Transcription,Anas platyrhynchos,dsDNA-RT,Avihepadnavirus
+553,3OWG_A,Poxviridae,Poxviridae,Poxviridae,114,0.011092224059033984,480.0,449.25,97.18,985,0.005,poly(A) polymerase large subunit,Replication-Transcription,Homo sapiens,dsDNA,Orthopoxvirus
+554,AIT53896.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,113,0.010994923847989826,840.0,796.82,66.07,2799,0.015,ORF11,Other-Functions,Homo sapiens,dsDNA,Varicellovirus
+555,YP_009143489.1,Poxviridae,Poxviridae,Poxviridae,113,0.010994923847989826,565.0,537.93,83.78,1410,0.007,ankyrin-like protein,Other-Functions,Homo sapiens,dsDNA,Orthopoxvirus
+556,AWY10942.1,Partitiviridae,Partitiviridae-Picobirnaviridae,Partitiviridae,113,0.010994923847989826,553.0,431.35,137.52,886,0.005,RNA-dependent RNA polymerase,Replication-Transcription,Pseudogymnoascus destructans,dsRNA,Gammapartitivirus
+557,AMB66090.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,112,0.010897623636945668,605.0,478.96,99.39,1085,0.006,UL54,Regulation-Control,Homo sapiens,dsDNA,Simplexvirus
+558,YP_081532.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,112,0.010897623636945668,587.0,561.8,60.41,1547,0.008,protein UL84,Other-Functions,Homo sapiens,dsDNA,Cytomegalovirus
+559,NP_612688.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,111,0.01080032342590151,945.0,873.1,126.32,3270,0.017,ribonucleotide reductase subunit 1,Other-Functions,Homo sapiens,dsDNA,Cytomegalovirus
+560,QIQ51177.1,Reoviridae,Reoviridae,Sedoreoviridae,111,0.01080032342590151,616.0,541.77,57.93,1416,0.007,NS1,Other-Functions,Equus caballus,dsRNA,Orbivirus
+561,YP_009508759.1,Papillomaviridae,Papillomaviridae,Papillomaviridae,111,0.01080032342590151,584.0,507.04,76.28,1233,0.006,L2,Other-Functions,Homo sapiens,dsDNA,Betapapillomavirus
+562,YP_009268831.1,Poxviridae,Poxviridae,Poxviridae,111,0.01080032342590151,435.0,410.31,75.12,736,0.004,DNA polymerase processivity factor,Replication-Transcription,Homo sapiens,dsDNA,Orthopoxvirus
+563,AXN75247.1,Poxviridae,Poxviridae,Poxviridae,110,0.010703023214857353,679.0,552.88,171.31,1542,0.008,CPXV027 protein,Other-Functions,Homo sapiens,dsDNA,Orthopoxvirus
+564,YP_009507926.1,Fimoviridae,Fimoviridae,Fimoviridae,110,0.010703023214857353,653.0,532.55,209.83,1536,0.008,putative glycoprotein p2,Glycoprotein,Rosa sp.,ssRNA(-),Emaravirus
+565,NP_624332.2,Totiviridae,Totiviridae-Partitiviridae,Totiviridae,176,0.017124837143771766,1601.0,679.2,276.78,3659,0.019,RNA-dependent RNA polymerase,Replication-Transcription,Pyricularia oryzae,dsRNA,Victorivirus
+566,QHW06094.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,109,0.010605723003813195,1492.0,558.72,571.66,1796,0.009,ICP4,Replication-Transcription,Gallus gallus,dsDNA,Iltovirus
+567,BAM75921.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,108,0.010508422792769038,1216.0,553.89,272.46,1541,0.008,envelope glycoprotein,Structural-Envelope,Equus caballus,dsDNA,Varicellovirus
+568,AZL89935.1,Mimiviridae,Mimiviridae,Mimiviridae,108,0.010508422792769038,549.0,411.03,107.5,715,0.004,hypothetical protein,Other-Functions,Acanthamoeba castellanii,dsDNA,Mimivirus
+569,YP_009325603.1,Phycodnaviridae,Phycodnaviridae,Phycodnaviridae,106,0.010313822370680722,1506.0,1251.0,340.37,5097,0.027,Chlorovirus glycoprotein repeat domain-containing protein,Glycoprotein,Chlorella variabilis,dsDNA,Chlorovirus
+570,AYV76052.1,Mimiviridae,Mimiviridae-Phycodnaviridae-Marseilleviridae-Poxviridae-Nimaviridae,Mimiviridae,105,0.010216522159636565,1067.0,607.5,256.07,1844,0.01,Hsp70 protein,Stress-Response,Acanthamoeba castellanii,dsDNA,Mimivirus
+571,YP_009551696.1,Mesoniviridae,Mesoniviridae-Coronaviridae,Mesoniviridae,104,0.010119221948592407,5365.0,2655.97,1445.08,12397,0.065,ORF2,Polyprotein,Culex quinquefasciatus,ssRNA(+),Alphamesonivirus
+572,AVR53748.1,Parvoviridae,Parvoviridae,Parvoviridae,104,0.010119221948592407,712.0,616.99,86.0,1680,0.009,minor capsid protein,Structural-Envelope,Gallus gallus,ssDNA(+/-),Aveparvovirus
+573,NP_612745.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,104,0.010119221948592407,598.0,561.23,61.13,1454,0.008,regulatory protein IE2,Regulation-Control,Homo sapiens,dsDNA,Cytomegalovirus
+574,AXU44617.1,Secoviridae,Secoviridae,Secoviridae,103,0.01002192173754825,3544.0,815.82,1171.46,2972,0.016,coat protein 1,Structural-Envelope,Oryza sativa,ssRNA(+),Waikavirus
+575,YP_007506946.1,Solemoviridae,Solemoviridae,Solemoviridae,103,0.01002192173754825,1018.0,669.57,187.6,1965,0.01,RNA-dependent RNA polymerase,Replication-Transcription,Oryza sativa,ssRNA(+),Sobemovirus
+576,AXF38732.1,Reoviridae,Reoviridae,Sedoreoviridae,103,0.01002192173754825,784.0,566.93,207.58,1494,0.008,VP4,Structural-Envelope,Homo sapiens,dsRNA,Rotavirus
+577,YP_004821536.1,Poxviridae,Poxviridae,Poxviridae,103,0.01002192173754825,603.0,528.23,124.69,1288,0.007,ankyrin-like protein,Other-Functions,Homo sapiens,dsDNA,Orthopoxvirus
+578,BCS83056.1,Phycodnaviridae,Phycodnaviridae-Mimiviridae-Marseilleviridae-Iridoviridae-Poxviridae,Phycodnaviridae,102,0.00992462152650409,1296.0,1015.28,277.56,3716,0.019,DNA topoisomerase II,Other-Functions,Acanthamoeba castellanii,dsDNA,Chlorovirus
+579,YP_249673.1,Baculoviridae,Baculoviridae-Ascoviridae,Baculoviridae,166,0.016151835033330186,635.0,432.53,130.75,1357,0.007,BRO-B,Other-Functions,Lymantria dispar,dsDNA,Alphabaculovirus
+580,ASZ83554.1,Partitiviridae,Partitiviridae,Partitiviridae,102,0.00992462152650409,624.0,548.85,120.64,1353,0.007,RNA-dependent RNA polymerase,Replication-Transcription,Heterobasidion parviporum,dsRNA,Alphapartitivirus
+581,AJA04925.1,Caulimoviridae,Caulimoviridae,Caulimoviridae,102,0.00992462152650409,503.0,472.12,76.87,975,0.005,capsid protein,Structural-Envelope,Brassica oleracea var. botrytis,dsDNA-RT,Caulimovirus
+582,YP_001129505.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,102,0.00992462152650409,469.0,468.02,5.37,914,0.005,LF1,Other-Functions,Homo sapiens,dsDNA,Lymphocryptovirus
+583,YP_009109556.3,Arteriviridae,Arteriviridae,Arteriviridae,101,0.009827321315459932,3595.0,2296.13,822.43,10110,0.053,polyprotein,Other-Functions,Piliocolobus tephrosceles,ssRNA(+),Zetaarterivirus
+584,QVY10319.1,Reoviridae,Reoviridae,Spinareoviridae,101,0.009827321315459932,471.0,410.73,115.31,726,0.004,sigma 1,Cellular-Regulation,Sus scrofa,dsRNA,Orthoreovirus
+585,WP_016069857.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,100,0.009730021104415775,943.0,885.59,209.07,3210,0.017,protein UL87,Hypothetical,Homo sapiens,dsDNA,Cytomegalovirus
+586,QRG29177.1,Partitiviridae,Partitiviridae-Picobirnaviridae,Partitiviridae,100,0.009730021104415775,500.0,417.45,106.21,702,0.004,RNA-dependent RNA polymerase,Replication-Transcription,Capsicum annuum,dsRNA,Deltapartitivirus
+587,YP_009352912.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,99,0.009632720893371619,782.0,715.42,134.03,2141,0.011,helicase-primase subunit,Replication-Transcription,Equus caballus,dsDNA,Varicellovirus
+588,QBR53290.1,Solemoviridae,Solemoviridae-Tombusviridae,Solemoviridae,99,0.009632720893371619,668.0,609.71,44.48,1606,0.008,P1 protein,Other-Functions,Brassica napus,ssRNA(+),Polerovirus
+589,7NT5_A,Paramyxoviridae,Paramyxoviridae,Paramyxoviridae,98,0.00953542068232746,539.0,404.06,173.12,776,0.004,nucleocapsid protein,Structural-Envelope,Homo sapiens,ssRNA(-),Henipavirus
+590,NP_733875.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,98,0.00953542068232746,508.0,506.08,1.45,1076,0.006,BGLF1,Other-Functions,Homo sapiens,dsDNA,Lymphocryptovirus
+591,YP_009133271.1,Baculoviridae,Baculoviridae,Baculoviridae,97,0.009438120471283302,908.0,826.71,53.65,2591,0.014,viral capsid associated protein,Other-Functions,Bombyx mori,dsDNA,Alphabaculovirus
+592,NP_054007.4,Tombusviridae,Tombusviridae-Solemoviridae,Tombusviridae,97,0.009438120471283302,882.0,636.51,298.37,1837,0.01,RNA-dependent RNA polymerase,Replication-Transcription,Pisum sativum,ssRNA(+),Umbravirus
+593,YP_009111421.1,Polyomaviridae,Polyomaviridae,Polyomaviridae,97,0.009438120471283302,817.0,531.79,275.56,1308,0.007,large T antigen,Other-Functions,Homo sapiens,dsDNA,Alphapolyomavirus
+594,QBH66128.1,Baculoviridae,Baculoviridae,Baculoviridae,97,0.009438120471283302,798.0,683.0,107.44,1957,0.01,ODV-E66,Structural-Envelope,Bombyx mori,dsDNA,Alphabaculovirus
+595,AWC26950.1,Sinhaliviridae,Sinhaliviridae,Sinhaliviridae,96,0.009340820260239144,862.0,472.6,327.94,1175,0.006,Orf1,Other-Functions,Apis mellifera,ssRNA(+),Sinaivirus
+596,YP_009259388.1,Iridoviridae,Iridoviridae,Iridoviridae,96,0.009340820260239144,646.0,443.1,146.69,862,0.005,hypothetical protein,Other-Functions,Ambystoma tigrinum,dsDNA,Ranavirus
+597,QED42772.1,Potyviridae,Potyviridae,Potyviridae,95,0.009243520049194986,916.0,802.31,141.49,2459,0.013,polyprotein,Polyprotein,Triticum aestivum,ssRNA(+),Bymovirus
+598,YP_010087001.1,Potyviridae,Potyviridae,Potyviridae,94,0.009146219838150829,3019.0,725.89,865.15,2168,0.011,polyprotein,Polyprotein,Elettaria cardamomum,ssRNA(+),Macluravirus
+599,QJE50384.1,Reoviridae,Reoviridae,Spinareoviridae,94,0.009146219838150829,452.0,380.35,98.76,500,0.003,sigma-2 protein,Cellular-Regulation,Sus scrofa,dsRNA,Orthoreovirus
+600,AYD75927.1,Betaflexiviridae,Betaflexiviridae,Betaflexiviridae,93,0.009048919627106671,1893.0,1355.34,773.38,5105,0.027,replicase,Replication-Transcription,Malus domestica,ssRNA(+),Trichovirus
+601,AJR29268.1,Iridoviridae,Iridoviridae,Iridoviridae,93,0.009048919627106671,1247.0,1104.68,227.91,3822,0.02,DNA-dependent RNA polymerase II second largest subunit domain 6,Replication-Transcription,Ambystoma tigrinum,dsDNA,Ranavirus
+602,YP_009551832.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,93,0.009048919627106671,782.0,593.59,239.23,1533,0.008,glycoprotein H,Glycoprotein,Equus caballus,dsDNA,Rhadinovirus
+603,AFA46655.1,Adenoviridae,Adenoviridae,Adenoviridae,93,0.009048919627106671,500.0,485.96,11.93,913,0.005,DNA-binding protein,DNA-Binding,Homo sapiens,dsDNA,Mastadenovirus
+604,NP_054697.1,Paramyxoviridae,Paramyxoviridae,Paramyxoviridae,92,0.008951619416062514,2270.0,1278.98,1039.18,4728,0.025,polymerase,Replication-Transcription,Homo sapiens,ssRNA(-),Henipavirus
+605,YP_002647021.1,Betaflexiviridae,Betaflexiviridae-Alphaflexiviridae-Potyviridae,Betaflexiviridae,92,0.008951619416062514,1932.0,1790.93,458.92,6960,0.036,replicase,Replication-Transcription,Allium sativum,ssRNA(+),Carlavirus
+606,QXI73301.1,Baculoviridae,Baculoviridae-Orthomyxoviridae,Baculoviridae,92,0.008951619416062514,532.0,498.23,82.91,993,0.005,gp64,Other-Functions,Bombyx mori,dsDNA,Alphabaculovirus
+607,YP_009165496.1,Bornaviridae,Bornaviridae,Bornaviridae,92,0.008951619416062514,511.0,485.6,60.79,934,0.005,glycoprotein,Glycoprotein,Homo sapiens,ssRNA(-),Orthobornavirus
+608,YP_008130302.1,Solemoviridae,Solemoviridae-Luteoviridae,Solemoviridae,91,0.008854319205018356,1323.0,909.16,390.64,2970,0.016,peptidase,Replication-Transcription,Pisum sativum,ssRNA(+),Enamovirus
+609,QAA77585.1,Reoviridae,Reoviridae,Spinareoviridae,91,0.008854319205018356,1293.0,1222.07,261.78,4446,0.023,lambda-2 protein,Other-Functions,Sus scrofa,dsRNA,Orthoreovirus
+610,YP_009029998.1,Flaviviridae,Flaviviridae,Flaviviridae,91,0.008854319205018356,754.0,550.58,221.64,1266,0.007,putative glycoprotein,Glycoprotein,Rhipicephalus microplus,ssRNA(+),Undefined genus
+611,AUS94757.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,90,0.008757018993974198,3602.0,2856.03,1110.03,11531,0.06,large tegument protein,Structural-Envelope,Equus caballus,dsDNA,Varicellovirus
+612,YP_009259667.1,Tombusviridae,Tombusviridae,Tombusviridae,90,0.008757018993974198,852.0,647.21,239.9,1666,0.009,RNA-dependent RNA polymerase,Replication-Transcription,Beta vulgaris,ssRNA(+),Tombusvirus
+613,QHE24171.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,90,0.008757018993974198,689.0,616.87,52.3,1489,0.008,nuclear antigen EBNA-1,Other-Functions,Homo sapiens,dsDNA,Lymphocryptovirus
+614,QGN68052.1,Poxviridae,Poxviridae,Poxviridae,90,0.008757018993974198,597.0,569.28,88.56,1273,0.007,CPXV088 protein,Other-Functions,Homo sapiens,dsDNA,Orthopoxvirus
+615,YP_008378340.1,Baculoviridae,Baculoviridae,Baculoviridae,90,0.008757018993974198,421.0,406.71,24.17,537,0.003,alkaline exonuclease,Other-Functions,Lymantria dispar,dsDNA,Alphabaculovirus
+616,ASH99277.1,Iridoviridae,Iridoviridae-Ascoviridae,Iridoviridae,89,0.00865971878293004,1323.0,1214.27,182.0,4138,0.022,DNA-dependent RNA polymerase II largest subunit,Replication-Transcription,Ambystoma tigrinum,dsDNA,Ranavirus
+617,QRE02518.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,89,0.00865971878293004,621.0,457.82,101.51,855,0.004,BGLF5,Other-Functions,Homo sapiens,dsDNA,Lymphocryptovirus
+618,QYD01972.1,Anelloviridae,Anelloviridae,Anelloviridae,89,0.00865971878293004,589.0,547.21,18.6,1144,0.006,ORF1,Other-Functions,Lynx canadensis,ssDNA(-),Etatorquevirus
+619,NP_040552.1,Betaflexiviridae,Betaflexiviridae,Betaflexiviridae,89,0.00865971878293004,460.0,418.97,100.98,656,0.003,movement protein,Transport,Malus domestica,ssRNA(+),Trichovirus
+620,NP_040184.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,88,0.008562418571885883,1310.0,1308.7,4.97,4484,0.023,ORF62,Replication-Transcription,Homo sapiens,dsDNA,Varicellovirus
+621,QJE50381.2,Reoviridae,Reoviridae,Spinareoviridae,88,0.008562418571885883,894.0,733.98,36.84,1928,0.01,mu-2 protein,Structural-Envelope,Sus scrofa,dsRNA,Orthoreovirus
+622,QVP25977.1,Flaviviridae,Flaviviridae,Flaviviridae,88,0.008562418571885883,810.0,669.93,194.46,1711,0.009,NS3-like protein,Other-Functions,Rhipicephalus microplus,ssRNA(+),Undefined genus
+623,AQM37676.1,Orthomyxoviridae,Orthomyxoviridae,Orthomyxoviridae,88,0.008562418571885883,588.0,560.78,70.04,1192,0.006,acid polymerase,Replication-Transcription,Salmo salar,ssRNA(-),Isavirus
+624,AKI23504.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,88,0.008562418571885883,437.0,424.31,17.35,583,0.003,envelope protein UL78,Structural-Envelope,Homo sapiens,dsDNA,Cytomegalovirus
+625,YP_009351919.1,Flaviviridae,Flaviviridae,Flaviviridae,87,0.008465118360841725,783.0,408.63,139.25,605,0.003,putative membrane protein,Other-Functions,Rhipicephalus microplus,ssRNA(+),Undefined genus
+626,QKN88800.1,Astroviridae,Astroviridae,Astroviridae,87,0.008465118360841725,771.0,641.26,108.15,1540,0.008,capsid protein,Structural-Envelope,Gallus gallus,ssRNA(+),Avastrovirus
+627,YP_007417864.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,87,0.008465118360841725,595.0,537.45,89.65,1112,0.006,deoxyribonuclease,Other-Functions,Homo sapiens,dsDNA,Cytomegalovirus
+628,YP_003933800.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,86,0.008367818149797568,1048.0,765.36,197.24,2119,0.011,BORF2-ribonucleotide reductase subunit,Replication-Transcription,Homo sapiens,dsDNA,Lymphocryptovirus
+629,QPN36941.1,Flaviviridae,Flaviviridae,Flaviviridae,86,0.008367818149797568,1034.0,745.33,292.89,2047,0.011,NS5-like protein,Polyprotein,Rhipicephalus microplus,ssRNA(+),Undefined genus
+630,NP_733869.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,86,0.008367818149797568,793.0,728.3,92.33,1920,0.01,hypothetical protein,Other-Functions,Homo sapiens,dsDNA,Lymphocryptovirus
+631,ACG69815.1,Closteroviridae,Closteroviridae,Closteroviridae,85,0.008270517938753408,2807.0,1271.36,1023.83,4200,0.022,polyprotein,Polyprotein,Prunus avium,ssRNA(+),Velarivirus
+632,YP_009448193.1,Totiviridae,Totiviridae,Totiviridae,85,0.008270517938753408,1608.0,801.46,276.23,2187,0.011,RNA-dependent RNA polymerase,Replication-Transcription,Zea mays,dsRNA,Totivirus
+633,ATB53305.1,Peribunyaviridae,Peribunyaviridae,Peribunyaviridae,85,0.008270517938753408,1594.0,1068.49,611.69,3438,0.018,polyprotein,Polyprotein,Homo sapiens,ssRNA(-),Orthobunyavirus
+634,ALQ28410.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,85,0.008270517938753408,789.0,688.48,23.19,1711,0.009,BALF3,Other-Functions,Homo sapiens,dsDNA,Lymphocryptovirus
+635,YP_005296211.1,Poxviridae,Poxviridae,Poxviridae,85,0.008270517938753408,641.0,418.05,127.6,614,0.003,CPXV017 protein,Other-Functions,Homo sapiens,dsDNA,Orthopoxvirus
+636,QFX66143.1,Parvoviridae,Parvoviridae,Parvoviridae,84,0.00817321772770925,723.0,579.93,192.59,1298,0.007,NS1,Non-structural,Sus scrofa,ssDNA(+/-),Chaphamaparvovirus
+637,QED42836.1,Solemoviridae,Solemoviridae-Luteoviridae-Geminiviridae,Solemoviridae,84,0.00817321772770925,694.0,541.29,165.17,1100,0.006,P1,Other-Functions,Capsicum annuum,ssRNA(+),Polerovirus
+638,AKN10675.1,Arenaviridae,Arenaviridae,Arenaviridae,84,0.00817321772770925,435.0,420.44,46.92,564,0.003,glycoprotein,Other-Functions,Boa constrictor,ssRNA(+/-),Reptarenavirus
+639,YP_009164031.1,Flaviviridae,Flaviviridae,Flaviviridae,83,0.008075917516665093,3403.0,1143.96,1337.54,3698,0.019,polyprotein,Polyprotein,Culex tarsalis,ssRNA(+),Flavivirus
+640,YP_224289.1,Caulimoviridae,Caulimoviridae,Caulimoviridae,83,0.008075917516665093,1869.0,474.75,577.72,1075,0.006,polyprotein,Other-Functions,Musa,dsDNA-RT,Badnavirus
+641,YP_081613.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,83,0.008075917516665093,462.0,461.94,0.29,747,0.004,membrane protein US29,Structural-Envelope,Homo sapiens,dsDNA,Cytomegalovirus
+642,YP_003199424.1,Reoviridae,Reoviridae,Spinareoviridae,83,0.008075917516665093,455.0,396.96,132.08,552,0.003,sigma 1,Cellular-Regulation,Sus scrofa,dsRNA,Orthoreovirus
+643,YP_009054943.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,82,0.007978617305620937,878.0,805.74,160.7,2221,0.012,envelope glycoprotein H,Structural-Envelope,Homo sapiens,dsDNA,Varicellovirus
+644,AFA26578.1,Papillomaviridae,Papillomaviridae,Papillomaviridae,82,0.007978617305620937,567.0,518.87,45.23,947,0.005,L2 protein,Other-Functions,Bos taurus,dsDNA,Xipapillomavirus
+645,YP_138504.1,Paramyxoviridae,Paramyxoviridae,Paramyxoviridae,82,0.007978617305620937,543.0,469.73,137.09,852,0.004,nucleocapsid protein,Structural-Envelope,Homo sapiens,ssRNA(-),Orthorubulavirus
+646,NP_620669.1,Virgaviridae,Virgaviridae,Virgaviridae,80,0.00778401688353262,1707.0,701.66,660.18,1780,0.009,RNA-dependent RNA polymerase,Replication-Transcription,Lamprocapnos spectabilis,ssRNA(+),Tobravirus
+647,AHB63508.1,Coronaviridae,Coronaviridae,Coronaviridae,80,0.00778401688353262,1495.0,1021.46,357.23,2950,0.015,spike glycoprotein,Structural-Envelope,Meleagris gallopavo,ssRNA(+),Gammacoronavirus
+648,YP_009506682.1,Iridoviridae,Iridoviridae,Iridoviridae,80,0.00778401688353262,975.0,918.9,154.78,2523,0.013,putative D5 family NTPase/ATPase,Replication-Transcription,Ambystoma tigrinum,dsDNA,Ranavirus
+649,AFK83845.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,80,0.00778401688353262,793.0,649.99,124.51,1465,0.008,protein UL29,Other-Functions,Homo sapiens,dsDNA,Cytomegalovirus
+650,YP_009268722.1,Poxviridae,Poxviridae,Poxviridae,80,0.00778401688353262,433.0,411.42,49.27,521,0.003,CPXV044 protein,Other-Functions,Homo sapiens,dsDNA,Orthopoxvirus
+651,NP_058528.1,Phenuiviridae,Phenuiviridae,Phenuiviridae,79,0.007686716672488462,2925.0,2404.82,1064.83,8414,0.044,RNA polymerase,Replication-Transcription,Oryza sativa,ssRNA(-),Tenuivirus
+652,QOQ52508.1,Picornaviridae,Picornaviridae,Picornaviridae,79,0.007686716672488462,2871.0,1291.13,1130.79,4202,0.022,polyprotein,Polyprotein,Gallus gallus,ssRNA(+),Sicinivirus
+653,YP_009126942.1,Anelloviridae,Anelloviridae,Anelloviridae,79,0.007686716672488462,773.0,611.34,145.17,1273,0.007,ORF1,Other-Functions,Chlorocebus sabaeus,ssDNA(-),Alphatorquevirus
+654,NP_116403.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,79,0.007686716672488462,588.0,550.19,60.58,1038,0.005,protein UL49,Other-Functions,Homo sapiens,dsDNA,Cytomegalovirus
+655,QCY49501.1,Alphaflexiviridae,Alphaflexiviridae,Alphaflexiviridae,78,0.007589416461444305,1721.0,1019.59,672.86,2973,0.016,RNA-dependent RNA polymerase,Replication-Transcription,Hylocereus,ssRNA(+),Potexvirus
+656,QMP82168.1,Orthomyxoviridae,Orthomyxoviridae-Peribunyaviridae,Orthomyxoviridae,78,0.007589416461444305,807.0,734.96,147.66,1754,0.009,polymerase PB1,Replication-Transcription,Culex tarsalis,ssRNA(-),Quaranjavirus
+657,AMB65934.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,78,0.007589416461444305,578.0,489.56,10.5,786,0.004,UL42,Replication-Transcription,Homo sapiens,dsDNA,Simplexvirus
+658,YP_009133264.1,Baculoviridae,Baculoviridae,Baculoviridae,77,0.007492116250400148,1308.0,1222.56,63.21,3593,0.019,helicase,Replication-Transcription,Chrysodeixis includens,dsDNA,Alphabaculovirus
+659,QNU41088.1,Bromoviridae,Bromoviridae,Bromoviridae,77,0.007492116250400148,877.0,603.04,311.16,1362,0.007,RNA-dependent RNA polymerase,Replication-Transcription,Malus domestica,ssRNA(+),Ilarvirus
+660,QQL09786.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,77,0.007492116250400148,635.0,601.05,15.23,1216,0.006,protein US26,Structural-Envelope,Homo sapiens,dsDNA,Cytomegalovirus
+661,QYA72484.1,Secoviridae,Secoviridae,Secoviridae,76,0.007394816039355989,1641.0,544.78,557.27,1103,0.006,coat protein,Polyprotein,Betula pubescens,ssRNA(+),Nepovirus
+662,QHJ68634.1,Reoviridae,Reoviridae,Sedoreoviridae,76,0.007394816039355989,965.0,880.05,208.99,2279,0.012,VP2,Other-Functions,Ovis aries,dsRNA,Orbivirus
+663,AYQ58840.1,Reoviridae,Reoviridae,Spinareoviridae,76,0.007394816039355989,726.0,719.37,10.79,1663,0.009,mu-NS protein,Other-Functions,Sus scrofa,dsRNA,Orthoreovirus
+664,CAA35430.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,76,0.007394816039355989,694.0,528.91,183.86,1096,0.006,protein UL31,Other-Functions,Homo sapiens,dsDNA,Cytomegalovirus
+665,NP_612669.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,76,0.007394816039355989,682.0,656.32,2.99,1370,0.007,tegument protein UL25,Structural-Envelope,Homo sapiens,dsDNA,Cytomegalovirus
+666,BAM36403.1,Partitiviridae,Partitiviridae,Partitiviridae,76,0.007394816039355989,647.0,533.76,128.26,966,0.005,RNA-dependent RNA polymerase,Replication-Transcription,Sarcosphaera coronaria,dsRNA,Alphapartitivirus
+667,WP_016041377.1,Poxviridae,Poxviridae,Poxviridae,76,0.007394816039355989,569.0,419.05,193.7,676,0.004,CPXV215 protein,Hypothetical,Homo sapiens,dsDNA,Orthopoxvirus
+668,QJI52022.1,Dicistroviridae,Dicistroviridae,Dicistroviridae,75,0.0072975158283118315,1773.0,724.52,657.92,1853,0.01,non-structural polyprotein,Hypothetical,Apis mellifera,ssRNA(+),Triatovirus
+669,AZI72604.1,Arenaviridae,Arenaviridae,Arenaviridae,75,0.0072975158283118315,595.0,572.51,74.91,1077,0.006,nucleoprotein,Structural-Envelope,Boa constrictor,ssRNA(+/-),Reptarenavirus
+670,AKG51195.1,Poxviridae,Poxviridae,Poxviridae,75,0.0072975158283118315,497.0,442.81,104.06,654,0.003,CPXV050 protein,Other-Functions,Homo sapiens,dsDNA,Orthopoxvirus
+671,NP_647496.1,Togaviridae,Togaviridae,Togaviridae,74,0.007200215617267674,2601.0,1206.51,1184.56,3674,0.019,nonstructural protein P3,Non-structural,Salmo salar,ssRNA(+),Alphavirus
+672,YP_003933788.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,74,0.007200215617267674,1157.0,1073.0,94.42,2923,0.015,helicase-primase primase subunit,Replication-Transcription,Homo sapiens,dsDNA,Varicellovirus
+673,QWK51502.1,Closteroviridae,Closteroviridae,Closteroviridae,74,0.007200215617267674,565.0,542.69,11.96,909,0.005,heat shock protein 90,Stress-Response,Vitis vinifera,ssRNA(+),Ampelovirus
+674,ACB32172.1,Poxviridae,Poxviridae-Baculoviridae-Phycodnaviridae,Poxviridae,74,0.007200215617267674,564.0,405.89,119.31,515,0.003,DNA photolyase,Replication-Transcription,Chrysodeixis includens,dsDNA,Alphabaculovirus
+675,AYV82597.1,Mimiviridae,Mimiviridae,Mimiviridae,74,0.007200215617267674,517.0,417.47,81.29,503,0.003,chromosome condensation regulator,Regulation-Control,Undefined host,dsDNA,Undefined genus
+676,QDZ58984.1,Phasmaviridae,Phasmaviridae-Peribunyaviridae,Phasmaviridae,73,0.007102915406223516,2223.0,1131.0,896.17,3225,0.017,RNA-dependent RNA polymerase,Replication-Transcription,Chaoborus americanus,ssRNA(-),Orthophasmavirus
+677,YP_010086664.1,Baculoviridae,Baculoviridae,Baculoviridae,73,0.007102915406223516,1265.0,1180.77,203.93,3274,0.017,helicase,Replication-Transcription,Lymantria dispar,dsDNA,Alphabaculovirus
+678,QFU18701.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,73,0.007102915406223516,1162.0,593.27,439.96,1319,0.007,ORF73,Other-Functions,Homo sapiens,dsDNA,Rhadinovirus
+679,YP_006347710.1,Iridoviridae,Iridoviridae,Iridoviridae,73,0.007102915406223516,963.0,864.41,81.81,2098,0.011,hypothetical protein,Hypothetical,Ambystoma tigrinum,dsDNA,Ranavirus
+680,AMB66099.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,73,0.007102915406223516,587.0,474.85,40.21,705,0.004,US3,Other-Functions,Homo sapiens,dsDNA,Simplexvirus
+681,QEJ80026.1,Poxviridae,Poxviridae,Poxviridae,72,0.007005615195179358,2030.0,1906.5,333.33,5846,0.031,m134R,Other-Functions,Oryctolagus cuniculus,dsDNA,Leporipoxvirus
+682,YP_164155.1,Iridoviridae,Iridoviridae,Iridoviridae,72,0.007005615195179358,970.0,888.06,196.45,2305,0.012,putative NTPase,Other-Functions,Ambystoma tigrinum,dsDNA,Ranavirus
+683,YP_054419.1,Closteroviridae,Closteroviridae,Closteroviridae,72,0.007005615195179358,521.0,514.54,29.38,781,0.004,p60,Hypothetical,Solanum lycopersicum,ssRNA(+),Crinivirus
+684,YP_004935369.1,Closteroviridae,Closteroviridae,Closteroviridae,71,0.0069083149841352,2860.0,895.37,827.29,2180,0.011,RNA-dependent RNA polymerase,Replication-Transcription,Vitis vinifera,ssRNA(+),Ampelovirus
+685,QPB69979.1,Flaviviridae,Flaviviridae,Flaviviridae,71,0.0069083149841352,2849.0,1207.62,1189.74,3397,0.018,polyprotein,Polyprotein,Bos taurus,ssRNA(+),Hepacivirus
+686,QJI52018.1,Dicistroviridae,Dicistroviridae,Dicistroviridae,71,0.0069083149841352,2113.0,1794.28,565.09,5347,0.028,nonstructural polyprotein,Non-structural,Apis mellifera,ssRNA(+),Cripavirus
+687,ACN59473.1,Tombusviridae,Tombusviridae,Tombusviridae,71,0.0069083149841352,875.0,602.37,261.25,1205,0.006,replicase,Other-Functions,Cucurbitaceae,ssRNA(+),Gammacarmovirus
+688,ARF10604.1,Mimiviridae,Mimiviridae-Phycodnaviridae,Mimiviridae,71,0.0069083149841352,838.0,451.08,110.96,612,0.003,hypothetical protein,Replication-Transcription,Ostreococcus sp. 'lucimarinus',dsDNA,Prasinovirus
+689,QJQ80347.1,Closteroviridae,Closteroviridae,Closteroviridae,71,0.0069083149841352,486.0,452.97,95.41,643,0.003,Hsp90-like protein,Other-Functions,Vitis vinifera,ssRNA(+),Ampelovirus
+690,AAA16739.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,70,0.006811014773091043,2078.0,2029.56,274.21,6074,0.032,U31,Structural-Envelope,Homo sapiens,dsDNA,Roseolovirus
+691,NP_064163.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,70,0.006811014773091043,1281.0,1081.07,256.9,2784,0.015,single-stranded DNA-binding protein,Other-Functions,Homo sapiens,dsDNA,Roseolovirus
+692,YP_009553226.1,Polyomaviridae,Polyomaviridae,Polyomaviridae,70,0.006811014773091043,681.0,585.96,152.12,1076,0.006,large T antigen,Other-Functions,Homo sapiens,dsDNA,Betapolyomavirus
+693,QKE55041.1,Picornaviridae,Picornaviridae,Picornaviridae,69,0.0067137145620468856,2851.0,1501.93,1193.74,4269,0.022,polyprotein,Polyprotein,Gallus gallus,ssRNA(+),Megrivirus
+694,AHJ80314.1,Betaflexiviridae,Betaflexiviridae,Betaflexiviridae,69,0.0067137145620468856,2039.0,1488.28,857.88,4282,0.022,replicase,Replication-Transcription,Prunus avium,ssRNA(+),Robigovirus
+695,YP_081516.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,69,0.0067137145620468856,1235.0,1164.36,253.11,3013,0.016,single-stranded DNA-binding protein,Binding-Protein,Homo sapiens,dsDNA,Cytomegalovirus
+696,QBG64657.1,Coronaviridae,Coronaviridae,Coronaviridae,69,0.0067137145620468856,1145.0,943.67,325.09,2410,0.013,spike glycoprotein,Structural-Envelope,Rhinolophus,ssRNA(+),Alphacoronavirus
+697,AVI07320.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,69,0.0067137145620468856,871.0,743.52,244.74,1596,0.008,U11,Structural-Envelope,Homo sapiens,dsDNA,Roseolovirus
+698,QBJ02241.1,Reoviridae,Reoviridae,Sedoreoviridae,69,0.0067137145620468856,769.0,697.93,145.94,1415,0.007,VP3,Other-Functions,Sus scrofa,dsRNA,Rotavirus
+699,CAD53434.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,69,0.0067137145620468856,723.0,597.74,214.06,1157,0.006,helicase-primase subunit BBLF2/3,Replication-Transcription,Homo sapiens,dsDNA,Lymphocryptovirus
+700,NP_835244.2,Closteroviridae,Closteroviridae,Closteroviridae,68,0.006616414351002728,3390.0,1548.72,1235.96,4191,0.022,polyprotein,Polyprotein,Vitis vinifera,ssRNA(+),Closterovirus
+701,QXN75374.1,Mitoviridae,Mitoviridae,Mitoviridae,104,0.010119221948592407,887.0,526.36,251.39,1415,0.007,RNA-dependent RNA polymerase,Replication-Transcription,Gremmeniella abietina,ssRNA(+),Mitovirus
+702,QRE02500.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,68,0.006616414351002728,699.0,367.1,211.55,580,0.003,ORF17,Structural-Envelope,Homo sapiens,dsDNA,Rhadinovirus
+703,NP_689396.1,Closteroviridae,Closteroviridae,Closteroviridae,67,0.006519114139958569,2492.0,1480.97,893.37,3991,0.021,polyprotein,Polyprotein,Ipomoea batatas,ssRNA(+),Crinivirus
+704,YP_002290968.1,Astroviridae,Astroviridae,Astroviridae,67,0.006519114139958569,756.0,408.04,236.76,513,0.003,capsid protein,Structural-Envelope,Homo sapiens,ssRNA(+),Mamastrovirus
+705,QGR54273.1,Mimiviridae,Mimiviridae,Mimiviridae,67,0.006519114139958569,570.0,453.24,98.1,586,0.003,hypothetical protein,Other-Functions,Acanthamoeba castellanii,dsDNA,Mimivirus
+706,YP_004894877.1,Mimiviridae,Mimiviridae,Mimiviridae,67,0.006519114139958569,563.0,510.75,98.36,763,0.004,putative serine/threonine-protein kinase,Other-Functions,Acanthamoeba castellanii,dsDNA,Mimivirus
+707,YP_008686606.1,Rhabdoviridae,Rhabdoviridae,Rhabdoviridae,67,0.006519114139958569,531.0,522.87,17.86,766,0.004,glycoprotein,Glycoprotein,Anguilla anguilla,ssRNA(-),Perhabdovirus
+708,QID92311.1,Rhabdoviridae,Rhabdoviridae,Rhabdoviridae,66,0.006421813928914412,2243.0,1235.53,901.53,3255,0.017,L protein,Replication-Transcription,Fragaria x ananassa,ssRNA(-),Cytorhabdovirus
+709,AYN45100.1,Bromoviridae,Bromoviridae,Bromoviridae,66,0.006421813928914412,819.0,572.91,295.09,1071,0.006,RNA-dependent RNA polymerase,Replication-Transcription,Glycine max,ssRNA(+),Ilarvirus
+710,YP_654637.1,Iridoviridae,Iridoviridae-Ascoviridae,Iridoviridae,66,0.006421813928914412,630.0,496.64,136.76,737,0.004,ribonucleoside-diphosphate reductase large subunit,Other-Functions,Pelophylax lessonae,dsDNA,Ranavirus
+711,AYA49825.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,66,0.006421813928914412,611.0,581.86,103.67,1017,0.005,BRLF1,Replication-Transcription,Homo sapiens,dsDNA,Lymphocryptovirus
+712,YP_009047155.1,Adenoviridae,Adenoviridae,Adenoviridae,65,0.006324513717870254,1341.0,1111.97,404.27,2730,0.014,DNA polymerase,Replication-Transcription,Gallus gallus,dsDNA,Aviadenovirus
+713,YP_001040018.1,Secoviridae,Secoviridae,Secoviridae,65,0.006324513717870254,1198.0,471.71,446.43,810,0.004,polyprotein,Polyprotein,Solanum lycopersicum,ssRNA(+),Torradovirus
+714,YP_009137476.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,65,0.006324513717870254,774.0,660.48,193.71,1255,0.007,U40,Other-Functions,Homo sapiens,dsDNA,Cytomegalovirus
+715,YP_009508778.1,Parvoviridae,Parvoviridae,Parvoviridae,65,0.006324513717870254,768.0,490.51,250.96,824,0.004,nonstructural protein 1,Non-structural,Penaeus vannamei,ssDNA(+/-),Penstyldensovirus
+716,ASQ42880.1,Iridoviridae,Iridoviridae,Iridoviridae,65,0.006324513717870254,623.0,595.18,56.13,994,0.005,hypothetical protein,Hypothetical,Ambystoma tigrinum,dsDNA,Ranavirus
+717,QYF11865.1,Reoviridae,Reoviridae,Spinareoviridae,65,0.006324513717870254,512.0,500.51,65.0,693,0.004,VP56-structural,Structural-Envelope,Ctenopharyngodon idella,dsRNA,Aquareovirus
+718,AAA16738.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,64,0.006227213506826096,1086.0,1000.48,161.16,2277,0.012,U30,Other-Functions,Homo sapiens,dsDNA,Roseolovirus
+719,AKI79830.1,Mimiviridae,Mimiviridae-Phycodnaviridae,Mimiviridae,64,0.006227213506826096,885.0,521.72,204.71,868,0.005,putative ankyrin repeat protein,Other-Functions,Acanthamoeba castellanii,dsDNA,Mimivirus
+720,YP_009507893.1,Phenuiviridae,Phenuiviridae,Phenuiviridae,64,0.006227213506826096,834.0,833.66,0.76,1728,0.009,NSvc2 protein,Other-Functions,Oryza sativa,ssRNA(-),Tenuivirus
+721,AZY88493.1,Iridoviridae,Iridoviridae,Iridoviridae,64,0.006227213506826096,741.0,583.08,71.32,935,0.005,hypothetical protein,Hypothetical,Ambystoma tigrinum,dsDNA,Ranavirus
+722,QXM27532.1,Astroviridae,Astroviridae,Astroviridae,64,0.006227213506826096,704.0,683.16,94.75,1284,0.007,capsid protein,Structural-Envelope,Anatidae,ssRNA(+),Avastrovirus
+723,YP_164121.1,Iridoviridae,Iridoviridae,Iridoviridae,64,0.006227213506826096,566.0,470.8,180.71,714,0.004,hypothetical protein,Hypothetical,Pelophylax lessonae,dsDNA,Ranavirus
+724,AEV80619.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,64,0.006227213506826096,565.0,540.34,76.66,835,0.004,tegument protein pp65,Other-Functions,Homo sapiens,dsDNA,Cytomegalovirus
+725,YP_008658419.1,Reoviridae,Reoviridae,Sedoreoviridae,64,0.006227213506826096,557.0,544.84,54.87,819,0.004,NS1 protein,Other-Functions,Bos taurus,dsRNA,Orbivirus
+726,AJR29292.1,Iridoviridae,Iridoviridae,Iridoviridae,63,0.006129913295781938,1005.0,953.92,102.29,2094,0.011,putative tyrosine kinase,Other-Functions,Ambystoma tigrinum,dsDNA,Ranavirus
+727,YP_006347685.1,Iridoviridae,Iridoviridae,Iridoviridae,63,0.006129913295781938,758.0,605.89,135.4,1016,0.005,neurofilament triplet H1-like protein,Structural-Envelope,Ambystoma tigrinum,dsDNA,Ranavirus
+728,YP_067997.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,63,0.006129913295781938,707.0,671.29,151.57,1314,0.007,BXLF2,Other-Functions,Homo sapiens,dsDNA,Lymphocryptovirus
+729,NP_612679.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,63,0.006129913295781938,652.0,607.79,103.99,1040,0.005,tegument protein UL35,Structural-Envelope,Homo sapiens,dsDNA,Cytomegalovirus
+730,YP_009246358.1,Adenoviridae,Adenoviridae,Adenoviridae,63,0.006129913295781938,552.0,511.56,72.0,718,0.004,DBP,Binding-Protein,Homo sapiens,dsDNA,Mastadenovirus
+731,NP_620656.1,Potyviridae,Potyviridae,Potyviridae,62,0.00603261308473778,3456.0,1026.29,907.24,2322,0.012,polyprotein,Polyprotein,Ipomoea batatas,ssRNA(+),Ipomovirus
+732,YP_009140562.1,Iflaviridae,Iflaviridae,Iflaviridae,62,0.00603261308473778,3057.0,1041.68,1211.17,2314,0.012,polyprotein,Polyprotein,Drosophila melanogaster,ssRNA(+),Iflavirus
+733,YP_009330277.1,Phenuiviridae,Phenuiviridae-Peribunyaviridae,Phenuiviridae,62,0.00603261308473778,2256.0,1961.31,598.23,5203,0.027,RNA-dependent RNA polymerase,Replication-Transcription,Aedes aegypti,ssRNA(-),Phasivirus
+734,YP_956845.1,Reoviridae,Reoviridae,Spinareoviridae,62,0.00603261308473778,1171.0,986.55,357.2,2172,0.011,P4 protein,Hypothetical,Zea mays,dsRNA,Fijivirus
+735,QJI53756.1,Parvoviridae,Parvoviridae-Bidnaviridae-Baculoviridae,Parvoviridae,62,0.00603261308473778,1168.0,810.13,355.82,1656,0.009,structural protein,Structural-Envelope,Motacilla cinerea,ssDNA(+/-),Bidensovirus
+736,QPL20148.1,Reoviridae,Reoviridae,Spinareoviridae,62,0.00603261308473778,689.0,643.0,97.74,1105,0.006,mu 1 protein,Structural-Envelope,Oncorhynchus mykiss,dsRNA,Orthoreovirus
+737,AAS48944.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,62,0.00603261308473778,512.0,470.79,20.24,547,0.003,tegument protein vICA,Structural-Envelope,Homo sapiens,dsDNA,Cytomegalovirus
+738,YP_009389287.1,Dicistroviridae,Dicistroviridae,Dicistroviridae,61,0.005935312873693623,2007.0,1687.49,637.47,4290,0.022,nonstructural polyprotein,Non-structural,Aphis fabae,ssRNA(+),Cripavirus
+739,QTJ62749.1,Narnaviridae,Narnaviridae,Narnaviridae,61,0.005935312873693623,1046.0,974.87,150.34,2096,0.011,RNA-dependent RNA polymerase,Replication-Transcription,Entomophthora muscae,ssRNA(+),Narnavirus
+740,QTJ62254.1,Dicistroviridae,Dicistroviridae,Dicistroviridae,61,0.005935312873693623,911.0,726.51,226.62,1381,0.007,structural polyprotein,Structural-Envelope,Drosophila melanogaster,ssRNA(+),Cripavirus
+741,QUD39733.1,Anelloviridae,Anelloviridae,Anelloviridae,61,0.005935312873693623,682.0,603.43,157.74,1003,0.005,hypothetical protein,Hypothetical,Homo sapiens,ssDNA(-),Gammatorquevirus
+742,NP_733866.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,61,0.005935312873693623,662.0,602.18,31.96,962,0.005,thymidine kinase,Other-Functions,Homo sapiens,dsDNA,Lymphocryptovirus
+743,AYP74220.1,Poxviridae,Poxviridae,Poxviridae,61,0.005935312873693623,638.0,602.3,36.49,960,0.005,putative metalloprotease,Other-Functions,Ovis aries,dsDNA,Parapoxvirus
+744,AGE52806.1,Phycodnaviridae,Phycodnaviridae,Phycodnaviridae,60,0.005838012662649465,682.0,465.42,65.42,528,0.003,ATP-dependent helicase,Replication-Transcription,Chlorella heliozoae,dsDNA,Chlorovirus
+745,QOD39474.1,Parvoviridae,Parvoviridae,Parvoviridae,60,0.005838012662649465,586.0,517.2,99.96,700,0.004,NS1,Non-structural,Pisaster ochraceus,ssDNA(+/-),Ambidensovirus
+746,AWY11059.1,Rhabdoviridae,Rhabdoviridae,Rhabdoviridae,60,0.005838012662649465,569.0,513.35,130.35,739,0.004,outer coat protein,Structural-Envelope,Drosophila melanogaster,ssRNA(-),Sigmavirus
+747,AWW14943.1,Secoviridae,Secoviridae,Secoviridae,59,0.005740712451605307,2336.0,1100.73,959.47,2500,0.013,polyprotein,Polyprotein,Solanum lycopersicum,ssRNA(+),Torradovirus
+748,NP_050266.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,59,0.005740712451605307,1078.0,920.05,223.57,1861,0.01,hypothetical protein,Other-Functions,Homo sapiens,dsDNA,Roseolovirus
+749,QKE54915.1,Parvoviridae,Parvoviridae,Parvoviridae,59,0.005740712451605307,676.0,623.2,120.04,1001,0.005,nonstructural protein,Non-structural,Grus japonensis,ssDNA(+/-),Chaphamaparvovirus
+750,NP_612796.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,59,0.005740712451605307,598.0,589.93,16.85,879,0.005,protein US23,Other-Functions,Homo sapiens,dsDNA,Cytomegalovirus
+751,QGN19694.1,Reoviridae,Reoviridae,Spinareoviridae,58,0.00564341224056115,1147.0,934.9,404.2,1959,0.01,P3 protein,Structural-Envelope,Zea mays,dsRNA,Fijivirus
+752,QOE74618.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,58,0.00564341224056115,871.0,604.36,265.79,989,0.005,origin binding protein,DNA-Binding,Homo sapiens,dsDNA,Roseolovirus
+753,QAT94360.1,Virgaviridae,Virgaviridae,Virgaviridae,58,0.00564341224056115,798.0,459.12,244.16,600,0.003,coat protein,Structural-Envelope,Triticum aestivum,ssRNA(+),Furovirus
+754,APO37186.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,58,0.00564341224056115,761.0,713.93,30.78,1246,0.007,DR1,Other-Functions,Homo sapiens,dsDNA,Roseolovirus
+755,QGZ11208.1,Rhabdoviridae,Rhabdoviridae,Rhabdoviridae,58,0.00564341224056115,524.0,437.12,163.89,534,0.003,glycoprotein,Glycoprotein,Mus musculus,ssRNA(-),Lyssavirus
+756,YP_009506353.1,Endornaviridae,Endornaviridae,Endornaviridae,57,0.005546112029516992,4920.0,2623.82,2298.95,6675,0.035,polyprotein,Polyprotein,Capsicum annuum,dsRNA,Alphaendornavirus
+757,YP_654555.1,Secoviridae,Secoviridae,Secoviridae,57,0.005546112029516992,2163.0,1301.26,808.08,2954,0.015,polyprotein,Polyprotein,Fragaria x ananassa,ssRNA(+),Sadwavirus
+758,QDH90133.1,Mitoviridae,Mitoviridae,Mitoviridae,57,0.005546112029516992,889.0,535.93,235.48,763,0.004,RNA-dependent RNA polymerase,Replication-Transcription,Diversispora versiformis,ssRNA(+),Mitovirus
+759,YP_008052645.1,Mimiviridae,Mimiviridae-Phycodnaviridae-Marseilleviridae,Mimiviridae,57,0.005546112029516992,563.0,521.25,56.87,674,0.004,glutamine-dependent asparagine synthetase,Other-Functions,Acanthamoeba castellanii,dsDNA,Prasinovirus
+760,AWK77128.1,Retroviridae,Retroviridae,Retroviridae,57,0.005546112029516992,554.0,544.3,2.51,738,0.004,gag polyprotein,Structural-Envelope,Bos taurus,ssRNA-RT,Bovispumavirus
+761,YP_001531159.1,Filoviridae,Filoviridae,Filoviridae,56,0.005448811818472834,2331.0,2055.2,734.91,4951,0.026,polymerase,Replication-Transcription,Homo sapiens,ssRNA(-),Orthomarburgvirus
+762,QDH12847.1,Filoviridae,Filoviridae,Filoviridae,56,0.005448811818472834,949.0,513.88,273.97,773,0.004,nucleoprotein,Structural-Envelope,Rousettus aegyptiacus,ssRNA(-),Orthomarburgvirus
+763,YP_008378659.1,Paramyxoviridae,Paramyxoviridae,Paramyxoviridae,56,0.005448811818472834,551.0,496.21,76.76,575,0.003,nucleoprotein,Structural-Envelope,Homo sapiens,ssRNA(-),Orthorubulavirus
+764,YP_009506367.1,Flaviviridae,Flaviviridae,Flaviviridae,55,0.005351511607428677,3057.0,1963.65,1347.83,4672,0.024,polyprotein,Polyprotein,Homo sapiens,ssRNA(+),Pegivirus
+765,YP_009325632.1,Phycodnaviridae,Phycodnaviridae,Phycodnaviridae,55,0.005351511607428677,1376.0,915.93,401.23,1739,0.009,hypothetical protein,Hypothetical,Chlorella heliozoae,dsDNA,Chlorovirus
+766,QRY06499.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,55,0.005351511607428677,1281.0,718.56,376.67,1187,0.006,hypothetical protein,Hypothetical,Homo sapiens,dsDNA,Roseolovirus
+767,NP_050270.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,55,0.005351511607428677,1212.0,1156.2,158.09,2381,0.012,hypothetical protein,Hypothetical,Homo sapiens,dsDNA,Roseolovirus
+768,QOL71465.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,55,0.005351511607428677,1066.0,999.2,164.13,1977,0.01,tegument protein UL37,Structural-Envelope,Equus caballus,dsDNA,Varicellovirus
+769,BBJ21543.1,Adenoviridae,Adenoviridae,Adenoviridae,55,0.005351511607428677,720.0,554.47,115.32,752,0.004,pIIIa,Structural-Envelope,Gallus gallus,dsDNA,Aviadenovirus
+770,NP_203553.1,Alphaflexiviridae,Alphaflexiviridae,Alphaflexiviridae,54,0.005254211396384519,1658.0,1338.15,588.39,2879,0.015,RNA-dependent RNA polymerase,Replication-Transcription,Ambrosia psilostachya,ssRNA(+),Potexvirus
+771,YP_009505328.1,Phenuiviridae,Phenuiviridae,Phenuiviridae,54,0.005254211396384519,1239.0,1195.93,162.15,2433,0.013,glycoprotein,Glycoprotein,Aedes aegypti,ssRNA(-),Phasivirus
+772,YP_009507917.1,Secoviridae,Secoviridae,Secoviridae,54,0.005254211396384519,1128.0,775.7,370.96,1367,0.007,polyprotein,Polyprotein,Cucumis melo,ssRNA(+),Nepovirus
+773,BBG61979.2,Polyomaviridae,Polyomaviridae,Polyomaviridae,54,0.005254211396384519,846.0,540.8,273.53,782,0.004,large T antigen,Other-Functions,Miniopterus schreibersii,dsDNA,Alphapolyomavirus
+774,AEN80118.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,54,0.005254211396384519,795.0,668.78,196.67,1065,0.006,capsid portal protein,Structural-Envelope,Homo sapiens,dsDNA,Varicellovirus
+775,NP_862834.2,Retroviridae,Retroviridae,Retroviridae,54,0.005254211396384519,622.0,518.72,173.61,666,0.003,envelope glycoprotein,Structural-Envelope,Capra hircus,ssRNA-RT,Betaretrovirus
+776,YP_009220597.1,Nimaviridae,Nimaviridae-Caulimoviridae,Nimaviridae,53,0.005156911185340361,6077.0,2150.15,2648.14,5027,0.026,hypothetical protein,Hypothetical,Penaeus vannamei,dsDNA,Whispovirus
+777,YP_008567619.1,Caulimoviridae,Caulimoviridae,Caulimoviridae,53,0.005156911185340361,1925.0,427.25,594.32,602,0.003,polyprotein,Polyprotein,Piper nigrum,dsDNA-RT,Badnavirus
+778,YP_008052581.1,Mimiviridae,Mimiviridae-Phycodnaviridae-Marseilleviridae,Mimiviridae,53,0.005156911185340361,1512.0,1044.75,495.41,2162,0.011,DNA-directed RNA polymerase subunit 1,Replication-Transcription,Acanthamoeba castellanii,dsDNA,Mimivirus
+779,BCS82639.1,Mimiviridae,Mimiviridae,Mimiviridae,53,0.005156911185340361,757.0,460.26,190.33,578,0.003,putative ankyrin repeat protein,Other-Functions,Acanthamoeba castellanii,dsDNA,Mimivirus
+780,YP_009055225.1,Filoviridae,Filoviridae,Filoviridae,53,0.005156911185340361,681.0,635.11,162.96,980,0.005,glycoprotein,Glycoprotein,Homo sapiens,ssRNA(-),Orthomarburgvirus
+781,ALH44501.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,53,0.005156911185340361,499.0,488.49,6.01,527,0.003,K15,Structural-Envelope,Homo sapiens,dsDNA,Rhadinovirus
+782,AGK41012.1,Flaviviridae,Flaviviridae,Flaviviridae,52,0.005059610974296204,3010.0,826.15,1199.38,1687,0.009,NS5B,Non-structural,Pteropus giganteus,ssRNA(+),Pegivirus
+783,YP_009328931.1,Totiviridae,Totiviridae,Totiviridae,52,0.005059610974296204,1505.0,994.83,437.04,1857,0.01,gag-pol fusion protein,Structural-Envelope,Saccharomyces paradoxus,dsRNA,Totivirus
+784,YP_003969958.1,Phycodnaviridae,Phycodnaviridae-Mimiviridae-Iridoviridae,Phycodnaviridae,52,0.005059610974296204,1488.0,1037.67,235.73,1953,0.01,DNA topoisomerase II,Other-Functions,Emiliania huxleyi,dsDNA,Prasinovirus
+785,AYV85599.1,Mimiviridae,Mimiviridae-Phycodnaviridae,Mimiviridae,52,0.005059610974296204,999.0,846.48,216.11,1463,0.008,D5-ATPase-helicase,Replication-Transcription,Acanthamoeba castellanii,dsDNA,Mimivirus
+786,QDH86441.1,Totiviridae,Totiviridae,Totiviridae,52,0.005059610974296204,898.0,738.62,142.94,1182,0.006,coat protein,Structural-Envelope,Botrytis cinerea,dsRNA,Victorivirus
+787,YP_004021929.1,Reoviridae,Reoviridae,Spinareoviridae,52,0.005059610974296204,793.0,781.98,72.96,1276,0.007,P6 protein,Other-Functions,Zea mays,dsRNA,Fijivirus
+788,AMB66046.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,52,0.005059610974296204,763.0,573.13,119.76,761,0.004,UL12,Other-Functions,Homo sapiens,dsDNA,Simplexvirus
+789,QRG29183.1,Partitiviridae,Partitiviridae,Partitiviridae,52,0.005059610974296204,685.0,607.67,160.91,862,0.005,coat protein,Structural-Envelope,Sarcosphaera coronaria,dsRNA,Betapartitivirus
+790,NP_051861.1,Poxviridae,Poxviridae,Poxviridae,52,0.005059610974296204,675.0,593.21,150.56,809,0.004,ankyrin repeat protein,Other-Functions,Oryctolagus cuniculus,dsDNA,Leporipoxvirus
+791,YP_009094086.1,Paramyxoviridae,Paramyxoviridae,Paramyxoviridae,52,0.005059610974296204,622.0,477.73,240.1,700,0.004,glycoprotein,Structural-Envelope,Homo sapiens,ssRNA(-),Henipavirus
+792,NP_612795.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,52,0.005059610974296204,609.0,577.58,6.77,733,0.004,tegument protein US22,Structural-Envelope,Homo sapiens,dsDNA,Cytomegalovirus
+793,YP_164245.1,Iridoviridae,Iridoviridae,Iridoviridae,52,0.005059610974296204,508.0,498.31,2.14,522,0.003,putative phosphotransferase,Other-Functions,Ambystoma tigrinum,dsDNA,Ranavirus
+794,YP_008802578.1,Secoviridae,Secoviridae,Secoviridae,51,0.004962310763252045,2324.0,1462.76,1006.03,3104,0.016,polyprotein,Polyprotein,Cucumis melo,ssRNA(+),Nepovirus
+795,YP_605811.1,Caulimoviridae,Caulimoviridae,Caulimoviridae,51,0.004962310763252045,1900.0,422.14,589.72,566,0.003,polyprotein,Polyprotein,Musa acuminata,dsDNA-RT,Badnavirus
+796,QGQ62777.1,Adenoviridae,Adenoviridae,Adenoviridae,51,0.004962310763252045,1095.0,994.94,196.49,1807,0.009,100 kDa protein,Other-Functions,Gallus gallus,dsDNA,Aviadenovirus
+797,YP_717666.1,Baculoviridae,Baculoviridae,Baculoviridae,51,0.004962310763252045,1036.0,919.08,37.23,1606,0.008,hypothetical protein,Hypothetical,Lymantria dispar,dsDNA,Alphabaculovirus
+798,YP_009049849.1,Baculoviridae,Baculoviridae,Baculoviridae,51,0.004962310763252045,650.0,512.12,54.63,574,0.003,EGT,Other-Functions,Chrysodeixis includens,dsDNA,Alphabaculovirus
+799,ACS44770.1,Roniviridae,Roniviridae,Roniviridae,50,0.004865010552207887,6692.0,1110.6,2098.51,2177,0.011,pp1ab,Polyprotein,Penaeus monodon,ssRNA(+),Okavirus
+800,YP_009506366.1,Flaviviridae,Flaviviridae,Flaviviridae,50,0.004865010552207887,3469.0,2842.24,891.4,6334,0.033,polyprotein,Polyprotein,Rattus tanezumi,ssRNA(+),Pegivirus
+801,QRY06578.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,50,0.004865010552207887,1639.0,984.18,621.21,1806,0.009,regulatory protein IE2,Regulation-Control,Homo sapiens,dsDNA,Roseolovirus
+802,YP_009552487.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,50,0.004865010552207887,936.0,739.36,76.11,1123,0.006,hypothetical protein,Other-Functions,Homo sapiens,dsDNA,Rhadinovirus
+803,AYV75638.1,Mimiviridae,Mimiviridae,Mimiviridae,49,0.00476771034116373,1350.0,1081.18,331.47,1958,0.01,putative helicase,Replication-Transcription,Acanthamoeba castellanii,dsDNA,Mimivirus
+804,AFA44971.1,Iridoviridae,Iridoviridae,Iridoviridae,49,0.00476771034116373,1192.0,1165.65,4.0,2157,0.011,hypothetical protein,Hypothetical,Ambystoma tigrinum,dsDNA,Ranavirus
+805,P25073.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,49,0.00476771034116373,872.0,851.2,80.24,1376,0.007,tegument protein VP13/14,Structural-Envelope,Equus caballus,dsDNA,Varicellovirus
+806,NP_258347.1,Baculoviridae,Baculoviridae,Baculoviridae,49,0.00476771034116373,861.0,813.14,58.06,1284,0.007,VP91,Other-Functions,Chrysodeixis includens,dsDNA,Alphabaculovirus
+807,QIQ53102.1,Bromoviridae,Bromoviridae,Bromoviridae,49,0.00476771034116373,794.0,471.86,296.5,572,0.003,90 kDa protein,Replication-Transcription,Medicago sativa,ssRNA(+),Alfamovirus
+808,YP_145804.1,Orthomyxoviridae,Orthomyxoviridae,Orthomyxoviridae,49,0.00476771034116373,708.0,636.45,164.49,876,0.005,PB1,Other-Functions,Salmo salar,ssRNA(-),Isavirus
+809,YP_009330159.1,Baculoviridae,Baculoviridae,Baculoviridae,49,0.00476771034116373,645.0,571.02,74.99,693,0.004,efp-envelope fusion protein,Structural-Envelope,Plutella xylostella,dsDNA,Betabaculovirus
+810,QPI35501.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,49,0.00476771034116373,560.0,545.39,64.05,621,0.003,tegument protein pp71,Structural-Envelope,Homo sapiens,dsDNA,Cytomegalovirus
+811,AYC63251.1,Potyviridae,Potyviridae,Potyviridae,48,0.004670410130119572,3415.0,732.25,1100.71,1234,0.006,NIa-Pro,Polyprotein,Punica granatum,ssRNA(+),Roymovirus
+812,ATA66954.1,Secoviridae,Secoviridae,Secoviridae,48,0.004670410130119572,1740.0,942.35,754.31,1708,0.009,polyprotein,Polyprotein,Fragaria x ananassa,ssRNA(+),Sadwavirus
+813,YP_009666327.1,Roniviridae,Roniviridae,Roniviridae,48,0.004670410130119572,1666.0,676.48,533.46,944,0.005,polyprotein pp3,Structural-Envelope,Penaeus monodon,ssRNA(+),Okavirus
+814,YP_009121868.1,Baculoviridae,Baculoviridae,Baculoviridae,48,0.004670410130119572,1164.0,1053.17,267.6,1859,0.01,helicase,Replication-Transcription,Erinnyis ello,dsDNA,Betabaculovirus
+815,YP_009352963.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,48,0.004670410130119572,1120.0,990.54,262.11,1751,0.009,helicase-primase primase subunit,Replication-Transcription,Bos taurus,dsDNA,Varicellovirus
+816,ANA50328.1,Adenoviridae,Adenoviridae,Adenoviridae,48,0.004670410130119572,773.0,654.0,173.59,907,0.005,ORF19,Hypothetical,Gallus gallus,dsDNA,Aviadenovirus
+817,YP_010086730.1,Baculoviridae,Baculoviridae,Baculoviridae,48,0.004670410130119572,756.0,668.35,27.78,904,0.005,fusion protein,Structural-Envelope,Bombyx mori,dsDNA,Alphabaculovirus
+818,YP_145803.1,Orthomyxoviridae,Orthomyxoviridae,Orthomyxoviridae,48,0.004670410130119572,616.0,583.58,128.29,736,0.004,nucleoprotein,Structural-Envelope,Salmo salar,ssRNA(-),Isavirus
+819,YP_003824.1,Iridoviridae,Iridoviridae,Iridoviridae,48,0.004670410130119572,526.0,510.54,75.39,562,0.003,myristylated membrane protein,Other-Functions,Ambystoma tigrinum,dsDNA,Ranavirus
+820,AIC34742.2,Totiviridae,Totiviridae,Totiviridae,47,0.004573109919075414,2554.0,927.74,503.22,1511,0.008,RNA-dependent RNA polymerase,Replication-Transcription,Penaeus vannamei,dsRNA,Undefined genus
+821,AXB26865.1,Hepeviridae,Hepeviridae,Hepeviridae,47,0.004573109919075414,1539.0,647.09,652.25,1069,0.006,helicase,Replication-Transcription,Gallus gallus,ssRNA(+),Avihepevirus
+822,YP_009389479.1,Alphaflexiviridae,Alphaflexiviridae,Alphaflexiviridae,47,0.004573109919075414,1437.0,859.19,619.31,1453,0.008,RNA-dependent RNA polymerase,Replication-Transcription,Orchidaceae,ssRNA(+),Potexvirus
+823,YP_007417835.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,47,0.004573109919075414,1067.0,879.36,163.6,1416,0.007,M70 protein,Other-Functions,Homo sapiens,dsDNA,Roseolovirus
+824,QQN90116.1,Dicistroviridae,Dicistroviridae,Dicistroviridae,47,0.004573109919075414,856.0,735.15,173.85,1058,0.006,capsid protein precursor,Structural-Envelope,Apis mellifera,ssRNA(+),Cripavirus
+825,AXQ04852.1,Parvoviridae,Parvoviridae,Parvoviridae,47,0.004573109919075414,851.0,535.26,277.47,644,0.003,non-structural protein 1,Non-structural,Culicidae,ssDNA(+/-),Brevidensovirus
+826,YP_009175042.2,Nodaviridae,Nodaviridae,Nodaviridae,47,0.004573109919075414,827.0,709.68,206.31,1022,0.005,alpha-delta fusion protein,Structural-Envelope,Caenorhabditis briggsae,ssRNA(+),Undefined genus
+827,QGQ62515.1,Adenoviridae,Adenoviridae,Adenoviridae,47,0.004573109919075414,779.0,647.7,86.14,850,0.004,pTP,Other-Functions,Gallus gallus,dsDNA,Aviadenovirus
+828,NP_042603.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,47,0.004573109919075414,728.0,655.49,141.5,880,0.005,ORF7,Other-Functions,Homo sapiens,dsDNA,Rhadinovirus
+829,YP_009133218.1,Baculoviridae,Baculoviridae,Baculoviridae,47,0.004573109919075414,722.0,682.51,13.19,922,0.005,F protein,Structural-Envelope,Lymantria dispar,dsDNA,Alphabaculovirus
+830,ARF07704.1,Nairoviridae,Nairoviridae-Peribunyaviridae,Nairoviridae,46,0.004475809708031257,4061.0,2047.63,1883.86,4147,0.022,RNA-dependent RNA polymerase,Replication-Transcription,Amblyomma gemma,ssRNA(-),Orthonairovirus
+831,AVT50743.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,46,0.004475809708031257,3326.0,3114.09,672.46,6823,0.036,large tegument protein,Structural-Envelope,Bos taurus,dsDNA,Varicellovirus
+832,YP_009058892.1,Togaviridae,Togaviridae,Togaviridae,46,0.004475809708031257,2411.0,2106.2,737.11,4202,0.022,non-structural polyprotein,Non-structural,Ochlerotatus camptorhynchus,ssRNA(+),Alphavirus
+833,YP_164258.1,Betaflexiviridae,Betaflexiviridae,Betaflexiviridae,46,0.004475809708031257,2090.0,1839.8,535.52,3585,0.019,replicase,Replication-Transcription,Prunus persica,ssRNA(+),Foveavirus
+834,QKU35550.1,Mimiviridae,Mimiviridae-Phycodnaviridae,Mimiviridae,46,0.004475809708031257,1562.0,759.74,427.26,1169,0.006,DNA-directed RNA polymerase subunit 2,Replication-Transcription,Acanthamoeba castellanii,dsDNA,Mimivirus
+835,ANY92091.1,Reoviridae,Reoviridae,Spinareoviridae,46,0.004475809708031257,1308.0,1245.04,203.94,2200,0.011,lambda2,Structural-Envelope,Salmo salar,dsRNA,Orthoreovirus
+836,AVM87470.1,Reoviridae,Reoviridae,Spinareoviridae,46,0.004475809708031257,1298.0,1145.39,361.37,1998,0.01,lambda 3,Structural-Envelope,Salmo salar,dsRNA,Orthoreovirus
+837,YP_010087503.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,46,0.004475809708031257,804.0,783.33,33.63,1137,0.006,ORF61,Other-Functions,Homo sapiens,dsDNA,Rhadinovirus
+838,NP_050228.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,46,0.004475809708031257,738.0,644.48,152.19,821,0.004,hypothetical protein,Glycoprotein,Homo sapiens,dsDNA,Roseolovirus
+839,QOR60759.1,Phycodnaviridae,Phycodnaviridae,Phycodnaviridae,46,0.004475809708031257,684.0,626.26,102.66,784,0.004,hypothetical protein,Hypothetical,Chlorella heliozoae,dsDNA,Prasinovirus
+840,YP_009330194.1,Baculoviridae,Baculoviridae,Baculoviridae,46,0.004475809708031257,621.0,530.74,52.17,557,0.003,pif-1,Other-Functions,Plutella xylostella,dsDNA,Betabaculovirus
+841,ARB16032.1,Nairoviridae,Nairoviridae-Peribunyaviridae-Coronaviridae,Nairoviridae,45,0.004378509496987099,4812.0,3231.33,1709.57,6620,0.035,RNA-dependent RNA polymerase,Replication-Transcription,Ixodes ricinus,ssRNA(-),Orthonairovirus
+842,CDM63857.1,Closteroviridae,Closteroviridae,Closteroviridae,45,0.004378509496987099,2866.0,1264.82,971.96,2247,0.012,polyprotein,Polyprotein,Prunus avium,ssRNA(+),Ampelovirus
+843,NP_059513.1,Virgaviridae,Virgaviridae,Virgaviridae,45,0.004378509496987099,1858.0,1088.93,685.27,1840,0.01,152-kDa protein,Replication-Transcription,Triticum aestivum,ssRNA(+),Furovirus
+844,QBR53297.1,Narnaviridae,Narnaviridae,Narnaviridae,45,0.004378509496987099,1037.0,984.0,31.53,1565,0.008,hypothetical protein,Hypothetical,Undefined host,ssRNA(+),Undefined genus
+845,QWE80460.1,Reoviridae,Reoviridae,Sedoreoviridae,45,0.004378509496987099,1015.0,962.29,188.28,1570,0.008,VP2,Structural-Envelope,Bos taurus,dsRNA,Orbivirus
+846,ARV85907.1,Parvoviridae,Parvoviridae,Parvoviridae,45,0.004378509496987099,838.0,586.76,217.44,704,0.004,structural protein,Structural-Envelope,Acheta domesticus,ssDNA(+/-),Scindoambidensovirus
+847,ALN70040.1,Reoviridae,Reoviridae,Spinareoviridae,45,0.004378509496987099,766.0,707.98,151.1,953,0.005,muNS,Non-structural,Salmo salar,dsRNA,Orthoreovirus
+848,YP_003587871.1,Anelloviridae,Anelloviridae,Anelloviridae,45,0.004378509496987099,665.0,607.56,103.01,722,0.004,hypothetical protein,Hypothetical,Homo sapiens,ssDNA(-),Betatorquevirus
+849,P24380.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,45,0.004378509496987099,552.0,513.18,93.49,518,0.003,envelope glycoprotein E,Structural-Envelope,Equus caballus,dsDNA,Varicellovirus
+850,YP_053108.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,44,0.004281209285942941,1487.0,1427.7,197.4,2512,0.013,transcriptional regulator ICP4,Replication-Transcription,Equus caballus,dsDNA,Varicellovirus
+851,YP_009505588.1,Mesoniviridae,Mesoniviridae,Mesoniviridae,44,0.004281209285942941,912.0,900.32,3.82,1332,0.007,putative spike protein,Structural-Envelope,Culex pipiens,ssRNA(+),Alphamesonivirus
+852,YP_004940094.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,44,0.004281209285942941,621.0,520.75,71.97,509,0.003,U50,Structural-Envelope,Homo sapiens,dsDNA,Roseolovirus
+853,QGQ62596.1,Adenoviridae,Adenoviridae,Adenoviridae,44,0.004281209285942941,570.0,528.77,46.56,527,0.003,DNA-binding protein,DNA-Binding,Gallus gallus,dsDNA,Aviadenovirus
+854,YP_004782118.1,Adenoviridae,Adenoviridae,Adenoviridae,44,0.004281209285942941,557.0,489.09,151.48,501,0.003,fiber protein,Structural-Envelope,Canis lupus familiaris,dsDNA,Mastadenovirus
+855,QHD64829.1,Hypoviridae,Hypoviridae,Hypoviridae,43,0.004183909074898784,3522.0,1327.44,1340.79,2333,0.012,polyprotein,Polyprotein,Sclerotinia sclerotiorum,ssRNA(+),Betahypovirus
+856,NP_653077.1,Picornaviridae,Picornaviridae,Picornaviridae,43,0.004183909074898784,2589.0,817.58,784.43,1222,0.006,polyprotein,Polyprotein,Equus caballus,ssRNA(+),Erbovirus
+857,YP_006543639.1,Picornaviridae,Picornaviridae,Picornaviridae,43,0.004183909074898784,2133.0,533.47,781.01,769,0.004,polyprotein,Polyprotein,Sus scrofa,ssRNA(+),Pasivirus
+858,QRX38982.1,Rhabdoviridae,Rhabdoviridae-Caulimoviridae,Rhabdoviridae,43,0.004183909074898784,2116.0,1289.19,902.76,2198,0.011,RNA-dependent RNA polymerase,Replication-Transcription,Triticum aestivum,ssRNA(-),Cytorhabdovirus
+859,YP_010086602.1,Rhabdoviridae,Rhabdoviridae,Rhabdoviridae,43,0.004183909074898784,1946.0,975.23,837.65,1534,0.008,RNA-dependent RNA polymerase,Replication-Transcription,Solanum lycopersicum,ssRNA(-),Alphanucleorhabdovirus
+860,YP_009976137.1,Rhabdoviridae,Rhabdoviridae,Rhabdoviridae,43,0.004183909074898784,1879.0,1011.23,858.09,1680,0.009,RNA-dependent RNA polymerase,Replication-Transcription,Citrus sinensis,ssRNA(-),Dichorhavirus
+861,AVL93817.1,Mimiviridae,Mimiviridae,Mimiviridae,43,0.004183909074898784,1476.0,736.84,173.74,961,0.005,hypothetical protein,Hypothetical,Acanthamoeba castellanii,dsDNA,Mimivirus
+862,QPH36701.1,Totiviridae,Totiviridae,Totiviridae,43,0.004183909074898784,1426.0,684.35,195.57,863,0.005,RNA-dependent RNA polymerase,Replication-Transcription,Plasmopara viticola,dsRNA,Totivirus
+863,QQD86171.1,Alphaflexiviridae,Alphaflexiviridae,Alphaflexiviridae,43,0.004183909074898784,1409.0,745.56,575.0,1090,0.006,RNA-dependent RNA polymerase,Replication-Transcription,Manihot esculenta,ssRNA(+),Potexvirus
+864,YP_009480346.1,Reoviridae,Reoviridae,Spinareoviridae,43,0.004183909074898784,1226.0,1128.4,306.15,1831,0.01,P2 protein,Structural-Envelope,Zea mays,dsRNA,Fijivirus
+865,AWO67791.1,Secoviridae,Secoviridae,Secoviridae,43,0.004183909074898784,996.0,718.35,351.14,988,0.005,polyprotein,Polyprotein,Lilium,ssRNA(+),Stralarivirus
+866,QKU33981.1,Mimiviridae,Mimiviridae,Mimiviridae,43,0.004183909074898784,883.0,604.02,238.93,712,0.004,hypothetical protein,Hypothetical,Acanthamoeba castellanii,dsDNA,Mimivirus
+867,QBJ02269.1,Reoviridae,Reoviridae,Sedoreoviridae,43,0.004183909074898784,783.0,586.84,224.39,681,0.004,VP3,Structural-Envelope,Sus scrofa,dsRNA,Rotavirus
+868,AVX53545.1,Picobirnaviridae,Picobirnaviridae,Picobirnaviridae,43,0.004183909074898784,610.0,532.07,67.71,522,0.003,putative capsid,Structural-Envelope,Marmota himalayana,dsRNA,Picobirnavirus
+869,QFU19788.1,Tobaniviridae,Tobaniviridae-Herpesviridae,Tobaniviridae,42,0.004086608863854625,8249.0,2319.88,2850.83,4336,0.023,ORF1B,Other-Functions,Morelia viridis,ssRNA(+),Pregotovirus
+870,AJE25834.1,Picornaviridae,Picornaviridae,Picornaviridae,42,0.004086608863854625,2291.0,1290.9,988.23,2167,0.011,polyprotein,Polyprotein,Bos taurus,ssRNA(+),Aphthovirus
+871,CAD6468500.1,Picornaviridae,Picornaviridae,Picornaviridae,42,0.004086608863854625,2225.0,994.4,920.52,1556,0.008,polyprotein,Other-Functions,Gallus gallus,ssRNA(+),Tremovirus
+872,QUW17162.1,Betaflexiviridae,Betaflexiviridae,Betaflexiviridae,42,0.004086608863854625,2094.0,1467.57,835.95,2507,0.013,replicase,Replication-Transcription,Chrysanthemum,ssRNA(+),Carlavirus
+873,YP_003987358.1,Mimiviridae,Mimiviridae-Phycodnaviridae-Marseilleviridae,Mimiviridae,42,0.004086608863854625,1657.0,1550.57,297.05,2654,0.014,putative serine/threonine-protein kinase/receptor,Other-Functions,Acanthamoeba castellanii,dsDNA,Mimivirus
+874,QKK35402.1,Nodaviridae,Nodaviridae,Nodaviridae,42,0.004086608863854625,1065.0,667.74,382.24,858,0.004,RNA-dependent RNA polymerase,Replication-Transcription,Macrobrachium rosenbergii,ssRNA(+),Alphanodavirus
+875,AYV76937.1,Mimiviridae,Mimiviridae-Phycodnaviridae,Mimiviridae,42,0.004086608863854625,983.0,802.71,105.65,1080,0.006,DNA topoisomerase 1,Other-Functions,Acanthamoeba castellanii,dsDNA,Mimivirus
+876,AYV84232.1,Mimiviridae,Mimiviridae,Mimiviridae,41,0.0039893086528104684,2157.0,1668.2,589.8,2828,0.015,putative early transcription factor large subunit,Replication-Transcription,Acanthamoeba polyphaga,dsDNA,Mimivirus
+877,QHG11155.1,Caulimoviridae,Caulimoviridae,Caulimoviridae,41,0.0039893086528104684,2003.0,484.66,652.99,565,0.003,ORFIII polyprotein,Polyprotein,Musa acuminata,dsDNA-RT,Badnavirus
+878,AAL55651.1,Caulimoviridae,Caulimoviridae,Caulimoviridae,41,0.0039893086528104684,1677.0,1059.07,664.04,1607,0.008,coat protein,Other-Functions,Oryza sativa,dsDNA-RT,Tungrovirus
+879,AYV78915.1,Mimiviridae,Mimiviridae-Phycodnaviridae-Marseilleviridae,Mimiviridae,41,0.0039893086528104684,1152.0,1016.76,149.81,1496,0.008,DNA mismatch repair ATPase,Other-Functions,Acanthamoeba castellanii,dsDNA,Mimivirus
+880,YP_009345987.1,Baculoviridae,Baculoviridae-Nudiviridae,Baculoviridae,41,0.0039893086528104684,1042.0,651.95,138.25,744,0.004,RR1,Other-Functions,Lymantria dispar,dsDNA,Alphabaculovirus
+881,YP_009310251.1,Mimiviridae,Mimiviridae-Marseilleviridae,Mimiviridae,41,0.0039893086528104684,833.0,615.24,157.19,701,0.004,D6/D11-like helicase,Replication-Transcription,Acanthamoeba castellanii,dsDNA,Marseillevirus
+882,AGE50337.1,Phycodnaviridae,Phycodnaviridae,Phycodnaviridae,41,0.0039893086528104684,589.0,545.37,20.23,526,0.003,cellulose synthase catalytic subunit (UDP-forming),Other-Functions,Chlorella heliozoae,dsDNA,Chlorovirus
+883,QID77659.1,Endornaviridae,Endornaviridae,Endornaviridae,40,0.00389200844176631,4939.0,870.52,1537.78,1204,0.006,polyprotein,Polyprotein,Capsicum annuum,dsRNA,Alphaendornavirus
+884,YP_009290629.1,Picornaviridae,Picornaviridae-Dicistroviridae,Picornaviridae,40,0.00389200844176631,2491.0,1331.72,1080.03,2159,0.011,polyprotein,Polyprotein,Rattus norvegicus,ssRNA(+),Rosavirus
+885,YP_009362026.1,Peribunyaviridae,Peribunyaviridae,Peribunyaviridae,40,0.00389200844176631,2425.0,641.05,830.8,785,0.004,RNA-dependent RNA polymerase,Replication-Transcription,Culex simpliciforceps,ssRNA(-),Herbevirus
+886,AYJ71467.2,Picornaviridae,Picornaviridae,Picornaviridae,40,0.00389200844176631,2274.0,887.9,863.66,1240,0.006,polyprotein,Polyprotein,Rattus norvegicus,ssRNA(+),Hunnivirus
+887,YP_595727.1,Betaflexiviridae,Betaflexiviridae,Betaflexiviridae,40,0.00389200844176631,2004.0,1833.92,479.49,3114,0.016,replicase,Replication-Transcription,Solanum tuberosum,ssRNA(+),Carlavirus
+888,YP_001427130.1,Phycodnaviridae,Phycodnaviridae,Phycodnaviridae,40,0.00389200844176631,1433.0,827.3,410.03,1118,0.006,hypothetical protein,Hypothetical,Micractinium conductrix,dsDNA,Chlorovirus
+889,A48779,Phycodnaviridae,Phycodnaviridae,Phycodnaviridae,40,0.00389200844176631,1120.0,898.25,171.94,1229,0.006,elongation factor 3,Other-Functions,Chlorella heliozoae,dsDNA,Chlorovirus
+890,NP_077436.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,40,0.00389200844176631,1041.0,864.0,339.82,1221,0.006,ORF21,Structural-Envelope,Homo sapiens,dsDNA,Varicellovirus
+891,YP_009508876.1,Secoviridae,Secoviridae,Secoviridae,40,0.00389200844176631,1006.0,844.92,280.0,1140,0.006,polyprotein 2,Polyprotein,Prunus avium,ssRNA(+),Fabavirus
+892,NP_149000.1,Potyviridae,Potyviridae,Potyviridae,40,0.00389200844176631,890.0,566.88,335.89,622,0.003,polyprotein,Polyprotein,Hordeum vulgare,ssRNA(+),Bymovirus
+893,YP_010086025.1,Reoviridae,Reoviridae,Sedoreoviridae,40,0.00389200844176631,826.0,686.32,206.35,790,0.004,VP4,Other-Functions,Sus scrofa,dsRNA,Rotavirus
+894,AYV85094.1,Mimiviridae,Mimiviridae-Asfarviridae,Mimiviridae,40,0.00389200844176631,815.0,609.7,217.55,666,0.003,putative FtsJ-like methyltransferase,Other-Functions,Acanthamoeba castellanii,dsDNA,Asfivirus
+895,AYV85114.1,Mimiviridae,Mimiviridae,Mimiviridae,39,0.0037947082307221527,1760.0,1219.38,582.82,1838,0.01,B-family DNA polymerase,Replication-Transcription,Acanthamoeba castellanii,dsDNA,Mimivirus
+896,YP_009551946.1,Betaflexiviridae,Betaflexiviridae,Betaflexiviridae,39,0.0037947082307221527,1703.0,1204.0,718.66,1868,0.01,replicase,Replication-Transcription,Vitis vinifera,ssRNA(+),Vitivirus
+897,AKS10590.1,Nimaviridae,Nimaviridae-Caulimoviridae,Nimaviridae,39,0.0037947082307221527,1119.0,704.64,368.8,858,0.004,hypothetical protein,Other-Functions,Penaeus vannamei,dsDNA,Whispovirus
+898,BAV93436.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,39,0.0037947082307221527,829.0,617.97,244.29,676,0.004,envelope glycoprotein J,Structural-Envelope,Equus caballus,dsDNA,Varicellovirus
+899,YP_001293224.1,Poxviridae,Poxviridae,Poxviridae,39,0.0037947082307221527,735.0,705.33,100.25,813,0.004,hypothetical protein,Hypothetical,Bos taurus,dsDNA,Capripoxvirus
+900,QJQ28579.1,Orthomyxoviridae,Orthomyxoviridae,Orthomyxoviridae,39,0.0037947082307221527,732.0,672.26,154.53,776,0.004,PB2 polymerase,Replication-Transcription,Salmo salar,ssRNA(-),Isavirus
+901,YP_001876435.1,Coronaviridae,Coronaviridae,Coronaviridae,38,0.0036974080196779946,6663.0,3436.34,3162.68,6109,0.032,replicase polyprotein,Replication-Transcription,Arenaria interpres,ssRNA(+),Gammacoronavirus
+902,NP_891562.2,Closteroviridae,Closteroviridae,Closteroviridae,38,0.0036974080196779946,2150.0,905.71,819.31,1270,0.007,polyprotein,Polyprotein,Prunus avium,ssRNA(+),Ampelovirus
+903,QDH87218.1,Mitoviridae,Mitoviridae,Mitoviridae,38,0.0036974080196779946,995.0,566.5,286.54,563,0.003,RNA-dependent RNA polymerase,Replication-Transcription,Undefined host,ssRNA(+),Mitovirus
+904,YP_001497355.1,Phycodnaviridae,Phycodnaviridae,Phycodnaviridae,38,0.0036974080196779946,867.0,851.29,7.15,1076,0.006,glycosyl transferase,Hypothetical,Chlorella heliozoae,dsDNA,Chlorovirus
+905,NP_045007.1,Closteroviridae,Closteroviridae,Closteroviridae,38,0.0036974080196779946,664.0,611.39,149.26,646,0.003,minor coat protein,Structural-Envelope,Prunus avium,ssRNA(+),Velarivirus
+906,AGE48446.1,Phycodnaviridae,Phycodnaviridae,Phycodnaviridae,38,0.0036974080196779946,626.0,595.79,16.42,578,0.003,PBCV-specific basic adaptor domain-containing protein,Other-Functions,Chlorella heliozoae,dsDNA,Chlorovirus
+907,QNS27180.1,Flaviviridae,Flaviviridae,Flaviviridae,37,0.003600107808633837,3256.0,3063.57,165.53,5132,0.027,polyprotein,Polyprotein,Lophuromys machangui,ssRNA(+),Hepacivirus
+908,YP_009361867.1,Flaviviridae,Flaviviridae,Flaviviridae,37,0.003600107808633837,2972.0,1108.49,1224.09,1532,0.008,E2 glycoprotein,Polyprotein,Sus scrofa,ssRNA(+),Pegivirus
+909,QQR34436.1,Picornaviridae,Picornaviridae,Picornaviridae,37,0.003600107808633837,2411.0,1284.03,1058.32,1915,0.01,polyprotein,Polyprotein,Canis lupus familiaris,ssRNA(+),Mischivirus
+910,YP_003075957.1,Betaflexiviridae,Betaflexiviridae,Betaflexiviridae,37,0.003600107808633837,1999.0,541.92,708.33,616,0.003,replicase,Replication-Transcription,Vaccinium corymbosum,ssRNA(+),Carlavirus
+911,ALO75725.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,37,0.003600107808633837,1471.0,1448.38,77.96,2148,0.011,ICP4,Replication-Transcription,Sus scrofa,dsDNA,Varicellovirus
+912,QTF48904.1,Mimiviridae,Mimiviridae,Mimiviridae,37,0.003600107808633837,1105.0,858.65,297.52,1057,0.006,hypothetical protein,Hypothetical,Acanthamoeba castellanii,dsDNA,Mimivirus
+913,QKO28838.1,Baculoviridae,Baculoviridae,Baculoviridae,37,0.003600107808633837,1047.0,524.32,341.15,512,0.003,late expression factor 8,Other-Functions,Spodoptera frugiperda,dsDNA,Alphabaculovirus
+914,YP_002268145.1,Baculoviridae,Baculoviridae-Polydnaviridae-Ascoviridae,Baculoviridae,37,0.003600107808633837,886.0,702.05,237.51,791,0.004,p94,Other-Functions,Mamestra configurata,dsDNA,Alphabaculovirus
+915,BCS83225.1,Mimiviridae,Mimiviridae,Mimiviridae,37,0.003600107808633837,838.0,786.05,28.85,911,0.005,DEAD/SNF2-like helicase,Replication-Transcription,Acanthamoeba castellanii,dsDNA,Mimivirus
+916,DAB41740.1,Mitoviridae,Mitoviridae,Mitoviridae,37,0.003600107808633837,821.0,781.76,15.93,912,0.005,RNA-dependent RNA polymerase,Replication-Transcription,Beta vulgaris,ssRNA(+),Duamitovirus
+917,YP_009051991.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,37,0.003600107808633837,819.0,673.24,256.27,865,0.005,hypothetical protein,Other-Functions,Homo sapiens,dsDNA,Roseolovirus
+918,AGE55747.1,Phycodnaviridae,Phycodnaviridae,Phycodnaviridae,37,0.003600107808633837,789.0,620.3,248.96,793,0.004,helicase,Replication-Transcription,Chlorella heliozoae,dsDNA,Chlorovirus
+919,AYV76414.1,Mimiviridae,Mimiviridae,Mimiviridae,37,0.003600107808633837,752.0,696.0,17.11,748,0.004,putative ATP-dependent RNA helicase,Replication-Transcription,Acanthamoeba castellanii,dsDNA,Mimivirus
+920,NP_042941.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,37,0.003600107808633837,694.0,657.43,96.98,680,0.004,glycoprotein H,Glycoprotein,Homo sapiens,dsDNA,Roseolovirus
+921,YP_009666663.1,Baculoviridae,Baculoviridae,Baculoviridae,37,0.003600107808633837,681.0,666.43,24.07,696,0.004,F protein,Other-Functions,Chrysodeixis includens,dsDNA,Alphabaculovirus
+922,AKG94053.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,36,0.003502807597589679,3246.0,3104.33,410.22,5020,0.026,VP1/2,Other-Functions,Sus scrofa,dsDNA,Varicellovirus
+923,QKN88782.1,Caliciviridae,Caliciviridae,Caliciviridae,36,0.003502807597589679,2608.0,1664.14,954.08,2505,0.013,polyprotein,Polyprotein,Gallus gallus,ssRNA(+),Bavovirus
+924,QVX19931.1,Caulimoviridae,Caulimoviridae,Caulimoviridae,36,0.003502807597589679,2045.0,536.28,707.61,597,0.003,polyprotein,Other-Functions,Rubus idaeus,dsDNA-RT,Badnavirus
+925,QHN75177.1,Betaflexiviridae,Betaflexiviridae,Betaflexiviridae,36,0.003502807597589679,1987.0,1312.25,836.51,1914,0.01,replicase polyprotein,Replication-Transcription,Nicotiana occidentalis,ssRNA(+),Citrivirus
+926,ALD83625.1,Nairoviridae,Nairoviridae,Nairoviridae,36,0.003502807597589679,1909.0,1405.39,95.37,2009,0.01,glycoprotein precursor,Glycoprotein,Ixodes uriae,ssRNA(-),Orthonairovirus
+927,NP_620642.1,Alphaflexiviridae,Alphaflexiviridae,Alphaflexiviridae,36,0.003502807597589679,1323.0,1150.67,360.83,1559,0.008,replicase,Replication-Transcription,Trifolium repens,ssRNA(+),Potexvirus
+928,AVP72154.1,Reoviridae,Reoviridae,Sedoreoviridae,36,0.003502807597589679,1225.0,1045.17,312.2,1373,0.007,VP1,Other-Functions,Culex tritaeniorhynchus,dsRNA,Seadornavirus
+929,YP_009094119.1,Paramyxoviridae,Paramyxoviridae,Paramyxoviridae,36,0.003502807597589679,1052.0,589.44,396.74,629,0.003,attachment glycoprotein,Structural-Envelope,Rattus norvegicus,ssRNA(-),Jeilongvirus
+930,AOR51364.1,Totiviridae,Totiviridae,Totiviridae,36,0.003502807597589679,1006.0,829.03,171.04,974,0.005,RNA-dependent RNA polymerase,Replication-Transcription,Aedes aegypti,dsRNA,Totivirus
+931,YP_009130647.1,Astroviridae,Astroviridae,Astroviridae,36,0.003502807597589679,889.0,697.89,298.17,773,0.004,nonstructural protein,Non-structural,Canis lupus familiaris,ssRNA(+),Mamastrovirus
+932,QBK89142.1,Mimiviridae,Mimiviridae-Phycodnaviridae,Mimiviridae,36,0.003502807597589679,636.0,596.14,52.82,555,0.003,glucosamine-fructose-6-phosphate aminotransferase,Other-Functions,Acanthamoeba castellanii,dsDNA,Mimivirus
+933,QHN64363.1,Picornaviridae,Picornaviridae,Picornaviridae,35,0.0034055073865455216,2485.0,617.69,843.89,683,0.004,polyprotein,Polyprotein,Macaca mulatta,ssRNA(+),Sapelovirus
+934,QYA72416.1,Secoviridae,Secoviridae,Secoviridae,35,0.0034055073865455216,2113.0,1254.29,903.18,1702,0.009,polymerase,Polyprotein,Actinidia chinensis,ssRNA(+),Nepovirus
+935,YP_009552830.1,Caliciviridae,Caliciviridae,Caliciviridae,35,0.0034055073865455216,1991.0,834.2,618.49,972,0.005,polyprotein,Polyprotein,Macaca mulatta,ssRNA(+),Recovirus
+936,AGG16061.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,35,0.0034055073865455216,1898.0,731.46,709.95,791,0.004,ORF-C,Other-Functions,Elephas maximus,dsDNA,Proboscivirus
+937,ALZ45690.1,Nimaviridae,Nimaviridae-Mimiviridae-Iridoviridae,Nimaviridae,35,0.0034055073865455216,1690.0,842.34,642.52,1097,0.006,hypothetical protein,Hypothetical,Penaeus vannamei,dsDNA,Whispovirus
+938,AVL84357.1,Alphaflexiviridae,Alphaflexiviridae,Alphaflexiviridae,35,0.0034055073865455216,1388.0,1171.63,441.07,1581,0.008,RNA-dependent RNA polymerase,Replication-Transcription,Lilium,ssRNA(+),Potexvirus
+939,QFG74865.1,Mimiviridae,Mimiviridae-Marseilleviridae-Poxviridae-Phycodnaviridae,Mimiviridae,35,0.0034055073865455216,1076.0,608.37,144.05,556,0.003,NAD-dependent DNA ligase,Other-Functions,Acanthamoeba castellanii,dsDNA,Mimivirus
+940,AZQ20773.1,Iridoviridae,Iridoviridae,Iridoviridae,35,0.0034055073865455216,1050.0,737.91,306.56,800,0.004,ORF-2,Cell-Structure,Trichopodus leerii,dsDNA,Megalocytivirus
+941,YP_009293591.1,Phenuiviridae,Phenuiviridae-Peribunyaviridae,Phenuiviridae,35,0.0034055073865455216,1012.0,975.54,122.92,1203,0.006,glycoprotein precursor,Glycoprotein,Ixodes uriae,RNA,Uukuvirus
+942,AAA16736.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,35,0.0034055073865455216,809.0,719.06,213.74,784,0.004,RIR1,Other-Functions,Homo sapiens,dsDNA,Roseolovirus
+943,QBK89057.1,Mimiviridae,Mimiviridae,Mimiviridae,35,0.0034055073865455216,789.0,668.83,199.19,713,0.004,ankyrin repeat protein,Other-Functions,Acanthamoeba polyphaga,dsDNA,Mimivirus
+944,QRW42293.1,Luteoviridae,Luteoviridae-Solemoviridae,Solemoviridae,35,0.0034055073865455216,647.0,634.91,24.67,608,0.003,putative serine protease,Other-Functions,Undefined host,ssRNA(+),Sobemovirus
+945,QXC77018.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,34,0.003308207175501364,3357.0,2302.88,1403.68,3423,0.018,UL36,Structural-Envelope,Gallus gallus,dsDNA,Mardivirus
+946,QIM73877.1,Flaviviridae,Flaviviridae,Flaviviridae,34,0.003308207175501364,3050.0,2222.35,1174.26,3291,0.017,polyprotein,Polyprotein,Rattus exulans,ssRNA(+),Hepacivirus
+947,YP_164335.1,Picornaviridae,Picornaviridae,Picornaviridae,34,0.003308207175501364,2521.0,1241.74,1012.5,1657,0.009,polyprotein,Polyprotein,Gallus gallus,ssRNA(+),Anativirus
+948,YP_008531322.1,Picornaviridae,Picornaviridae,Picornaviridae,34,0.003308207175501364,2259.0,938.53,988.89,1214,0.006,polyprotein,Polyprotein,Anguilla anguilla,ssRNA(+),Parechovirus
+949,YP_009220366.1,Virgaviridae,Virgaviridae,Virgaviridae,34,0.003308207175501364,1850.0,1584.12,473.44,2212,0.012,RNA-dependent RNA polymerase,Replication-Transcription,Solanum tuberosum,ssRNA(+),Pomovirus
+950,P43139.1,Asfarviridae,Asfarviridae,Asfarviridae,34,0.003308207175501364,1244.0,989.18,427.86,1294,0.007,G1211R,Replication-Transcription,Sus scrofa,dsDNA,Asfivirus
+951,YP_238426.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,34,0.003308207175501364,939.0,923.53,29.58,1074,0.006,ORF63,Structural-Envelope,Homo sapiens,dsDNA,Rhadinovirus
+952,QIP68050.1,Totiviridae,Totiviridae,Totiviridae,34,0.003308207175501364,901.0,756.94,135.84,797,0.004,RNA-dependent RNA polymerase,Replication-Transcription,Erysiphe sp.,dsRNA,Totivirus
+953,QDH91058.1,Mitoviridae,Mitoviridae,Mitoviridae,34,0.003308207175501364,858.0,692.09,193.6,695,0.004,RNA-dependent RNA polymerase,Replication-Transcription,Plasmopara viticola,ssRNA(+),Mitovirus
+954,ARF08920.1,Mimiviridae,Mimiviridae,Mimiviridae,34,0.003308207175501364,797.0,734.18,29.16,756,0.004,hypothetical protein,Other-Functions,Acanthamoeba castellanii,dsDNA,Mimivirus
+955,QKK82921.1,Orthomyxoviridae,Orthomyxoviridae,Orthomyxoviridae,34,0.003308207175501364,717.0,524.88,269.87,502,0.003,PB1 protein,Other-Functions,Homo sapiens,ssRNA(-),Thogotovirus
+956,YP_293704.1,Closteroviridae,Closteroviridae,Closteroviridae,34,0.003308207175501364,669.0,629.18,130.79,591,0.003,minor coat protein,Structural-Envelope,Solanum lycopersicum,ssRNA(+),Crinivirus
+957,QJI53791.1,Marnaviridae,Marnaviridae-Picornaviridae,Marnaviridae,33,0.003210906964457206,2608.0,998.45,667.12,1207,0.006,hypothetical protein 2,Hypothetical,Undefined host,ssRNA(+),Locarnavirus
+958,YP_010087157.1,Rhabdoviridae,Rhabdoviridae,Rhabdoviridae,33,0.003210906964457206,2113.0,973.91,993.2,1282,0.007,RNA-dependent RNA polymerase,Replication-Transcription,Glycine max,ssRNA(-),Cytorhabdovirus
+959,AIT39631.1,Secoviridae,Secoviridae,Secoviridae,33,0.003210906964457206,1979.0,952.82,628.83,1123,0.006,coat protein,Polyprotein,Rubus,ssRNA(+),Nepovirus
+960,YP_003358194.1,Alloherpesviridae,Alloherpesviridae,Alloherpesviridae,33,0.003210906964457206,1720.0,582.12,682.46,638,0.003,DNA polymerase,Replication-Transcription,Cyprinus carpio,dsDNA,Cyvirus
+961,YP_009507836.1,Totiviridae,Totiviridae,Totiviridae,33,0.003210906964457206,1481.0,809.45,591.29,958,0.005,RNA-dependent RNA polymerase,Replication-Transcription,Trichomonas vaginalis,dsRNA,Trichomonasvirus
+962,AYV76483.1,Mimiviridae,Mimiviridae-Phycodnaviridae,Mimiviridae,33,0.003210906964457206,1144.0,1033.55,204.66,1237,0.006,isoleucyl-tRNA synthetase,Replication-Transcription,Acanthamoeba castellanii,dsDNA,Mimivirus
+963,AGE51440.1,Phycodnaviridae,Phycodnaviridae,Phycodnaviridae,33,0.003210906964457206,836.0,510.36,261.88,529,0.003,putative bifunctional chitinase/lysozyme,Other-Functions,Chlorella variabilis,dsDNA,Chlorovirus
+964,QKU33935.1,Mimiviridae,Mimiviridae,Mimiviridae,32,0.003113606753413048,1785.0,1368.59,567.46,1734,0.009,putative ATP-dependent RNA helicase,Replication-Transcription,Acanthamoeba polyphaga,dsDNA,Mimivirus
+965,ARF09230.1,Mimiviridae,Mimiviridae,Mimiviridae,32,0.003113606753413048,1484.0,1145.78,206.87,1380,0.007,putative NTPase,Replication-Transcription,Acanthamoeba castellanii,dsDNA,Mimivirus
+966,AVT50749.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,32,0.003113606753413048,1284.0,874.16,529.58,1061,0.006,DNA polymerase catalytic subunit,Replication-Transcription,Bos taurus,dsDNA,Varicellovirus
+967,AYV76046.1,Mimiviridae,Mimiviridae-Phycodnaviridae,Mimiviridae,32,0.003113606753413048,1080.0,931.72,210.55,1040,0.005,lon protease-like protein,Other-Functions,Acanthamoeba castellanii,dsDNA,Mimivirus
+968,YP_009179315.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,32,0.003113606753413048,756.0,582.25,257.12,513,0.003,envelope glycoprotein H,Structural-Envelope,Elephas maximus,dsDNA,Proboscivirus
+969,AYW76619.1,Nimaviridae,Nimaviridae-Caulimoviridae,Nimaviridae,31,0.00301630654236889,4189.0,2362.23,1836.65,3287,0.017,hypothetical protein,Hypothetical,Penaeus vannamei,dsDNA,Whispovirus
+970,QKE51408.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,31,0.00301630654236889,2641.0,2556.74,434.61,3511,0.018,ORF64,Other-Functions,Homo sapiens,dsDNA,Rhadinovirus
+971,QHZ60202.1,Aspiviridae,Aspiviridae,Aspiviridae,31,0.00301630654236889,2417.0,1459.81,1023.91,1890,0.01,unknown,Replication-Transcription,Lachenalia,ssRNA(-),Ophiovirus
+972,YP_009666115.1,Nairoviridae,Nairoviridae-Peribunyaviridae,Nairoviridae,31,0.00301630654236889,1665.0,1104.71,498.0,1281,0.007,glycoprotein precursor,Glycoprotein,Homo sapiens,ssRNA(-),Orthonairovirus
+973,BCS82822.1,Mimiviridae,Mimiviridae,Mimiviridae,31,0.00301630654236889,1182.0,620.06,371.15,641,0.003,putative ankyrin repeat protein,Other-Functions,Acanthamoeba castellanii,dsDNA,Mimivirus
+974,QEJ80777.1,Adenoviridae,Adenoviridae,Adenoviridae,31,0.00301630654236889,1088.0,979.77,71.27,1070,0.006,100 kDa protein,Hypothetical,Gallus gallus,dsDNA,Aviadenovirus
+975,QPF49922.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,31,0.00301630654236889,753.0,680.61,174.11,624,0.003,terminase subunit 1,Other-Functions,Sus scrofa,dsDNA,Varicellovirus
+976,AEM64091.1,Herpesviridae,Herpesviridae,Orthoherpesviridae,31,0.00301630654236889,688.0,644.74,157.11,594,0.003,gH,Other-Functions,Sus scrofa,dsDNA,Varicellovirus
+977,YP_009507752.1,Reoviridae,Reoviridae,Spinareoviridae,31,0.00301630654236889,653.0,579.03,191.36,521,0.003,putative outer capsid VP4,Structural-Envelope,Ctenopharyngodon idella,dsRNA,Aquareovirus
+978,Prokaryotic-viral,Prokaryotic-viral,Prokaryotic-viral,Prokaryotic-viral,6464,0.6289485641894357,,,,47941,0.25,Prokaryotic-viral,Other-Functions,Bacteria-Arqueas,Variaty,Variaty
+979,Non-Viral,Non-Viral,Non-Viral,Non-Viral,7561,0.7356868957048768,,,,107423,0.561,Non-Viral,Other-Functions,Non-Viral,Variaty,Variaty

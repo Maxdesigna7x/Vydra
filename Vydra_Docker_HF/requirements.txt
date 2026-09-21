@@ -1,0 +1,11 @@
+gradio>=4.44.0,<6.0
+fastapi>=0.110
+uvicorn[standard]>=0.27
+python-multipart>=0.0.9
+numpy>=1.24
+pandas>=2.0
+torch>=2.1
+transformers>=4.40
+sentencepiece>=0.2
+protobuf>=4.25
+faiss-cpu>=1.8
