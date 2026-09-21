@@ -1,7 +1,11 @@
 <div align="center">
+  <p>
+    <a href="README.md"><img alt="English" src="https://img.shields.io/badge/Language-English-2563EB?style=for-the-badge"></a>
+    <a href="README.es.md"><img alt="Español" src="https://img.shields.io/badge/Idioma-Español-EAB308?style=for-the-badge"></a>
+  </p>
   <img src="docs/images/vydra-icon.webp" width="96" alt="Vydra logo">
   <h1>Vydra</h1>
-  <p><strong>Clasificación jerárquica y contextualización de proteínas virales con ProstT5, MLP y FAISS.</strong></p>
+  <p><strong>Hierarchical protein classification and biological contextualization with ProstT5, MLPs, and FAISS.</strong></p>
   <p>
     <img alt="Python 3.10+" src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white">
     <img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-2.1%2B-EE4C2C?logo=pytorch&logoColor=white">
@@ -10,38 +14,38 @@
   </p>
 </div>
 
-Vydra recibe una secuencia de proteína y la conduce por una cascada de seis
-clasificadores. Distingue proteínas celulares y virales, separa bacteriófagos de
-virus eucariotas y, para bacteriófagos, identifica proteínas estructurales y su
-clase funcional. Finalmente busca vecinos de referencia para aportar contexto
-biológico interpretable.
+Vydra takes a protein sequence through a cascade of six classifiers. It separates
+cellular from viral proteins, distinguishes bacteriophages from eukaryotic
+viruses, and identifies structural phage proteins and their functional class.
+For phage predictions, it also searches reference neighborhoods to provide
+interpretable biological context.
 
-> **Estado:** proyecto de investigación en desarrollo. Las asignaciones FAISS
-> aportan contexto por similitud y no deben interpretarse como una clasificación
-> taxonómica directa de la consulta.
+> **Status:** active research project. FAISS assignments provide similarity-based
+> context and should not be interpreted as direct taxonomic classification of a
+> query sequence.
 
-![Jerarquía completa de Vydra](docs/images/hierarchy.png)
+![Vydra hierarchical classification workflow](docs/images/diagram-en.png)
 
-## Qué puede predecir
+## What Vydra predicts
 
-La jerarquía comparte un embedding ProstT5 de 1,024 dimensiones:
+All six classifiers share a 1,024-dimensional ProstT5 embedding:
 
-| Modelo | Decisión |
+| Model | Decision |
 |---|---|
-| M1 | Viral o celular |
-| M2 | Bacteria, Archaea o Eukaryota |
-| M3 | Bacteriófago o virus eucariota |
-| M4 | Una de 978 clases de virus eucariotas |
-| M5 | Proteína de fago estructural o no estructural |
-| M6 | Una de 10 clases estructurales de fago |
+| M1 | Viral or cellular |
+| M2 | Bacteria, Archaea, or Eukaryota |
+| M3 | Bacteriophage or eukaryotic virus |
+| M4 | One of 978 eukaryotic-virus classes |
+| M5 | Structural or non-structural phage protein |
+| M6 | One of 10 structural phage classes |
 
-Las clases estructurales son: `baseplate`, `collar`, `head_tail_joining`,
+The structural classes are `baseplate`, `collar`, `head_tail_joining`,
 `major_capsid`, `major_tail`, `minor_capsid`, `minor_tail`, `portal`,
-`tail_fiber` y `tail_sheath`.
+`tail_fiber`, and `tail_sheath`.
 
-## Inicio rápido
+## Quick start
 
-### 1. Clonar e instalar
+### 1. Clone and install
 
 ```bash
 git clone https://github.com/Maxdesigna7x/Vydra.git
@@ -50,144 +54,156 @@ conda env create -f environment.yml
 conda activate vydra
 ```
 
-### 2. Descargar los artefactos grandes
+### 2. Download the large artifacts
 
-Los pesos MLP están incluidos en el repositorio. Los bancos FAISS se publican
-separadamente en GitHub Releases porque juntos ocupan aproximadamente 1.6 GB:
+The MLP weights are included in the repository. The FAISS prototype banks are
+published separately in GitHub Releases because together they occupy about 1.6
+GB:
 
 ```bash
 ./vydra download-artifacts
 ```
 
-Para clasificar secuencias crudas también se necesita ProstT5. Este comando lo
-guarda dentro del bundle para usos posteriores sin conexión:
+Raw protein sequences also require ProstT5. Downloading it once stores a local
+copy inside the bundle for later offline use:
 
 ```bash
 ./vydra download-model
-```
-
-Comprueba que todo esté listo:
-
-```bash
 ./vydra doctor
 ```
 
-### 3. Ejecutar una predicción
+For a private clone, `download-artifacts` automatically uses an authenticated
+GitHub CLI session. Run `gh auth login` first when needed.
+
+### 3. Run a prediction
 
 ```bash
 ./vydra predict --seq "MSTNPKPQRKTKRNTNRRPQDVKFPGGGQIVGGVYLLPRRGPRLG"
 ```
 
-Con un FASTA y salida CSV:
+FASTA input and CSV output:
 
 ```bash
 ./vydra predict --fasta proteins.fasta --format csv --output predictions.csv
 ```
 
-Desde un pipe:
+Read FASTA from a pipe:
 
 ```bash
 cat proteins.fasta | ./vydra predict --stdin --format jsonl
 ```
 
-Si ya tienes embeddings ProstT5 normalizados de 1,024 dimensiones:
+Use existing 1,024-dimensional ProstT5 embeddings without loading the base
+model:
 
 ```bash
 ./vydra predict --embedding embeddings.npy --offline --format json
 ```
 
-La CLI admite `table`, `json`, `jsonl` y `csv`, detecta CUDA automáticamente y
-permite forzar `--device cpu` o `--device cuda`.
+The CLI supports `table`, `json`, `jsonl`, and `csv` output. It detects CUDA
+automatically, while `--device cpu` and `--device cuda` provide explicit control.
 
-## Ejecución offline
-
-Después de ejecutar `download-artifacts` y `download-model`, la inferencia puede
-trabajar sin red:
-
-```bash
-./vydra predict --offline --fasta proteins.fasta
-```
-
-También puedes apuntar a una instalación local existente de ProstT5:
-
-```bash
-export VYDRA_PROSTT5_PATH=/ruta/local/ProstT5
-./vydra predict --offline --fasta proteins.fasta
-```
-
-## Cómo funciona
+## How it works
 
 ```text
-Secuencia
-   │
-   ▼
-ProstT5 → embedding de 1,024 dimensiones
-   │
-   ▼
-M1: celular ──────────────► M2: Bacteria / Archaea / Eukaryota
+Protein sequence
+      │
+      ▼
+ProstT5 → 1,024-dimensional embedding
+      │
+      ▼
+M1: cellular ─────────────► M2: Bacteria / Archaea / Eukaryota
  │
- └── viral ───────────────► M3: virus eucariota / bacteriófago
+ └── viral ───────────────► M3: eukaryotic virus / bacteriophage
                               │                    │
                               ▼                    ▼
-                         M4: 978 clases      M5: estructural / no estructural
+                         M4: 978 classes     M5: structural / non-structural
                                                    │
                                                    ▼
-                                             M6: 10 clases
+                                             M6: 10 classes
                                                    │
                                                    ▼
-                                      FAISS + contexto biológico
+                                      FAISS + biological context
 ```
 
-Las secuencias mayores de 2,048 aminoácidos se dividen en ventanas solapadas y
-sus embeddings se promedian. La búsqueda final usa producto interno sobre
-vectores normalizados y bancos de prototipos por rama/clase.
+Sequences longer than 2,048 amino acids are split into overlapping windows and
+their embeddings are averaged. The final search uses inner product over
+normalized vectors and class-specific prototype banks.
 
-![Contextualización mediante FAISS](docs/images/faiss-context.png)
+![FAISS contextualization of viral proteins](docs/images/faiss-context-en.png)
 
-## Rendimiento experimental
+## Experimental performance
 
-En los conjuntos de prueba usados durante el desarrollo, las seis cabezas
-obtuvieron accuracies locales entre 91.76% y 99.31%. Estas cifras describen la
-evaluación interna de cada cabeza, no la precisión end-to-end sobre cualquier
-distribución externa.
+Across the internal test sets used during development, the six local classifier
+heads achieved accuracies between 91.76% and 99.31%. These values describe each
+head under its own evaluation split; they are not a claim of end-to-end accuracy
+on every external distribution.
 
-![Rendimiento de los clasificadores](docs/images/performance.png)
+![Performance and convergence of the hierarchical classifiers](docs/images/classifiers-en.png)
 
-## Estructura del repositorio
+The project also compares Vydra with established protein-annotation approaches.
+Interpret this figure together with the evaluation protocol and dataset scope;
+different tools may solve partially different tasks.
 
-```text
-Vydra/
-├── vydra                         # lanzador de la CLI
-├── Vydra_Docker_HF/
-│   ├── vydra_cli.py              # comandos y formatos de salida
-│   ├── inference_gradio.py       # núcleo de inferencia
-│   ├── app.py                    # API FastAPI e interfaz web
-│   ├── models/mlp_weights/       # seis cabezas MLP
-│   ├── artifacts/                # clases, metadata y bancos descargables
-│   └── web/                      # frontend
-├── docs/images/                  # figuras del proyecto
-├── environment.yml
-└── requirements.txt
-```
+![Comparison with state-of-the-art approaches](docs/images/sota-comparison-en.png)
 
-Los datasets originales, embeddings de entrenamiento, notebooks de trabajo y
-checkpoints temporales no forman parte de la distribución ligera de GitHub.
+## Web interface
 
-## Interfaz web opcional
+The included FastAPI application provides FASTA upload, hierarchical results,
+confidence scores, cluster context, and downloadable predictions through a
+visual interface.
 
-La misma inferencia puede ejecutarse como aplicación local:
+![Vydra web interface](docs/images/web.png)
+
+Run it locally after downloading the inference artifacts:
 
 ```bash
 cd Vydra_Docker_HF
 uvicorn app:app --host 0.0.0.0 --port 7860
 ```
 
-Después abre `http://localhost:7860`.
+Then open `http://localhost:7860`.
 
-## Formato de embeddings
+## Offline execution
 
-La CLI acepta matrices NumPy `(n, 1024)` o diccionarios PyTorch. El formato
-anidado usado por el proyecto es:
+After `download-artifacts` and `download-model`, inference can run without
+network access:
+
+```bash
+./vydra predict --offline --fasta proteins.fasta
+```
+
+You may also point Vydra to an existing local ProstT5 installation:
+
+```bash
+export VYDRA_PROSTT5_PATH=/local/path/to/ProstT5
+./vydra predict --offline --fasta proteins.fasta
+```
+
+## Repository layout
+
+```text
+Vydra/
+├── vydra                         # CLI launcher
+├── Vydra_Docker_HF/
+│   ├── vydra_cli.py              # commands and output formats
+│   ├── inference_gradio.py       # inference engine
+│   ├── app.py                    # FastAPI API and web application
+│   ├── models/mlp_weights/       # six MLP heads
+│   ├── artifacts/                # labels, metadata, downloaded banks
+│   └── web/                      # frontend
+├── docs/images/                  # project figures
+├── environment.yml
+└── requirements.txt
+```
+
+Raw datasets, training embeddings, research notebooks, and temporary
+checkpoints are intentionally excluded from the lightweight GitHub distribution.
+
+## Embedding format
+
+The CLI accepts NumPy matrices with shape `(n, 1024)` or PyTorch dictionaries.
+The nested format used by the project is:
 
 ```python
 {
@@ -197,21 +213,22 @@ anidado usado por el proyecto es:
 }
 ```
 
-## Limitaciones
+## Limitations
 
-- La calidad depende de la cobertura y distribución de los datos de referencia.
-- Una confianza MLP alta no reemplaza una validación biológica independiente.
-- La etiqueta de cluster resume vecinos conocidos; no demuestra taxonomía.
-- ProstT5 y los bancos de prototipos requieren varios GB de almacenamiento.
-- CPU funciona, pero una GPU CUDA reduce considerablemente el tiempo de embedding.
+- Performance depends on the coverage and distribution of the reference data.
+- High MLP confidence does not replace independent biological validation.
+- A cluster label summarizes known neighbors; it does not establish taxonomy.
+- ProstT5 and the prototype banks require several GB of storage.
+- CPU inference works, but a CUDA GPU substantially reduces embedding time.
 
-## Documentación
+## Documentation
 
-- [Guía detallada de la CLI](Vydra_Docker_HF/CLI.md)
-- [Documentación del servicio web](Vydra_Docker_HF/README.md)
+- [CLI guide](Vydra_Docker_HF/CLI.md)
+- [Web service documentation](Vydra_Docker_HF/README.md)
+- [Versión en español](README.es.md)
 
-## Cita
+## Citation
 
-Vydra forma parte de un proyecto de tesis en desarrollo. La referencia formal se
-añadirá cuando el manuscrito esté disponible. Si utilizas este repositorio antes
-de su publicación, enlaza esta página y especifica el commit empleado.
+Vydra is part of an ongoing thesis project. A formal citation will be added when
+the manuscript becomes available. Until then, please link to this repository
+and record the commit used in your analysis.
