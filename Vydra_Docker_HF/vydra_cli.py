@@ -9,10 +9,13 @@ import hashlib
 import importlib.util
 import json
 import os
+import shutil
+import subprocess
 import sys
 import warnings
 from pathlib import Path
 from typing import Any, Iterable
+from urllib.error import HTTPError
 from urllib.request import urlopen
 
 
@@ -295,24 +298,49 @@ def command_download_artifacts(args: argparse.Namespace) -> int:
         partial = destination.with_suffix(destination.suffix + ".part")
         url = f"{RELEASE_BASE_URL}/{filename}"
         eprint(f"Descargando {filename}...")
-        with urlopen(url) as response, partial.open("wb") as output:
-            total = int(response.headers.get("Content-Length", 0))
-            copied = 0
-            while True:
-                chunk = response.read(8 * 1024 * 1024)
-                if not chunk:
-                    break
-                output.write(chunk)
-                copied += len(chunk)
-                if total:
-                    eprint(f"  {copied / total:6.1%}", end="\r")
-        if total:
-            eprint(" " * 20, end="\r")
-        actual_hash = sha256_file(partial)
-        if actual_hash != expected_hash:
+        downloaded_path = partial
+        try:
+            with urlopen(url) as response, partial.open("wb") as output:
+                total = int(response.headers.get("Content-Length", 0))
+                copied = 0
+                while True:
+                    chunk = response.read(8 * 1024 * 1024)
+                    if not chunk:
+                        break
+                    output.write(chunk)
+                    copied += len(chunk)
+                    if total:
+                        eprint(f"  {copied / total:6.1%}", end="\r")
+            if total:
+                eprint(" " * 20, end="\r")
+        except HTTPError as exc:
             partial.unlink(missing_ok=True)
+            if exc.code not in {401, 403, 404} or not shutil.which("gh"):
+                raise RuntimeError(
+                    "No se pudo descargar el artefacto. Si el repositorio es privado, "
+                    "instala GitHub CLI y ejecuta 'gh auth login'."
+                ) from exc
+            eprint("El repositorio requiere autenticacion; usando GitHub CLI...")
+            try:
+                subprocess.run(
+                    [
+                        "gh", "release", "download", RELEASE_TAG,
+                        "--repo", "Maxdesigna7x/Vydra",
+                        "--pattern", filename,
+                        "--dir", str(ARTIFACTS_DIR),
+                        "--clobber",
+                    ],
+                    check=True,
+                )
+            except subprocess.CalledProcessError as download_error:
+                raise RuntimeError("GitHub CLI no pudo descargar el artefacto") from download_error
+            downloaded_path = destination
+        actual_hash = sha256_file(downloaded_path)
+        if actual_hash != expected_hash:
+            downloaded_path.unlink(missing_ok=True)
             raise RuntimeError(f"Checksum invalido para {filename}")
-        partial.replace(destination)
+        if downloaded_path == partial:
+            partial.replace(destination)
         eprint(f"Listo: {destination}")
     return 0
 
