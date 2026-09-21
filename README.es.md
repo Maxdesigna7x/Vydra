@@ -103,6 +103,15 @@ Si ya tienes embeddings ProstT5 normalizados de 1,024 dimensiones:
 La CLI admite `table`, `json`, `jsonl` y `csv`, detecta CUDA automáticamente y
 permite forzar `--device cpu` o `--device cuda`.
 
+El batching es inteligente por defecto: Vydra ordena los chunks por longitud
+real, agrupa longitudes similares, consulta la VRAM o RAM disponible después de
+cargar el encoder y conserva una reserva de seguridad. Los límites GPU iniciales
+se calibraron con una RTX 3060 de 11.63 GiB y luego se escalan al dispositivo
+detectado. Si hay fragmentación u otro proceso ocupa memoria, Vydra reduce el
+batch a la mitad y reintenta automáticamente. Se puede controlar con
+`--batch-size`, `--max-batch-size`, `--memory-fraction`,
+`--reserve-memory-gb` y `--length-bin`.
+
 ## Ejecución offline
 
 Después de ejecutar `download-artifacts` y `download-model`, la inferencia puede
@@ -224,6 +233,7 @@ anidado usado por el proyecto es:
 ## Documentación
 
 - [Guía detallada de la CLI](Vydra_Docker_HF/CLI.md)
+- [Benchmark de límites de batch en RTX 3060](docs/BATCH_BENCHMARK_RTX3060.md)
 - [Documentación del servicio web](Vydra_Docker_HF/README.md)
 - [English version](README.md)
 

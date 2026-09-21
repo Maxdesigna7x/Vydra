@@ -2,9 +2,12 @@ from __future__ import annotations
 
 import gc
 import json
+import os
 import threading
 from dataclasses import dataclass
 from pathlib import Path
+
+os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
 
 import faiss
 import gradio as gr
@@ -416,24 +419,179 @@ def to_prost_t5_input(seq: str) -> str:
     return f"<AA2fold> {' '.join(seq)}"
 
 
-def batch_size_for_tokens(max_tokens: int) -> int:
-    if max_tokens <= 512:
-        return 8
-    if max_tokens <= 1024:
-        return 4
-    if max_tokens <= 1536:
-        return 2
-    return 1
+def _env_number(name: str, cast, default=None):
+    value = os.environ.get(name)
+    if value in (None, ""):
+        return default
+    try:
+        return cast(value)
+    except (TypeError, ValueError) as exc:
+        raise ValueError(f"Invalid {name}: {value!r}") from exc
 
 
-def embed_records(records: list[SequenceRecord], progress_callback=None) -> np.ndarray:
+def _system_memory() -> tuple[int, int]:
+    """Return available and total host RAM without requiring psutil."""
+    try:
+        values = {}
+        with open("/proc/meminfo", "r", encoding="utf-8") as handle:
+            for line in handle:
+                key, raw = line.split(":", 1)
+                values[key] = int(raw.strip().split()[0]) * 1024
+        return int(values["MemAvailable"]), int(values["MemTotal"])
+    except (OSError, KeyError, ValueError):
+        page_size = os.sysconf("SC_PAGE_SIZE")
+        available = page_size * os.sysconf("SC_AVPHYS_PAGES")
+        total = page_size * os.sysconf("SC_PHYS_PAGES")
+        return int(available), int(total)
+
+
+def _estimated_embedding_bytes(sequence_length: int, target_device: torch.device) -> int:
+    """Conservative activation estimate calibrated on the 12 GiB benchmark.
+
+    On an RTX 3060, the measured dynamic cost was about 0.028 GiB/sequence at
+    128 aa and 0.138 GiB/sequence at 512 aa. A safety multiplier and a steeper
+    curve above 512 aa keep the initial recommendation below the measured OOM
+    boundary; runtime OOM backoff remains the final guard.
+    """
+    length = max(32, int(sequence_length))
+    gib_at_128 = 0.0276
+    if length <= 512:
+        gib = gib_at_128 * (length / 128.0) ** 1.16
+    else:
+        gib_at_512 = gib_at_128 * 4.0**1.16
+        gib = gib_at_512 * (length / 512.0) ** 1.35
+    safety_multiplier = 1.25 if target_device.type == "cuda" else 2.5
+    return max(1, int(gib * safety_multiplier * 2**30))
+
+
+def _calibrated_gpu_cap(sequence_length: int, total_bytes: int) -> int:
+    """Safe throughput-oriented caps derived from the RTX 3060 benchmark."""
+    length = max(1, int(sequence_length))
+    if length <= 128:
+        reference_cap = 128
+    elif length <= 256:
+        reference_cap = 64
+    elif length <= 512:
+        reference_cap = 32
+    elif length <= 1024:
+        reference_cap = 12
+    elif length <= 1536:
+        reference_cap = 6
+    else:
+        reference_cap = 4
+    scale = max(0.25, total_bytes / (11.63 * 2**30))
+    return max(1, round(reference_cap * scale))
+
+
+def memory_aware_batch_size(
+    sequence_length: int,
+    *,
+    batch_size: int | None = None,
+    max_batch_size: int | None = None,
+    memory_fraction: float | None = None,
+    reserve_memory_gb: float | None = None,
+) -> tuple[int, dict]:
+    """Choose a safe initial batch from current free VRAM/RAM."""
+    target_device = device
+    manual_batch = batch_size if batch_size is not None else _env_number("VYDRA_BATCH_SIZE", int)
+    default_cap = 256 if target_device.type == "cuda" else 32
+    cap = max_batch_size if max_batch_size is not None else _env_number("VYDRA_MAX_BATCH_SIZE", int, default_cap)
+    if manual_batch is not None and max_batch_size is None and "VYDRA_MAX_BATCH_SIZE" not in os.environ:
+        cap = max(int(cap), int(manual_batch))
+    fraction_default = 0.85 if target_device.type == "cuda" else 0.75
+    fraction = memory_fraction if memory_fraction is not None else _env_number(
+        "VYDRA_MEMORY_FRACTION", float, fraction_default
+    )
+    reserve_gb = reserve_memory_gb if reserve_memory_gb is not None else _env_number(
+        "VYDRA_RESERVE_MEMORY_GB", float
+    )
+
+    if cap is None or cap < 1:
+        raise ValueError("max_batch_size must be >= 1")
+    if manual_batch is not None and manual_batch < 1:
+        raise ValueError("batch_size must be >= 1")
+    if not 0.1 <= float(fraction) <= 0.95:
+        raise ValueError("memory_fraction must be between 0.10 and 0.95")
+    if reserve_gb is not None and reserve_gb < 0:
+        raise ValueError("reserve_memory_gb must be >= 0")
+
+    if target_device.type == "cuda":
+        free_bytes, total_bytes = torch.cuda.mem_get_info(target_device)
+        minimum_reserve = 1.0 * 2**30
+    else:
+        free_bytes, total_bytes = _system_memory()
+        minimum_reserve = 2.0 * 2**30
+    reserve_bytes = (
+        float(reserve_gb) * 2**30
+        if reserve_gb is not None
+        else max(minimum_reserve, total_bytes * (1.0 - float(fraction)))
+    )
+    usable_bytes = max(0, int(free_bytes - reserve_bytes))
+    per_sequence_bytes = _estimated_embedding_bytes(sequence_length, target_device)
+    automatic = max(1, usable_bytes // per_sequence_bytes)
+    calibrated_cap = None
+    if target_device.type == "cuda" and manual_batch is None:
+        calibrated_cap = _calibrated_gpu_cap(sequence_length, total_bytes)
+        automatic = min(automatic, calibrated_cap)
+    chosen = min(int(cap), int(manual_batch if manual_batch is not None else automatic))
+    return max(1, chosen), {
+        "mode": "manual" if manual_batch is not None else "auto",
+        "free_gib": free_bytes / 2**30,
+        "total_gib": total_bytes / 2**30,
+        "reserve_gib": reserve_bytes / 2**30,
+        "estimated_gib_per_sequence": per_sequence_bytes / 2**30,
+        "calibrated_cap": calibrated_cap,
+        "cap": int(cap),
+    }
+
+
+def _embed_items(items: list[dict], tokenizer, model) -> np.ndarray:
+    batch_texts = [item["text"] for item in items]
+    inputs = tokenizer(batch_texts, add_special_tokens=True, padding=True, return_tensors="pt").to(device)
+    with torch.inference_mode():
+        if device.type == "cuda":
+            with torch.autocast(device_type="cuda", dtype=torch.float16):
+                outputs = model(input_ids=inputs["input_ids"], attention_mask=inputs["attention_mask"])
+        else:
+            outputs = model(input_ids=inputs["input_ids"], attention_mask=inputs["attention_mask"])
+        hidden = outputs.last_hidden_state
+        mask = inputs["attention_mask"].unsqueeze(-1).expand(hidden.size()).float()
+        pooled = (hidden * mask).sum(dim=1) / torch.clamp(mask.sum(dim=1), min=1e-9)
+        result = pooled.detach().cpu().float().numpy()
+    del inputs, outputs, hidden, mask, pooled
+    return result
+
+
+def _is_memory_error(exc: BaseException) -> bool:
+    message = str(exc).lower()
+    return isinstance(exc, (torch.cuda.OutOfMemoryError, MemoryError)) or any(
+        marker in message
+        for marker in ("out of memory", "can't allocate memory", "cannot allocate memory", "defaultcpuallocator")
+    )
+
+
+def embed_records(
+    records: list[SequenceRecord],
+    progress_callback=None,
+    *,
+    batch_size: int | None = None,
+    max_batch_size: int | None = None,
+    memory_fraction: float | None = None,
+    reserve_memory_gb: float | None = None,
+    length_bin: int | None = None,
+) -> np.ndarray:
     tokenizer, model = load_prost_t5()
+    if not records:
+        raise ValueError("No records to embed")
+    bin_width = length_bin if length_bin is not None else _env_number("VYDRA_LENGTH_BIN", int, 128)
+    if bin_width is None or bin_width < 1:
+        raise ValueError("length_bin must be >= 1")
     expanded = []
     chunk_counts = [0 for _ in records]
     for idx, rec in enumerate(records):
         for chunk in chunk_sequence(rec.sequence):
             model_input = to_prost_t5_input(chunk)
-            expanded.append({"record_idx": idx, "text": model_input, "length": len(model_input)})
+            expanded.append({"record_idx": idx, "text": model_input, "length": len(chunk)})
             chunk_counts[idx] += 1
 
     expanded.sort(key=lambda item: item["length"])
@@ -443,37 +601,62 @@ def embed_records(records: list[SequenceRecord], progress_callback=None) -> np.n
     cursor = 0
 
     while cursor < len(expanded):
-        max_tokens = expanded[cursor]["length"]
-        batch_size = batch_size_for_tokens(max_tokens)
-        batch = expanded[cursor:cursor + batch_size]
-        batch_texts = [item["text"] for item in batch]
-        inputs = tokenizer(batch_texts, add_special_tokens=True, padding=True, return_tensors="pt").to(device)
-        with torch.inference_mode():
+        first_length = expanded[cursor]["length"]
+        bucket_end = cursor
+        while bucket_end < len(expanded) and expanded[bucket_end]["length"] <= first_length + bin_width:
+            bucket_end += 1
+        bucket_length = expanded[bucket_end - 1]["length"]
+        recommended, memory_info = memory_aware_batch_size(
+            bucket_length,
+            batch_size=batch_size,
+            max_batch_size=max_batch_size,
+            memory_fraction=memory_fraction,
+            reserve_memory_gb=reserve_memory_gb,
+        )
+        active_batch_size = min(recommended, bucket_end - cursor)
+        print(
+            f"Batch {memory_info['mode']}: len={first_length}-{bucket_length} aa, "
+            f"size={active_batch_size}, free={memory_info['free_gib']:.2f} GiB, "
+            f"reserve={memory_info['reserve_gib']:.2f} GiB"
+        )
+
+        while cursor < bucket_end:
+            current_size = min(active_batch_size, bucket_end - cursor)
+            items = expanded[cursor : cursor + current_size]
+            try:
+                pooled_np = _embed_items(items, tokenizer, model)
+            except (torch.cuda.OutOfMemoryError, MemoryError, RuntimeError) as exc:
+                if not _is_memory_error(exc):
+                    raise
+                if current_size == 1:
+                    raise RuntimeError(
+                        f"Insufficient {device.type.upper()} memory even for batch 1 at {bucket_length} aa"
+                    ) from exc
+                # Break the traceback reference to tensors owned by the failed
+                # forward pass before asking the allocator to release its cache.
+                exc.__traceback__ = None
+                gc.collect()
+                if device.type == "cuda":
+                    torch.cuda.empty_cache()
+                active_batch_size = max(1, current_size // 2)
+                print(f"Memory OOM avoided: retrying with batch={active_batch_size}")
+                continue
+
+            for item, vector in zip(items, pooled_np):
+                record_idx = item["record_idx"]
+                chunk_vectors[record_idx].append(vector.astype(np.float32))
+                processed_chunks[record_idx] += 1
+                if processed_chunks[record_idx] == chunk_counts[record_idx]:
+                    processed_records += 1
+
+            if progress_callback:
+                progress_callback(processed_records, len(records))
+
+            del pooled_np
+            gc.collect()
             if device.type == "cuda":
-                with torch.autocast(device_type="cuda", dtype=torch.float16):
-                    outputs = model(input_ids=inputs["input_ids"], attention_mask=inputs["attention_mask"])
-            else:
-                outputs = model(input_ids=inputs["input_ids"], attention_mask=inputs["attention_mask"])
-            hidden = outputs.last_hidden_state
-            mask = inputs["attention_mask"].unsqueeze(-1).expand(hidden.size()).float()
-            pooled = (hidden * mask).sum(dim=1) / torch.clamp(mask.sum(dim=1), min=1e-9)
-            pooled_np = pooled.detach().cpu().float().numpy()
-
-        for item, vector in zip(batch, pooled_np):
-            record_idx = item["record_idx"]
-            chunk_vectors[record_idx].append(vector.astype(np.float32))
-            processed_chunks[record_idx] += 1
-            if processed_chunks[record_idx] == chunk_counts[record_idx]:
-                processed_records += 1
-
-        if progress_callback:
-            progress_callback(processed_records, len(records))
-
-        del inputs, outputs, hidden, mask, pooled, pooled_np
-        gc.collect()
-        if device.type == "cuda":
-            torch.cuda.empty_cache()
-        cursor += len(batch)
+                torch.cuda.empty_cache()
+            cursor += current_size
 
     per_record = []
     for idx, vectors in enumerate(chunk_vectors):

@@ -215,7 +215,14 @@ def command_predict(args: argparse.Namespace) -> int:
             raise ValueError("No se encontro ninguna secuencia valida")
         eprint(f"Generando embeddings de {len(records)} secuencia(s)...")
         with contextlib.redirect_stdout(sys.stderr):
-            embeddings = engine.embed_records(records)
+            embeddings = engine.embed_records(
+                records,
+                batch_size=args.batch_size,
+                max_batch_size=args.max_batch_size,
+                memory_fraction=args.memory_fraction,
+                reserve_memory_gb=args.reserve_memory_gb,
+                length_bin=args.length_bin,
+            )
 
     eprint(f"Clasificando {len(records)} registro(s) en {engine.device}...")
     with contextlib.redirect_stdout(sys.stderr):
@@ -363,6 +370,11 @@ def build_parser() -> argparse.ArgumentParser:
     predict.add_argument("-o", "--output", help="guardar resultado en un archivo")
     predict.add_argument("--device", choices=("auto", "cpu", "cuda"), default="auto")
     predict.add_argument("--offline", action="store_true", help="prohibir descargas y usar solo archivos locales")
+    predict.add_argument("--batch-size", type=int, help="batch fijo inicial; por defecto se calcula automaticamente")
+    predict.add_argument("--max-batch-size", type=int, help="limite superior del batch automatico (GPU: 256, CPU: 32)")
+    predict.add_argument("--memory-fraction", type=float, help="fraccion maxima de memoria total utilizable (GPU: 0.85, CPU: 0.75)")
+    predict.add_argument("--reserve-memory-gb", type=float, help="GiB que siempre deben quedar libres")
+    predict.add_argument("--length-bin", type=int, help="ancho en aa de los buckets de longitud (por defecto: 128)")
     predict.set_defaults(func=command_predict)
 
     doctor = subparsers.add_parser("doctor", help="comprobar dependencias, pesos y artefactos")

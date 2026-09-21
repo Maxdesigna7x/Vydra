@@ -103,6 +103,15 @@ model:
 The CLI supports `table`, `json`, `jsonl`, and `csv` output. It detects CUDA
 automatically, while `--device cpu` and `--device cuda` provide explicit control.
 
+Batching is memory-aware by default: Vydra sorts chunks by real sequence length,
+groups similar lengths, checks currently available VRAM or RAM after loading the
+encoder, and preserves a safety reserve. The initial GPU limits are calibrated
+from an RTX 3060 benchmark (11.63 GiB), then scaled to the detected device. If
+memory is fragmented or another process consumes memory, Vydra halves the batch
+and retries automatically. Advanced controls are available through
+`--batch-size`, `--max-batch-size`, `--memory-fraction`,
+`--reserve-memory-gb`, and `--length-bin`.
+
 ## How it works
 
 ```text
@@ -224,6 +233,7 @@ The nested format used by the project is:
 ## Documentation
 
 - [CLI guide](Vydra_Docker_HF/CLI.md)
+- [RTX 3060 batch-limit benchmark](docs/BATCH_BENCHMARK_RTX3060.md)
 - [Web service documentation](Vydra_Docker_HF/README.md)
 - [Versión en español](README.es.md)
 
