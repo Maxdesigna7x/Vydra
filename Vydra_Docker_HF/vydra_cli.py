@@ -20,6 +20,8 @@ from urllib.request import urlopen
 
 
 BASE_DIR = Path(__file__).resolve().parent
+sys.path.insert(0, str(BASE_DIR))
+from inference_i18n import language_from_argv, localize_parser
 ARTIFACTS_DIR = BASE_DIR / "artifacts"
 WEIGHTS_DIR = BASE_DIR / "models" / "mlp_weights"
 BUNDLED_PROSTT5_DIR = BASE_DIR / "models" / "prostt5"
@@ -84,9 +86,9 @@ def import_engine(device_name: str, offline: bool):
     return engine
 
 
-def rows_from_records(engine, records, embeddings) -> list[dict[str, Any]]:
+def rows_from_records(engine, records, embeddings, progress_callback=None) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
-    for record, embedding in zip(records, embeddings):
+    for index, (record, embedding) in enumerate(zip(records, embeddings), 1):
         prediction = engine.run_hierarchy(embedding)
         rows.append(
             {
@@ -96,6 +98,8 @@ def rows_from_records(engine, records, embeddings) -> list[dict[str, Any]]:
                 **prediction,
             }
         )
+        if progress_callback:
+            progress_callback(index, len(records))
     return rows
 
 
@@ -141,9 +145,9 @@ def write_csv(rows: list[dict[str, Any]], stream) -> None:
     writer.writerows(flat_rows)
 
 
-def render_table(rows: Iterable[dict[str, Any]], stream) -> None:
+def render_table(rows: Iterable[dict[str, Any]], stream, language='en') -> None:
     rows = list(rows)
-    headers = ("ID", "LONGITUD", "RUTA", "CLUSTER", "SIMILITUD")
+    headers = ("ID", "LENGTH", "PATH", "CLUSTER", "SIMILARITY") if language == 'en' else ("ID", "LONGITUD", "RUTA", "CLUSTER", "SIMILITUD")
     values = []
     for row in rows:
         cluster = row.get("cluster_id", -1)
@@ -169,7 +173,7 @@ def render_table(rows: Iterable[dict[str, Any]], stream) -> None:
         print("  ".join(value.ljust(width) for value, width in zip(row, widths)), file=stream)
 
 
-def emit(rows: list[dict[str, Any]], output_format: str, output: str | None) -> None:
+def emit(rows: list[dict[str, Any]], output_format: str, output: str | None, language='en') -> None:
     stream = open(output, "w", encoding="utf-8", newline="") if output else sys.stdout
     try:
         safe_rows = json_safe(rows)
@@ -182,15 +186,17 @@ def emit(rows: list[dict[str, Any]], output_format: str, output: str | None) -> 
         elif output_format == "csv":
             write_csv(safe_rows, stream)
         else:
-            render_table(safe_rows, stream)
+            render_table(safe_rows, stream, language)
     finally:
         if output:
             stream.close()
-            eprint(f"Resultados guardados en {Path(output).resolve()}")
+            eprint(f"Results saved to {Path(output).resolve()}" if language == 'en' else f"Resultados guardados en {Path(output).resolve()}")
 
 
 def command_predict(args: argparse.Namespace) -> int:
     engine = import_engine(args.device, args.offline)
+    with contextlib.redirect_stdout(sys.stderr):
+        engine.require_faiss_gpu()
 
     if args.embedding:
         with contextlib.redirect_stdout(sys.stderr):
@@ -213,7 +219,7 @@ def command_predict(args: argparse.Namespace) -> int:
         records = engine.parse_fasta_text(text)
         if not records:
             raise ValueError("No se encontro ninguna secuencia valida")
-        eprint(f"Generando embeddings de {len(records)} secuencia(s)...")
+        eprint(f"Generating embeddings for {len(records)} sequence(s)..." if args.language == 'en' else f"Generando embeddings de {len(records)} secuencia(s)...")
         with contextlib.redirect_stdout(sys.stderr):
             embeddings = engine.embed_records(
                 records,
@@ -224,10 +230,45 @@ def command_predict(args: argparse.Namespace) -> int:
                 length_bin=args.length_bin,
             )
 
-    eprint(f"Clasificando {len(records)} registro(s) en {engine.device}...")
+    eprint(f"Classifying {len(records)} record(s): MLP on {engine.device}, FAISS on CUDA GPU..." if args.language == 'en' else f"Clasificando {len(records)} registro(s): MLP en {engine.device}, FAISS en GPU CUDA...")
     with contextlib.redirect_stdout(sys.stderr):
-        rows = rows_from_records(engine, records, embeddings)
-    emit(rows, args.format, args.output)
+        rows = rows_from_records(engine, records, embeddings, getattr(args, "_progress_callback", None))
+    source = args.fasta or args.embedding
+    headers = [line.strip()[1:] for line in text.splitlines() if line.strip().startswith('>')] if not args.embedding else []
+    id_counts = {}
+    for row in rows:
+        id_counts[row['seq_id']] = id_counts.get(row['seq_id'], 0) + 1
+    duplicate_ids = any(n > 1 for n in id_counts.values())
+    source_hash = sha256_file(source.expanduser().resolve()) if source else None
+    for index, row in enumerate(rows, 1):
+        original_id = row['seq_id']
+        row['original_id'] = original_id
+        row['original_header'] = headers[index - 1] if len(headers) == len(rows) else original_id
+        if duplicate_ids:
+            row['seq_id'] = f'R{index:07d}:{original_id}'
+        if source:
+            resolved = source.expanduser().resolve()
+            row.update(source_path=str(resolved), source_relative_path=resolved.name,
+                       source_file=resolved.name, source_folder=str(resolved.parent), source_file_sha256=source_hash)
+    emit(rows, args.format, args.output, args.language)
+    if args.report and args.output:
+        report_path = BASE_DIR / 'inference_report.py'
+        spec = importlib.util.spec_from_file_location('vydra_report_inference', report_path)
+        report_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(report_module)
+        output = Path(args.output).resolve()
+        report_dir = output.parent / f'informe_inferencia_{output.stem}'
+        report_dir.mkdir(parents=True, exist_ok=True)
+        # Keep a structured input even when the requested output is a table or JSON.
+        report_input = report_dir / 'predicciones.jsonl'
+        with report_input.open('w', encoding='utf-8') as stream:
+            for row in rows:
+                stream.write(json.dumps(json_safe(row), ensure_ascii=False, allow_nan=False) + '\n')
+        report_module.generate_report(report_input, report_dir,
+                                      report_module.DEFAULT_TAXONOMY if report_module.DEFAULT_TAXONOMY.is_file() else None,
+                                      sequence_export=args.sequence_export, language=args.language)
+        report_module.write_run_readme(output.parent, report_dir, prediction_path=output, language=args.language)
+        eprint(f'Report saved to {report_dir / "informe.html"}' if args.language == 'en' else f'Informe guardado en {report_dir / "informe.html"}')
     return 0
 
 
@@ -241,36 +282,55 @@ def model_cache_candidates() -> list[Path]:
     return paths
 
 
-def command_doctor(_: argparse.Namespace) -> int:
+def command_doctor(args: argparse.Namespace) -> int:
+    english = getattr(args, 'language', 'en') == 'en'
+    missing = 'MISSING' if english else 'FALTA'
     problems = 0
-    print("Vydra CLI - diagnostico\n")
-    print(f"Paquete: {BASE_DIR}")
+    print("Vydra CLI - installation check\n" if english else "Vydra CLI - diagnostico\n")
+    print(f"Package: {BASE_DIR}" if english else f"Paquete: {BASE_DIR}")
 
     for module in ("torch", "transformers", "sentencepiece", "faiss", "numpy", "pandas"):
         found = importlib.util.find_spec(module) is not None
-        print(f"[{'OK' if found else 'FALTA'}] dependencia {module}")
+        print(f"[{'OK' if found else missing}] {'dependency' if english else 'dependencia'} {module}")
         problems += int(not found)
+
+    try:
+        if str(BASE_DIR) not in sys.path:
+            sys.path.insert(0, str(BASE_DIR))
+        from gpu_faiss import require_gpu
+
+        require_gpu()
+        print("[OK] FAISS GPU and CUDA available; CPU FAISS disabled" if english else "[OK] FAISS GPU y CUDA disponibles; CPU FAISS deshabilitado")
+    except (ImportError, RuntimeError) as exc:
+        print(f"[{missing}] GPU FAISS required: {exc}" if english else f"[FALTA] FAISS GPU obligatorio: {exc}")
+        problems += 1
 
     for model_name in MODEL_NAMES:
         path = WEIGHTS_DIR / f"{model_name}.pth"
-        print(f"[{'OK' if path.is_file() else 'FALTA'}] {path.relative_to(BASE_DIR)}")
+        print(f"[{'OK' if path.is_file() else missing}] {path.relative_to(BASE_DIR)}")
         problems += int(not path.is_file())
 
     for name in REQUIRED_ARTIFACTS:
         path = ARTIFACTS_DIR / name
-        print(f"[{'OK' if path.is_file() else 'FALTA'}] {path.relative_to(BASE_DIR)}")
+        print(f"[{'OK' if path.is_file() else missing}] {path.relative_to(BASE_DIR)}")
         problems += int(not path.is_file())
 
     local_prostt5 = next((path for path in model_cache_candidates() if path.exists()), None)
+    if not local_prostt5:
+        try:
+            from folder_inputs import resolve_model_path
+            local_prostt5 = resolve_model_path(None, offline=True, language='en')
+        except Exception:
+            pass
     if local_prostt5:
         print(f"[OK] ProstT5 local: {local_prostt5}")
     else:
-        print("[AVISO] ProstT5 no esta guardado localmente; las secuencias requeriran descargarlo una vez")
+        print("[NOTICE] ProstT5 is not cached locally; protein inputs will require a model download" if english else "[AVISO] ProstT5 no esta guardado localmente; las secuencias requeriran descargarlo una vez")
 
     if problems:
-        print(f"\nDiagnostico: {problems} problema(s) que impiden la inferencia.")
+        print(f"\nInstallation check: {problems} issue(s) prevent inference." if english else f"\nDiagnostico: {problems} problema(s) que impiden la inferencia.")
         return 1
-    print("\nDiagnostico: artefactos Vydra listos.")
+    print("\nInstallation check: Vydra artifacts are ready." if english else "\nDiagnostico: artefactos Vydra listos.")
     return 0
 
 
@@ -352,30 +412,50 @@ def command_download_artifacts(args: argparse.Namespace) -> int:
     return 0
 
 
-def build_parser() -> argparse.ArgumentParser:
+def command_gui(args):
+    from local_gui import serve
+    return serve(port=args.port, open_browser=not args.no_browser, state_dir=args.state_dir)
+
+
+def build_parser(language='en') -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="vydra",
         description="Clasificador jerarquico local de proteinas Vydra.",
+        epilog="Ayuda de inferencia: vydra predict --help. Cada subcomando admite --help.",
     )
-    parser.add_argument("--version", action="version", version="Vydra CLI 0.1.0")
+    parser.add_argument("--version", action="version", version="Vydra CLI 0.2.0", help="mostrar la versión del CLI")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
-    predict = subparsers.add_parser("predict", help="clasificar secuencias o embeddings")
+    predict = subparsers.add_parser("predict", help="clasificar secuencias o embeddings",
+        description="Clasifica proteínas con ProstT5, MLP y FAISS. Elija una entrada. Con --output genera resultados, informe y guía TXT.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog="Ejemplo:\n  vydra predict --fasta proteinas.faa --format csv --output resultados/predicciones.csv\n\nLa exportación adicional del informe se comprime por defecto con gzip.")
     source = predict.add_mutually_exclusive_group(required=True)
     source.add_argument("--seq", help="secuencia de aminoacidos o texto FASTA")
     source.add_argument("--fasta", type=Path, help="archivo FASTA/TXT")
     source.add_argument("--embedding", type=Path, help="archivo de embeddings .pt o .npy")
     source.add_argument("--stdin", action="store_true", help="leer secuencia/FASTA desde stdin")
-    predict.add_argument("--format", choices=("table", "json", "jsonl", "csv"), default="table")
-    predict.add_argument("-o", "--output", help="guardar resultado en un archivo")
-    predict.add_argument("--device", choices=("auto", "cpu", "cuda"), default="auto")
+    predict.add_argument("--format", choices=("table", "json", "jsonl", "csv"), default="table",
+                         help="formato de resultados: tabla legible, JSON, JSON por línea o CSV (predeterminado: table)")
+    predict.add_argument("-o", "--output", help="archivo de resultados; sin esta opción imprime en terminal y no genera informe")
+    predict.add_argument("--report", action=argparse.BooleanOptionalAction, default=True,
+                         help="generar informe junto al archivo --output (por defecto; --no-report lo desactiva)")
+    predict.add_argument('--sequence-export', choices=('gzip', 'csv', 'none'), default='gzip',
+                         help='Exportación adicional del informe: gzip (default), CSV o ninguna')
+    predict.add_argument("--device", choices=("auto", "cpu", "cuda"), default="auto", help="dispositivo para ProstT5/MLP; FAISS siempre requiere GPU CUDA")
     predict.add_argument("--offline", action="store_true", help="prohibir descargas y usar solo archivos locales")
     predict.add_argument("--batch-size", type=int, help="batch fijo inicial; por defecto se calcula automaticamente")
     predict.add_argument("--max-batch-size", type=int, help="limite superior del batch automatico (GPU: 256, CPU: 32)")
     predict.add_argument("--memory-fraction", type=float, help="fraccion maxima de memoria total utilizable (GPU: 0.85, CPU: 0.75)")
-    predict.add_argument("--reserve-memory-gb", type=float, help="GiB que siempre deben quedar libres")
+    predict.add_argument("--reserve-memory-gb", type=float, help="reserva de memoria en GiB; si se omite, el motor la calcula")
     predict.add_argument("--length-bin", type=int, help="ancho en aa de los buckets de longitud (por defecto: 128)")
     predict.set_defaults(func=command_predict)
+
+    gui = subparsers.add_parser("gui", help="open the local graphical interface")
+    gui.add_argument("--port", type=int, default=0, help="local port; 0 chooses a free port")
+    gui.add_argument("--no-browser", action="store_true", help="print the URL without opening a browser")
+    gui.add_argument("--state-dir", type=Path, help="directory for local run history")
+    gui.set_defaults(func=command_gui)
 
     doctor = subparsers.add_parser("doctor", help="comprobar dependencias, pesos y artefactos")
     doctor.set_defaults(func=command_doctor)
@@ -390,11 +470,11 @@ def build_parser() -> argparse.ArgumentParser:
     )
     artifacts.add_argument("--force", action="store_true", help="reemplazar archivos existentes")
     artifacts.set_defaults(func=command_download_artifacts)
-    return parser
+    return localize_parser(parser, language)
 
 
 def main(argv: list[str] | None = None) -> int:
-    parser = build_parser()
+    parser = build_parser(language_from_argv(argv))
     args = parser.parse_args(argv)
     try:
         return int(args.func(args))

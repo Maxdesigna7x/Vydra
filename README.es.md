@@ -242,3 +242,14 @@ anidado usado por el proyecto es:
 Vydra forma parte de un proyecto de tesis en desarrollo. La referencia formal se
 añadirá cuando el manuscrito esté disponible. Si utilizas este repositorio antes
 de su publicación, enlaza esta página y especifica el commit empleado.
+
+## Interfaz gráfica local
+
+Desde el entorno instalado:
+
+```bash
+conda activate vydra
+./vydra gui
+```
+
+Abre una interfaz local en inglés, con modo oscuro/claro, selección de FASTA o carpeta, progreso, logs, cancelación e historial. Consulta la [guía de la GUI](Vydra_Docker_HF/GUI.md) y el [FAQ de uso](docs/GUI_FAQ.md). Mantén abierta la terminal del servidor. La conexión con el informe interactivo rediseñado queda como un paso posterior.

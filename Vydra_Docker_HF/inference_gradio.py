@@ -5,17 +5,21 @@ import json
 import os
 import threading
 from dataclasses import dataclass
+from functools import wraps
 from pathlib import Path
 
 os.environ.setdefault("PYTORCH_CUDA_ALLOC_CONF", "expandable_segments:True")
 
-import faiss
+# Initialize FastAPI's compatibility import before Gradio starts worker threads.
+import pydantic.v1
 import gradio as gr
 import numpy as np
 import pandas as pd
 import torch
 import torch.nn as nn
 from transformers import T5EncoderModel, T5Tokenizer
+
+import gpu_faiss
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -44,6 +48,18 @@ MODEL_NAMES = [
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 print(f"Starting Vydra inference engine on: {device}")
+
+# Embedding and classification stages must not overlap across web job threads:
+# a finished stage releases the encoder before FAISS starts using the VRAM.
+inference_lock = threading.RLock()
+
+
+def serialized_inference(function):
+    @wraps(function)
+    def wrapped(*args, **kwargs):
+        with inference_lock:
+            return function(*args, **kwargs)
+    return wrapped
 
 
 class MLP(nn.Module):
@@ -85,10 +101,14 @@ def normalize_matrix(x: np.ndarray) -> np.ndarray:
     return (x / np.clip(norms, EMB_NORM_EPS, None)).astype(np.float32)
 
 
-def build_faiss_index(x: np.ndarray) -> faiss.IndexFlatIP:
-    index = faiss.IndexFlatIP(x.shape[1])
-    index.add(np.ascontiguousarray(x, dtype=np.float32))
-    return index
+def require_faiss_gpu() -> tuple[object, int]:
+    selected = device.index if device.type == "cuda" else None
+    return gpu_faiss.require_gpu(selected)
+
+
+def build_faiss_index(x: np.ndarray):
+    selected = device.index if device.type == "cuda" else None
+    return gpu_faiss.build_index(x, selected)
 
 
 def load_cluster_annotations(path: Path) -> dict[tuple[str, str, int], dict]:
@@ -280,6 +300,7 @@ def load_models() -> tuple[dict[str, nn.Module], dict[str, list[str]]]:
             return models, label_classes
 
         print("Loading MLP weights...")
+        require_faiss_gpu()
         class_map = load_json(ARTIFACTS_DIR / "label_classes.json")
         loaded: dict[str, nn.Module] = {}
         for model_name in MODEL_NAMES:
@@ -336,18 +357,22 @@ def get_non_structural_prototype_bank() -> dict[str, dict]:
     return non_structural_prototype_bank
 
 
+@serialized_inference
 def preload_inference_artifacts() -> None:
+    require_faiss_gpu()
     load_models()
-    load_prost_t5()
     get_structural_prototype_bank()
     get_non_structural_prototype_bank()
 
 
+@serialized_inference
 def load_prost_t5() -> tuple[T5Tokenizer, T5EncoderModel]:
     global t5_tokenizer, t5_model
-    if t5_tokenizer is None or t5_model is None:
+    if t5_model is None:
+        require_faiss_gpu()
         print("Loading Rostlab/ProstT5...")
-        t5_tokenizer = T5Tokenizer.from_pretrained(MODEL_NAME, do_lower_case=False)
+        if t5_tokenizer is None:
+            t5_tokenizer = T5Tokenizer.from_pretrained(MODEL_NAME, do_lower_case=False)
         t5_model = T5EncoderModel.from_pretrained(
             MODEL_NAME,
             low_cpu_mem_usage=False,
@@ -364,6 +389,23 @@ def load_prost_t5() -> tuple[T5Tokenizer, T5EncoderModel]:
             t5_model = t5_model.half()
         t5_model.eval()
     return t5_tokenizer, t5_model
+
+
+@serialized_inference
+def release_prost_t5() -> None:
+    """Release encoder weights, including references held by error tracebacks."""
+    global t5_model
+    if t5_model is None:
+        return
+    model = t5_model
+    t5_model = None
+    # Moving weights also releases VRAM when a caller/traceback holds the model.
+    model.to("cpu")
+    del model
+    gc.collect()
+    if torch.cuda.is_available():
+        torch.cuda.empty_cache()
+    print("ProstT5 released from memory; CUDA cache cleared before classification/FAISS.")
 
 
 def canonicalize_sequence(seq: str) -> str:
@@ -580,6 +622,28 @@ def embed_records(
     reserve_memory_gb: float | None = None,
     length_bin: int | None = None,
 ) -> np.ndarray:
+    with inference_lock:
+        try:
+            return _embed_records(
+                records, progress_callback,
+                batch_size=batch_size, max_batch_size=max_batch_size,
+                memory_fraction=memory_fraction, reserve_memory_gb=reserve_memory_gb,
+                length_bin=length_bin,
+            )
+        finally:
+            release_prost_t5()
+
+
+def _embed_records(
+    records: list[SequenceRecord],
+    progress_callback=None,
+    *,
+    batch_size: int | None = None,
+    max_batch_size: int | None = None,
+    memory_fraction: float | None = None,
+    reserve_memory_gb: float | None = None,
+    length_bin: int | None = None,
+) -> np.ndarray:
     tokenizer, model = load_prost_t5()
     if not records:
         raise ValueError("No records to embed")
@@ -735,7 +799,7 @@ def assign_cluster_prototype(emb: np.ndarray, class_name: str, bank: dict[str, d
     if class_name not in bank:
         return -1, float("nan"), ""
     norm_emb = normalize_embedding(emb)
-    distances, indices = bank[class_name]["index"].search(norm_emb.reshape(1, -1), 1)
+    distances, indices = gpu_faiss.search_index(bank[class_name]["index"], norm_emb.reshape(1, -1), 1)
     best_idx = int(indices[0, 0])
     if best_idx < 0:
         return -1, float("nan"), ""
@@ -744,7 +808,9 @@ def assign_cluster_prototype(emb: np.ndarray, class_name: str, bank: dict[str, d
     return cluster_id, float(distances[0, 0]), prototype_seq_id
 
 
+@serialized_inference
 def run_hierarchy(emb: np.ndarray) -> dict:
+    release_prost_t5()
     m1, c1 = predict_step("M1_L1_viral_vs_cellular", emb)
     path = [m1]
     confidences = {"M1": c1}

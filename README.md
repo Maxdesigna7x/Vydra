@@ -242,3 +242,16 @@ The nested format used by the project is:
 Vydra is part of an ongoing thesis project. A formal citation will be added when
 the manuscript becomes available. Until then, please link to this repository
 and record the commit used in your analysis.
+
+## Local graphical interface
+
+Run from the installed Vydra Conda environment:
+
+```bash
+conda activate vydra
+./vydra gui
+```
+
+A local browser interface opens with a minimal dark/light design. Choose a FASTA file or a folder, choose a new output folder, and run inference with progress, logs, cancellation, and local history. Advanced settings and the usage FAQ open in dialogs. The GUI uses the existing CUDA inference engine and saves complete predictions with original input provenance. No additional web framework is needed.
+
+Use `./vydra gui --no-browser --port 8732` to open the printed URL manually. Keep the terminal open. Read the [GUI guide](Vydra_Docker_HF/GUI.md) and [usage FAQ](docs/GUI_FAQ.md). The redesigned interactive report remains a separate integration step.

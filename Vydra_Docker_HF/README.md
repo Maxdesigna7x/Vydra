@@ -171,3 +171,7 @@ Los archivos grandes deben ir por Git LFS. Este repo ya trackea `*.pt`, `*.pth` 
 ## Hardware
 
 CPU Basic puede funcionar, pero ProstT5 puede tardar bastante y consumir memoria. Si la demo queda lenta o falla por memoria, conviene probar GPU en Hugging Face Spaces.
+
+## Local graphical interface
+
+From the installed inference environment, run `python vydra_cli.py gui` to open the local dark/light browser interface. See [GUI.md](GUI.md) for input selection, progress, cancellation, offline use, and environment requirements.
