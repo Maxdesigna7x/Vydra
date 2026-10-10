@@ -11,3 +11,14 @@ Validated on 2026-10-10 with Python 3.10 and the local pinned ProstT5 encoder, M
 - Additional local regression checks: 8 GPU contract/search tests and 5 encoder memory tests passed.
 
 These small checks validate execution paths and reference search, not broad biological equivalence, CPU throughput, or minimum RAM. CPU runs use the same model weights and thresholds; numeric differences may affect borderline predictions. The complete Conda CPU environment specification has not been recreated as part of these checks.
+
+## RAM measurements
+
+Measured with `/usr/bin/time -v`, offline, batch size 1, two short FASTA proteins (one cellular and one structural phage), including encoder loading, classification, and structural reference assignment. Reports were disabled. Both processes exited successfully.
+
+| Backend | Peak process RSS (KiB) | Peak process RSS (GiB) |
+|---|---:|---:|
+| CPU, CUDA unavailable, faiss-cpu | 7,901,796 | 7.54 |
+| CUDA, GPU FAISS | 8,353,056 | 7.97 |
+
+These are process memory measurements on a 32 GB host, not minimum-machine certifications. They exclude other applications and do not bound long-sequence activation memory, very large inputs, or loading all reference branches. The README therefore distinguishes an estimated practical minimum of 16 GB from the recommended 32 GB and does not claim a universal absolute minimum.

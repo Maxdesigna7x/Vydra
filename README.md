@@ -47,11 +47,13 @@ The structural classes are `baseplate`, `collar`, `head_tail_joining`,
 
 The local runtime supports Linux and Python 3.10 with either CPU or CUDA inference. The selected device applies to ProstT5, classifiers, and FAISS together.
 
-| Use | GPU | CPU / system RAM | Practical guidance |
-|---|---|---|---|
-| GPU inference | NVIDIA CUDA GPU; validated on RTX 3060 12 GB | Multi-core CPU; plan for 32 GB RAM | Install `environment.yml`. Smaller GPUs have not been certified. |
-| CPU inference | None required | Multi-core CPU; 32 GB RAM recommended | Install `environment-cpu.yml`. All stages run on CPU; expect longer runtimes. |
-| GUI / saved reports | None required | Ordinary desktop CPU; memory depends on result size | Reports can be viewed without loading models. |
+| Use | GPU | Minimum system RAM* | Recommended system RAM | Practical guidance |
+|---|---|---|---|---|
+| GPU inference | NVIDIA CUDA GPU; validated on RTX 3060 12 GB | 16 GB | 32 GB | Install `environment.yml`. Smaller GPUs have not been certified. |
+| CPU inference | None required | 16 GB | 32 GB | Install `environment-cpu.yml`. All stages run on CPU; expect longer runtimes. |
+| GUI / saved reports | None required | No inference RAM requirement | Depends on report size and browser | Viewing reports does not load the inference models. |
+
+\* **16 GB is an estimated practical minimum for small inputs with batch size 1, not a guaranteed absolute minimum for every workload.** A complete two-protein run measured peak process RAM of 7.54 GiB on CPU and 7.97 GiB on GPU; the operating system, browser, and other applications need additional memory. GPU execution still uses host RAM while loading the model and reference banks. Use `--batch-size 1` on memory-constrained machines (or Batch size = 1 in the GUI). Larger collections, long sequences, and larger batches can require more than 16 GB. **32 GB is recommended, not mandatory.** A full run on a physical 16 GB machine has not yet been validated. See [RAM measurements](docs/CPU_GPU_VALIDATION.md#ram-measurements).
 
 For a CPU-only installation:
 
@@ -64,7 +66,7 @@ conda activate vydra-cpu
 
 The GPU environment also supports CPU execution. Install one FAISS variant per environment; `faiss-gpu` already includes CPU indexes.
 
-Allow approximately **25 GB of free disk** for the environment, model cache, reference banks, and small runs; large input/output collections need additional space. The pinned encoder cache occupies about 5.3 GB and the two FAISS prototype banks about 1.6 GB. These RAM/disk recommendations are planning guidance, not measured minimum guarantees. Protein length, batch size, other GPU workloads, and result size change memory use. The [RTX 3060 benchmark](docs/BATCH_BENCHMARK_RTX3060.md) documents the validated GPU baseline. Automatic batching adapts to available memory; use a smaller batch if needed.
+Allow approximately **25 GB of free disk** for the environment, model cache, reference banks, and small runs; large input/output collections need additional space. The pinned encoder cache occupies about 5.3 GB and the two FAISS prototype banks about 1.6 GB. These RAM/disk values are planning guidance, not universal minimum guarantees. Protein length, batch size, other GPU workloads, and result size change memory use. The [RTX 3060 benchmark](docs/BATCH_BENCHMARK_RTX3060.md) documents the validated GPU baseline. Automatic batching adapts to available memory; use a smaller batch if needed.
 
 ## Local models and downloads
 
