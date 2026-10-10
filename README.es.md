@@ -9,8 +9,8 @@
   <p>
     <img alt="Python 3.10+" src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white">
     <img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-2.1%2B-EE4C2C?logo=pytorch&logoColor=white">
-    <img alt="CLI" src="https://img.shields.io/badge/interface-CLI-172B4D">
-    <img alt="CUDA optional" src="https://img.shields.io/badge/CUDA-optional-76B900?logo=nvidia&logoColor=white">
+    <img alt="CLI and local GUI" src="https://img.shields.io/badge/interfaces-CLI%20%2B%20GUI-172B4D">
+    <img alt="CUDA required for inference" src="https://img.shields.io/badge/CUDA-required-76B900?logo=nvidia&logoColor=white">
   </p>
 </div>
 
@@ -111,6 +111,36 @@ detectado. Si hay fragmentación u otro proceso ocupa memoria, Vydra reduce el
 batch a la mitad y reintenta automáticamente. Se puede controlar con
 `--batch-size`, `--max-batch-size`, `--memory-fraction`,
 `--reserve-memory-gb` y `--length-bin`.
+
+## Interfaz gráfica local
+
+Vydra incluye una interfaz local en el navegador para ejecutar inferencia sin escribir comandos de predicción. Desde el entorno instalado:
+
+```bash
+conda activate vydra
+./vydra gui
+```
+
+![Interfaz local de inferencia de Vydra en modo oscuro](docs/images/local-gui-dark.png)
+
+La interfaz está en inglés e incluye:
+
+- **Diseño compacto oscuro/claro:** entrada y salida en una fila; el flujo principal cabe en una vista de escritorio.
+- **Selección local:** un archivo FASTA de proteínas o una carpeta con búsqueda recursiva, conservando IDs, encabezados, archivos y carpetas originales.
+- **Opciones avanzadas:** dispositivo automático/CUDA/CPU para los modelos, batch, modo offline y generación opcional del informe existente.
+- **Seguimiento:** fase actual, conteos reales durante la clasificación, tiempo transcurrido, logs y cancelación.
+- **Historial local:** consulta de ejecuciones y destinos; la salida debe ser una carpeta nueva o vacía para proteger resultados existentes.
+- **Ayuda:** tooltips, comprobación de instalación y FAQ sobre preparación de entradas e interpretación biológica.
+
+El servidor escucha en `127.0.0.1` y usa el entorno Python instalado. Mantén abierta su terminal; cerrar la pestaña no detiene la inferencia. El modo offline requiere modelos y artefactos locales. La inferencia actual exige **FAISS GPU con CUDA**, incluso al seleccionar CPU para embeddings y clasificadores.
+
+Para elegir puerto y abrir manualmente la URL:
+
+```bash
+./vydra gui --no-browser --port 8732
+```
+
+En el paquete independiente, utiliza `python vydra_cli.py gui`. Consulta la [guía de la GUI](Vydra_Docker_HF/GUI.md) y el [FAQ de uso](docs/GUI_FAQ.md). La conexión con la página interactiva de resultados rediseñada se realizará en un paso posterior.
 
 ## Ejecución offline
 
@@ -228,7 +258,7 @@ anidado usado por el proyecto es:
 - Una confianza MLP alta no reemplaza una validación biológica independiente.
 - La etiqueta de cluster resume vecinos conocidos; no demuestra taxonomía.
 - ProstT5 y los bancos de prototipos requieren varios GB de almacenamiento.
-- CPU funciona, pero una GPU CUDA reduce considerablemente el tiempo de embedding.
+- Embeddings y clasificadores pueden ejecutarse en CPU; la inferencia actual sigue requiriendo FAISS GPU con CUDA.
 
 ## Documentación
 
@@ -243,13 +273,3 @@ Vydra forma parte de un proyecto de tesis en desarrollo. La referencia formal se
 añadirá cuando el manuscrito esté disponible. Si utilizas este repositorio antes
 de su publicación, enlaza esta página y especifica el commit empleado.
 
-## Interfaz gráfica local
-
-Desde el entorno instalado:
-
-```bash
-conda activate vydra
-./vydra gui
-```
-
-Abre una interfaz local en inglés, con modo oscuro/claro, selección de FASTA o carpeta, progreso, logs, cancelación e historial. Consulta la [guía de la GUI](Vydra_Docker_HF/GUI.md) y el [FAQ de uso](docs/GUI_FAQ.md). Mantén abierta la terminal del servidor. La conexión con el informe interactivo rediseñado queda como un paso posterior.

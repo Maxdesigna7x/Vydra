@@ -9,8 +9,8 @@
   <p>
     <img alt="Python 3.10+" src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white">
     <img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-2.1%2B-EE4C2C?logo=pytorch&logoColor=white">
-    <img alt="CLI" src="https://img.shields.io/badge/interface-CLI-172B4D">
-    <img alt="CUDA optional" src="https://img.shields.io/badge/CUDA-optional-76B900?logo=nvidia&logoColor=white">
+    <img alt="CLI and local GUI" src="https://img.shields.io/badge/interfaces-CLI%20%2B%20GUI-172B4D">
+    <img alt="CUDA required for inference" src="https://img.shields.io/badge/CUDA-required-76B900?logo=nvidia&logoColor=white">
   </p>
 </div>
 
@@ -111,6 +111,36 @@ memory is fragmented or another process consumes memory, Vydra halves the batch
 and retries automatically. Advanced controls are available through
 `--batch-size`, `--max-batch-size`, `--memory-fraction`,
 `--reserve-memory-gb`, and `--length-bin`.
+
+## Local graphical interface
+
+Vydra includes a local browser interface for running protein inference without writing CLI commands. Launch it from the installed environment:
+
+```bash
+conda activate vydra
+./vydra gui
+```
+
+![Vydra local inference GUI in dark mode](docs/images/local-gui-dark.png)
+
+The English interface includes:
+
+- **Compact dark/light layout:** input and output share a row, with the main workflow fitting into one desktop viewport.
+- **Local input selection:** browse for one protein FASTA file or a folder searched recursively; original IDs, headers, files, and folders remain traceable.
+- **Advanced settings:** automatic/CUDA/CPU model device, batch size, offline mode, and optional generation of the existing inference report.
+- **Run monitoring:** current phase, actual classified-protein counts when available, elapsed time, live logs, and cancellation.
+- **Local history:** revisit previous runs and their output locations. New runs require a new or empty output folder to protect existing results.
+- **Help:** explanatory tooltips, an installation check, and a usage FAQ covering input preparation and biological interpretation.
+
+The server runs on `127.0.0.1` and uses the installed Python environment. Keep its terminal open; closing the browser tab leaves inference running. Offline mode requires models and reference artifacts to be available locally. Current inference requires **CUDA GPU FAISS**, including when embeddings and classifiers run on CPU.
+
+To choose a port and open the URL manually:
+
+```bash
+./vydra gui --no-browser --port 8732
+```
+
+For the standalone bundle, use `python vydra_cli.py gui`. See the [GUI guide](Vydra_Docker_HF/GUI.md) and [usage FAQ](docs/GUI_FAQ.md). Integration with the redesigned interactive results page is planned separately.
 
 ## How it works
 
@@ -228,7 +258,7 @@ The nested format used by the project is:
 - High MLP confidence does not replace independent biological validation.
 - A cluster label summarizes known neighbors; it does not establish taxonomy.
 - ProstT5 and the prototype banks require several GB of storage.
-- CPU inference works, but a CUDA GPU substantially reduces embedding time.
+- Embeddings and classifiers can run on CPU; current inference still requires CUDA GPU FAISS.
 
 ## Documentation
 
@@ -243,15 +273,3 @@ Vydra is part of an ongoing thesis project. A formal citation will be added when
 the manuscript becomes available. Until then, please link to this repository
 and record the commit used in your analysis.
 
-## Local graphical interface
-
-Run from the installed Vydra Conda environment:
-
-```bash
-conda activate vydra
-./vydra gui
-```
-
-A local browser interface opens with a minimal dark/light design. Choose a FASTA file or a folder, choose a new output folder, and run inference with progress, logs, cancellation, and local history. Advanced settings and the usage FAQ open in dialogs. The GUI uses the existing CUDA inference engine and saves complete predictions with original input provenance. No additional web framework is needed.
-
-Use `./vydra gui --no-browser --port 8732` to open the printed URL manually. Keep the terminal open. Read the [GUI guide](Vydra_Docker_HF/GUI.md) and [usage FAQ](docs/GUI_FAQ.md). The redesigned interactive report remains a separate integration step.
