@@ -18,7 +18,7 @@ Only one inference runs at a time. Progress shows actual classified protein coun
 
 The server listens only on `127.0.0.1`. Run history and logs are stored in `~/.local/share/vydra/gui`; override with `--state-dir PATH`. If the server exits unexpectedly, a surviving worker continues, and a restarted interface can read its state. Cancellation of that surviving worker is unavailable from the restarted server.
 
-The optional report is the existing inference report. Integration with the redesigned interactive results prototype is a separate step.
+The optional report uses the interactive design: stacked bars, hierarchy diagram, category bars, reference distribution, and filterable protein tables. It embeds the current run’s data and works offline.
 
 The desktop interface fits its main workflow into one viewport. Input and output share a row; advanced settings, execution logs, and the English usage FAQ open in dialogs. Long history lists scroll within their panel. Small screens use a stacked, scrollable layout to keep fields readable. Hover or focus a control for its help tooltip. The usage FAQ is adapted from the project’s biologist FAQ; see the bundled English [usage FAQ](../docs/GUI_FAQ.md).
 

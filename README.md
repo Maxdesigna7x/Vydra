@@ -127,7 +127,7 @@ The English interface includes:
 
 - **Compact dark/light layout:** input and output share a row, with the main workflow fitting into one desktop viewport.
 - **Local input selection:** browse for one protein FASTA file or a folder searched recursively; original IDs, headers, files, and folders remain traceable.
-- **Advanced settings:** automatic/CUDA/CPU model device, batch size, offline mode, and optional generation of the existing inference report.
+- **Advanced settings:** automatic/CUDA/CPU model device, batch size, offline mode, and optional generation of the interactive inference report.
 - **Run monitoring:** current phase, actual classified-protein counts when available, elapsed time, live logs, and cancellation.
 - **Local history:** revisit previous runs and their output locations. New runs require a new or empty output folder to protect existing results.
 - **Help:** explanatory tooltips, an installation check, and a usage FAQ covering input preparation and biological interpretation.
@@ -140,7 +140,7 @@ To choose a port and open the URL manually:
 ./vydra gui --no-browser --port 8732
 ```
 
-For the standalone bundle, use `python vydra_cli.py gui`. See the [GUI guide](Vydra_Docker_HF/GUI.md) and [usage FAQ](docs/GUI_FAQ.md). Integration with the redesigned interactive results page is planned separately.
+For the standalone bundle, use `python vydra_cli.py gui`. See the [GUI guide](Vydra_Docker_HF/GUI.md) and [usage FAQ](docs/GUI_FAQ.md). Completed runs open the interactive results report, with folder/file filtering, three classification views, sortable tables, and selected CSV downloads.
 
 ## How it works
 

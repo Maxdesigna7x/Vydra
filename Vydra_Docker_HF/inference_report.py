@@ -722,7 +722,11 @@ def generate_report(input_path, output_dir, taxonomy_path=DEFAULT_TAXONOMY, sequ
     spanish_dir.mkdir(exist_ok=True)
     figures(spanish_dir, data, language='es')
     similarity_report(input_path, spanish_dir, language='es', write_table=False)
-    dashboard(output_dir, data, result_tables, similarity_rows, source_rows, sequence_export, language)
+    try:
+        from .interactive_report import write_interactive_report
+    except ImportError:
+        from interactive_report import write_interactive_report
+    write_interactive_report(input_path, output_dir, taxonomy)
     # These are reproducible outputs owned by the generator; retire obsolete copies.
     for name in ('dominancia_todos_phage.png', 'dominancia_todos_phage.svg',
                  'dominancia_todos_viral_euk.png', 'dominancia_todos_viral_euk.svg'):
@@ -730,7 +734,7 @@ def generate_report(input_path, output_dir, taxonomy_path=DEFAULT_TAXONOMY, sequ
     for name, mode in (('secuencias.csv', 'csv'), ('secuencias.csv.gz', 'gzip')):
         if sequence_export != mode:
             (output_dir / name).unlink(missing_ok=True)
-    provenance = dict(schema_version=4, default_language=language, report_languages=['en','es'], input=str(input_path), input_sha256=sha256(input_path),
+    provenance = dict(schema_version=5, report_design='interactive', default_language='en', report_languages=['en'], input=str(input_path), input_sha256=sha256(input_path),
                       sequence_export=sequence_export,
                       input_root=metadata.get('input_root') or metadata.get('input_directory'), source_files=len(source_rows),
                       proteins_with_source_and_original_id=source_complete,

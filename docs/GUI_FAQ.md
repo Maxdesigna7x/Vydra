@@ -38,7 +38,7 @@ Model loading and embedding generation show their current phase. During classifi
 
 ### What files will I receive?
 
-The local workflow writes complete CSV/JSONL predictions, a sequence manifest, exclusion records, summaries, and metadata. Generate inference report adds the existing HTML report and its supporting exports. The redesigned interactive report will be connected separately.
+The local workflow writes complete CSV/JSONL predictions, a sequence manifest, exclusion records, summaries, and metadata. Generate inference report adds the interactive HTML report and its supporting exports. The HTML report is interactive and can be opened directly from completed runs.
 
 ### Are confidence, similarity, and taxonomy equivalent?
 

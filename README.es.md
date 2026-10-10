@@ -127,7 +127,7 @@ La interfaz está en inglés e incluye:
 
 - **Diseño compacto oscuro/claro:** entrada y salida en una fila; el flujo principal cabe en una vista de escritorio.
 - **Selección local:** un archivo FASTA de proteínas o una carpeta con búsqueda recursiva, conservando IDs, encabezados, archivos y carpetas originales.
-- **Opciones avanzadas:** dispositivo automático/CUDA/CPU para los modelos, batch, modo offline y generación opcional del informe existente.
+- **Opciones avanzadas:** dispositivo automático/CUDA/CPU para los modelos, batch, modo offline y generación opcional del informe interactivo.
 - **Seguimiento:** fase actual, conteos reales durante la clasificación, tiempo transcurrido, logs y cancelación.
 - **Historial local:** consulta de ejecuciones y destinos; la salida debe ser una carpeta nueva o vacía para proteger resultados existentes.
 - **Ayuda:** tooltips, comprobación de instalación y FAQ sobre preparación de entradas e interpretación biológica.
@@ -140,7 +140,7 @@ Para elegir puerto y abrir manualmente la URL:
 ./vydra gui --no-browser --port 8732
 ```
 
-En el paquete independiente, utiliza `python vydra_cli.py gui`. Consulta la [guía de la GUI](Vydra_Docker_HF/GUI.md) y el [FAQ de uso](docs/GUI_FAQ.md). La conexión con la página interactiva de resultados rediseñada se realizará en un paso posterior.
+En el paquete independiente, utiliza `python vydra_cli.py gui`. Consulta la [guía de la GUI](Vydra_Docker_HF/GUI.md) y el [FAQ de uso](docs/GUI_FAQ.md). Las ejecuciones completadas abren el informe interactivo, con filtros por carpeta/archivo, tres vistas de clasificación, tablas ordenables y descarga de CSV de la selección.
 
 ## Ejecución offline
 
