@@ -63,12 +63,10 @@ def import_engine(device_name: str, offline: bool):
     with contextlib.redirect_stdout(sys.stderr):
         import engine
 
-    if device_name != "auto":
-        import torch
-
-        if device_name == "cuda" and not torch.cuda.is_available():
-            raise RuntimeError("Se solicito CUDA, pero PyTorch no detecta una GPU compatible")
-        engine.device = torch.device(device_name)
+    from gpu_faiss import select_device
+    with contextlib.redirect_stdout(sys.stderr):
+        engine.device = select_device(device_name)
+        print(f"Inference device: {engine.device} (models and FAISS)")
 
     model_dir = os.environ.get("VYDRA_PROSTT5_PATH")
     if model_dir:
@@ -223,7 +221,7 @@ def command_predict(args: argparse.Namespace) -> int:
                 length_bin=args.length_bin,
             )
 
-    eprint(f"Classifying {len(records)} record(s): MLP on {engine.device}, FAISS on CUDA GPU..." if args.language == 'en' else f"Clasificando {len(records)} registro(s): MLP en {engine.device}, FAISS en GPU CUDA...")
+    eprint(f"Classifying {len(records)} record(s): MLP on {engine.device}, FAISS on {engine.device}..." if args.language == 'en' else f"Clasificando {len(records)} registro(s): MLP en {engine.device}, FAISS en {engine.device}...")
     with contextlib.redirect_stdout(sys.stderr):
         rows = rows_from_records(engine, records, embeddings, getattr(args, "_progress_callback", None))
     source = args.fasta or args.embedding
@@ -290,12 +288,13 @@ def command_doctor(args: argparse.Namespace) -> int:
     try:
         if str(BASE_DIR) not in sys.path:
             sys.path.insert(0, str(BASE_DIR))
-        from gpu_faiss import require_gpu
+        from gpu_faiss import select_device, require_backend
 
-        require_gpu()
-        print("[OK] FAISS GPU and CUDA available; CPU FAISS disabled" if english else "[OK] FAISS GPU y CUDA disponibles; CPU FAISS deshabilitado")
+        selected = select_device("auto")
+        require_backend(selected)
+        print(f"[OK] Inference backend: {selected} (models and FAISS)")
     except (ImportError, RuntimeError) as exc:
-        print(f"[{missing}] GPU FAISS required: {exc}" if english else f"[FALTA] FAISS GPU obligatorio: {exc}")
+        print(f"[{missing}] FAISS unavailable: {exc}" if english else f"[FALTA] FAISS no disponible: {exc}")
         problems += 1
 
     for model_name in MODEL_NAMES:
@@ -436,7 +435,7 @@ def build_parser(language='en') -> argparse.ArgumentParser:
                          help="generar informe junto al archivo --output (por defecto; --no-report lo desactiva)")
     predict.add_argument('--sequence-export', choices=('gzip', 'csv', 'none'), default='gzip',
                          help='Exportación adicional del informe: gzip (default), CSV o ninguna')
-    predict.add_argument("--device", choices=("auto", "cpu", "cuda"), default="auto", help="dispositivo para ProstT5/MLP; FAISS siempre requiere GPU CUDA")
+    predict.add_argument("--device", choices=("auto", "cpu", "cuda"), default="auto", help="dispositivo para ProstT5, MLP y FAISS; auto usa GPU compatible o CPU")
     predict.add_argument("--offline", action="store_true", help="prohibir descargas y usar solo archivos locales")
     predict.add_argument("--batch-size", type=int, help="batch fijo inicial; por defecto se calcula automaticamente")
     predict.add_argument("--max-batch-size", type=int, help="limite superior del batch automatico (GPU: 256, CPU: 32)")

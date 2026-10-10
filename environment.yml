@@ -8,7 +8,7 @@ dependencies:
   - pip
   - git-lfs
   # Install GPU-enabled torch and faiss from conda so they do not get replaced
-  # by pip runtime dependencies.
+  # by pip requirements. This build supports both CPU and CUDA inference.
   - pytorch
   - pytorch-cuda=12.1
   - faiss-gpu=1.14.1

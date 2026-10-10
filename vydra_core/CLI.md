@@ -17,8 +17,7 @@ conda activate vydra
 ```
 
 En el proyecto completo el entorno se crea con `conda env create -f environment.yml`.
-Se requieren CUDA y FAISS GPU incluso al usar `--device cpu`: esa opción solo
-selecciona el dispositivo de ProstT5 y los MLP. No hay fallback de FAISS a CPU.
+CPU ejecuta ProstT5, MLP y FAISS sin CUDA. Auto usa CUDA si PyTorch y FAISS GPU pueden inicializarse; en caso contrario usa CPU. CUDA explícito requiere GPU.
 `doctor` revisa dependencias, soporte GPU, los seis pesos y los artefactos
 esperados; no ejecuta una predicción completa.
 
@@ -158,7 +157,7 @@ si ocurre un OOM, reduce el batch a la mitad y reintenta.
 
 | Opción | Uso / default |
 |---|---|
-| `--device auto`, `cpu` o `cuda` | Dispositivo de ProstT5/MLP; default `auto`. FAISS siempre CUDA. |
+| `--device auto`, `cpu` o `cuda` | Dispositivo de ProstT5/MLP/FAISS; default `auto`, GPU compatible o CPU. |
 | `--batch-size N` | Batch inicial fijo; mantiene la recuperación por OOM. |
 | `--max-batch-size N` | Límite automático; GPU 256, CPU 32. |
 | `--memory-fraction F` | Fracción máxima de memoria total; GPU 0.85, CPU 0.75. |

@@ -10,7 +10,7 @@
     <img alt="Python 3.10+" src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white">
     <img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-2.1%2B-EE4C2C?logo=pytorch&logoColor=white">
     <img alt="CLI and local GUI" src="https://img.shields.io/badge/interfaces-CLI%20%2B%20GUI-172B4D">
-    <img alt="CUDA required for inference" src="https://img.shields.io/badge/CUDA-required-76B900?logo=nvidia&logoColor=white">
+    <img alt="CPU and CUDA supported" src="https://img.shields.io/badge/Execution-CPU_or_CUDA-76B900?logo=nvidia&logoColor=white">
   </p>
 </div>
 
@@ -45,7 +45,7 @@ Las clases estructurales son: `baseplate`, `collar`, `head_tail_joining`,
 
 ## Hardware y ejecución local
 
-La inferencia actual necesita una GPU NVIDIA con CUDA y FAISS GPU, incluso con `--device cpu`: ese modo ejecuta ProstT5 y MLP en CPU y deja FAISS en GPU. No se admite inferencia completa sin GPU. El entorno validado usa Linux, Python 3.10 y una RTX 3060 de 12 GB. Se recomiendan 32 GB de RAM y unos 25 GB libres de disco para entorno, modelos y bancos; son recomendaciones prácticas, no mínimos garantizados. Abrir la GUI y los informes guardados no requiere GPU.
+La inferencia admite CPU y GPU: el dispositivo seleccionado se aplica a ProstT5, MLP y FAISS. Para CPU sin CUDA instala `conda env create -f environment-cpu.yml` y activa `conda activate vydra-cpu`. Para GPU utiliza `environment.yml`; ese entorno también permite CPU. No instales ambas variantes de FAISS juntas: `faiss-gpu` ya incluye índices CPU. Se recomiendan 32 GB de RAM y unos 25 GB libres; son recomendaciones, no mínimos garantizados. GPU está validada en RTX 3060 de 12 GB. CPU tarda más.
 
 Los modelos siempre se ejecutan localmente. Primero se reutilizan los archivos del paquete y la caché; **Allow model downloads** solo permite descargar lo que falte y guardarlo localmente. Desmarcarlo prohíbe las descargas. **Check installation** es opcional: no hace falta activarlo para usar modelos locales. Consulta la tabla de hardware y los detalles en el [README en inglés](README.md#hardware-and-execution-modes).
 
@@ -109,6 +109,8 @@ Si ya tienes embeddings ProstT5 normalizados de 1,024 dimensiones:
 La CLI admite `table`, `json`, `jsonl` y `csv`, detecta CUDA automáticamente y
 permite forzar `--device cpu` o `--device cuda`.
 
+`--device auto` usa CUDA si PyTorch y FAISS GPU pueden inicializarse; en caso contrario ejecuta todas las etapas en CPU. `--device cpu` no requiere GPU. `--device cuda` falla con un mensaje claro si el backend GPU no está disponible. Ambos índices usan float32 y los mismos umbrales; puede haber pequeñas diferencias numéricas en empates o valores justo en el umbral.
+
 El batching es inteligente por defecto: Vydra ordena los chunks por longitud
 real, agrupa longitudes similares, consulta la VRAM o RAM disponible después de
 cargar el encoder y conserva una reserva de seguridad. Los límites GPU iniciales
@@ -138,7 +140,7 @@ La interfaz está en inglés e incluye:
 - **Historial local:** consulta de ejecuciones y destinos; la salida debe ser una carpeta nueva o vacía para proteger resultados existentes.
 - **Ayuda:** tooltips, comprobación de instalación y FAQ sobre preparación de entradas e interpretación biológica.
 
-El servidor escucha en `127.0.0.1` y usa el entorno Python instalado. Mantén abierta su terminal; cerrar la pestaña no detiene la inferencia. El modo offline requiere modelos y artefactos locales. La inferencia actual exige **FAISS GPU con CUDA**, incluso al seleccionar CPU para embeddings y clasificadores.
+El servidor escucha en `127.0.0.1` y usa el entorno Python instalado. Mantén abierta su terminal; cerrar la pestaña no detiene la inferencia. El modo offline requiere modelos y artefactos locales. CPU ejecuta todas las etapas sin GPU.
 
 Para elegir puerto y abrir manualmente la URL:
 
@@ -217,7 +219,7 @@ Vydra/
 ├── environment.yml             # CUDA and GPU FAISS environment
 ├── requirements.txt            # local runtime Python dependencies
 ├── vydra_core/
-│   ├── engine.py               # ProstT5 + MLP + GPU FAISS, no web-framework dependency
+│   ├── engine.py               # ProstT5 + MLP + CPU/GPU FAISS, no web-framework dependency
 │   ├── vydra_cli.py             # commands and output formats
 │   ├── local_gui.py             # loopback browser interface
 │   ├── gui/                    # local GUI assets

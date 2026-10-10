@@ -10,7 +10,7 @@
     <img alt="Python 3.10+" src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white">
     <img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-2.1%2B-EE4C2C?logo=pytorch&logoColor=white">
     <img alt="CLI and local GUI" src="https://img.shields.io/badge/interfaces-CLI%20%2B%20GUI-172B4D">
-    <img alt="CUDA required for inference" src="https://img.shields.io/badge/CUDA-required-76B900?logo=nvidia&logoColor=white">
+    <img alt="CPU and CUDA supported" src="https://img.shields.io/badge/Execution-CPU_or_CUDA-76B900?logo=nvidia&logoColor=white">
   </p>
 </div>
 
@@ -45,14 +45,24 @@ The structural classes are `baseplate`, `collar`, `head_tail_joining`,
 
 ## Hardware and execution modes
 
-The supported runtime targets Linux, Python 3.10, CUDA-enabled PyTorch, and **GPU FAISS** from the supplied Conda environment. A recent browser is sufficient for the local GUI; no hosted inference service is used.
+The local runtime supports Linux and Python 3.10 with either CPU or CUDA inference. The selected device applies to ProstT5, classifiers, and FAISS together.
 
 | Use | GPU | CPU / system RAM | Practical guidance |
 |---|---|---|---|
-| GPU inference (default) | NVIDIA CUDA GPU; validated on RTX 3060 12 GB | Multi-core CPU; plan for 32 GB RAM | ProstT5 and classifiers use CUDA; GPU FAISS searches references. Smaller GPUs have not been certified. |
-| CPU model inference (`--device cpu`) | NVIDIA CUDA GPU still required by FAISS | Multi-core CPU; 32 GB RAM recommended | ProstT5 and classifiers run on CPU. This hybrid mode is slower and is **not CPU-only inference**. |
-| Open GUI / saved reports, regenerate reports | No GPU needed | Ordinary desktop CPU; memory depends on result size | Starting a new inference still requires GPU FAISS. |
-| Full inference on a CPU-only computer | Unsupported in the current implementation | — | Installing `faiss-cpu` does not enable a supported fallback. |
+| GPU inference | NVIDIA CUDA GPU; validated on RTX 3060 12 GB | Multi-core CPU; plan for 32 GB RAM | Install `environment.yml`. Smaller GPUs have not been certified. |
+| CPU inference | None required | Multi-core CPU; 32 GB RAM recommended | Install `environment-cpu.yml`. All stages run on CPU; expect longer runtimes. |
+| GUI / saved reports | None required | Ordinary desktop CPU; memory depends on result size | Reports can be viewed without loading models. |
+
+For a CPU-only installation:
+
+```bash
+conda env create -f environment-cpu.yml
+conda activate vydra-cpu
+./vydra doctor
+./vydra gui
+```
+
+The GPU environment also supports CPU execution. Install one FAISS variant per environment; `faiss-gpu` already includes CPU indexes.
 
 Allow approximately **25 GB of free disk** for the environment, model cache, reference banks, and small runs; large input/output collections need additional space. The pinned encoder cache occupies about 5.3 GB and the two FAISS prototype banks about 1.6 GB. These RAM/disk recommendations are planning guidance, not measured minimum guarantees. Protein length, batch size, other GPU workloads, and result size change memory use. The [RTX 3060 benchmark](docs/BATCH_BENCHMARK_RTX3060.md) documents the validated GPU baseline. Automatic batching adapts to available memory; use a smaller batch if needed.
 
@@ -127,6 +137,8 @@ model:
 The CLI supports `table`, `json`, `jsonl`, and `csv` output. It detects CUDA
 automatically, while `--device cpu` and `--device cuda` provide explicit control.
 
+`--device auto` selects CUDA when both PyTorch and GPU FAISS can initialize; otherwise it selects CPU for every stage. `--device cpu` requires no CUDA. `--device cuda` requires a working GPU backend and reports an error if unavailable. CPU and GPU FAISS use float32 inner-product indexes with the same normalization and thresholds. Small floating-point differences can affect ties or predictions exactly at a threshold.
+
 Batching is memory-aware by default: Vydra sorts chunks by real sequence length,
 groups similar lengths, checks currently available VRAM or RAM after loading the
 encoder, and preserves a safety reserve. The initial GPU limits are calibrated
@@ -156,7 +168,7 @@ The English interface includes:
 - **Local history:** revisit previous runs and their output locations. New runs require a new or empty output folder to protect existing results.
 - **Help:** explanatory tooltips, an installation check, and a usage FAQ covering input preparation and biological interpretation.
 
-The server runs on `127.0.0.1` and uses the installed Python environment. Keep its terminal open; closing the browser tab leaves inference running. Offline mode requires models and reference artifacts to be available locally. Current inference requires **CUDA GPU FAISS**, including when embeddings and classifiers run on CPU.
+The server runs on `127.0.0.1` and uses the installed Python environment. Keep its terminal open; closing the browser tab leaves inference running. Offline mode requires models and reference artifacts to be available locally. The device selection applies to models and FAISS; CPU inference requires no GPU.
 
 To choose a port and open the URL manually:
 
@@ -235,7 +247,7 @@ Vydra/
 ├── environment.yml             # CUDA and GPU FAISS environment
 ├── requirements.txt            # local runtime Python dependencies
 ├── vydra_core/
-│   ├── engine.py               # ProstT5 + MLP + GPU FAISS, no web-framework dependency
+│   ├── engine.py               # ProstT5 + MLP + CPU/GPU FAISS, no web-framework dependency
 │   ├── vydra_cli.py             # commands and output formats
 │   ├── local_gui.py             # loopback browser interface
 │   ├── gui/                    # local GUI assets

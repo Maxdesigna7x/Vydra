@@ -22,7 +22,7 @@ All inference runs locally. Vydra checks its configured model, bundled files, an
 
 ### Do I need a GPU?
 
-The current local inference implementation requires a CUDA GPU with GPU FAISS. The CPU setting moves embeddings and classifiers to CPU; FAISS still requires CUDA. Use Check installation to inspect the environment.
+No. CPU runs the models and FAISS without CUDA. Automatic uses a compatible GPU when available and otherwise CPU. GPU requires CUDA-enabled PyTorch and GPU FAISS. Use Check installation to inspect the environment.
 
 ### What is batch size?
 

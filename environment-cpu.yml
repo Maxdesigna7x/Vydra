@@ -1,0 +1,13 @@
+name: vydra-cpu
+channels:
+  - pytorch
+  - conda-forge
+dependencies:
+  - python=3.10
+  - pip
+  - git-lfs
+  - pytorch
+  - cpuonly
+  - faiss-cpu
+  - pip:
+      - -r requirements.txt

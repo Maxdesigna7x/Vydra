@@ -1,4 +1,4 @@
-"""Local ProstT5, hierarchical classifiers, and GPU FAISS inference engine."""
+"""Local ProstT5, hierarchical classifiers, and CPU/GPU FAISS inference engine."""
 from __future__ import annotations
 
 import gc
@@ -48,7 +48,6 @@ MODEL_NAMES = [
 ]
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-print(f"Starting Vydra inference engine on: {device}")
 
 # Embedding and classification stages must not overlap across local inference threads:
 # a finished stage releases the encoder before FAISS starts using the VRAM.
@@ -102,14 +101,14 @@ def normalize_matrix(x: np.ndarray) -> np.ndarray:
     return (x / np.clip(norms, EMB_NORM_EPS, None)).astype(np.float32)
 
 
-def require_faiss_gpu() -> tuple[object, int]:
-    selected = device.index if device.type == "cuda" else None
-    return gpu_faiss.require_gpu(selected)
+def require_faiss_gpu():
+    """Validate the selected backend (name retained for runtime compatibility)."""
+    return gpu_faiss.require_backend(device)
 
 
 def build_faiss_index(x: np.ndarray):
     selected = device.index if device.type == "cuda" else None
-    return gpu_faiss.build_index(x, selected)
+    return gpu_faiss.build_index(x, selected, device=device)
 
 
 def load_cluster_annotations(path: Path) -> dict[tuple[str, str, int], dict]:
@@ -404,9 +403,9 @@ def release_prost_t5() -> None:
     model.to("cpu")
     del model
     gc.collect()
-    if torch.cuda.is_available():
+    if device.type == "cuda":
         torch.cuda.empty_cache()
-    print("ProstT5 released from memory; CUDA cache cleared before classification/FAISS.")
+    print("ProstT5 released from memory before classification/FAISS.")
 
 
 def canonicalize_sequence(seq: str) -> str:
