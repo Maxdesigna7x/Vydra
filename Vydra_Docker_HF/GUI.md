@@ -21,3 +21,5 @@ The server listens only on `127.0.0.1`. Run history and logs are stored in `~/.l
 The optional report is the existing inference report. Integration with the redesigned interactive results prototype is a separate step.
 
 The desktop interface fits its main workflow into one viewport. Input and output share a row; advanced settings, execution logs, and the English usage FAQ open in dialogs. Long history lists scroll within their panel. Small screens use a stacked, scrollable layout to keep fields readable. Hover or focus a control for its help tooltip. The usage FAQ is adapted from the project’s biologist FAQ; see the bundled English [usage FAQ](../docs/GUI_FAQ.md).
+
+Click a completed run in Recent runs to open its saved HTML results report directly in the same tab. Report images and downloads are served from that run’s results folder. Runs without a generated report continue to show their status and log. Use the browser Back button to return to the inference interface.

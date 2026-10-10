@@ -46,6 +46,26 @@ class LocalGuiTests(unittest.TestCase):
         self.manager.cancel(state['id']);self.wait_done()
         self.assertEqual(self.manager.runs()[0]['status'],'cancelled')
         self.assertEqual((output/'existing').read_text(),'keep')
+    def test_completed_report_and_assets_are_confined_to_results(self):
+        output=self.root/'results';report=output/'informe_inferencia';report.mkdir(parents=True)
+        (report/'informe.html').write_text('<h1>Results</h1>')
+        (report/'data.json').write_text('{"count":2}')
+        (self.root/'private.txt').write_text('private')
+        (report/'escape.txt').symlink_to(self.root/'private.txt')
+        state=dict(id='saved',status='complete',created_at='2026-10-10',output=str(output),report_path=str(report/'informe.html'))
+        (self.manager.directory/'saved.json').write_text(json.dumps(state))
+        server=make_server(self.manager);threading.Thread(target=server.serve_forever,daemon=True).start()
+        base=f'http://127.0.0.1:{server.server_port}'
+        try:
+            self.assertIn(b'Results',urllib.request.urlopen(base+'/reports/saved/').read())
+            self.assertEqual(json.load(urllib.request.urlopen(base+'/reports/saved/data.json')),{'count':2})
+            for path in ['escape.txt','%2e%2e/%2e%2e/private.txt']:
+                with self.assertRaises(urllib.error.HTTPError) as error:urllib.request.urlopen(base+'/reports/saved/'+path)
+                self.assertEqual(error.exception.code,403)
+            with self.assertRaises(urllib.error.HTTPError) as error:urllib.request.urlopen(base+'/reports/unknown/')
+            self.assertEqual(error.exception.code,404)
+        finally:server.shutdown();server.server_close()
+
     def test_local_api_requires_token_and_origin(self):
         server=make_server(self.manager);threading.Thread(target=server.serve_forever,daemon=True).start()
         base=f'http://127.0.0.1:{server.server_port}'

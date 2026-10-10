@@ -1,6 +1,7 @@
 """Loopback-only, dependency-free GUI server for the installed Vydra bundle."""
 from __future__ import annotations
 import json
+import mimetypes
 import os
 import secrets
 import signal
@@ -13,7 +14,7 @@ import webbrowser
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import parse_qs, urlsplit
+from urllib.parse import parse_qs, urlsplit, unquote
 from folder_inputs import INPUT_EXTENSIONS, write_json
 
 BASE = Path(__file__).resolve().parent
@@ -171,7 +172,7 @@ def make_server(manager, port=0):
             pass
 
         def send(self, code, data, content_type='application/json'):
-            body = json.dumps(data).encode() if content_type == 'application/json' else data
+            body = json.dumps(data).encode() if content_type == 'application/json' and not isinstance(data, bytes) else data
             self.send_response(code)
             self.send_header('Content-Type', content_type)
             self.send_header('Content-Length', str(len(body)))
@@ -212,6 +213,22 @@ def make_server(manager, port=0):
                         stream.seek(max(0, stream.tell() - 65536))
                         log = stream.read().decode('utf-8', errors='replace')
                     return self.send(200, {'log': log})
+                if request.path.startswith('/reports/'):
+                    parts = request.path.split('/', 3)
+                    run = next((r for r in manager.runs() if r['id'] == parts[2]), None)
+                    if not run or run['status'] not in ('complete', 'completed') or not run.get('report_path'):
+                        return self.send(404, {'error': 'No report is available for this run.'})
+                    report = Path(run['report_path']).resolve()
+                    output = Path(run['output']).resolve()
+                    root = report.parent
+                    relative = unquote(parts[3]) if len(parts) > 3 else ''
+                    target = (root / relative).resolve() if relative else report
+                    if (root != output and output not in root.parents) or (target != root and root not in target.parents):
+                        return self.send(403, {'error': 'Report path is outside its results folder.'})
+                    if not target.is_file():
+                        return self.send(404, {'error': 'Report file is missing.'})
+                    mime = mimetypes.guess_type(target.name)[0] or 'application/octet-stream'
+                    return self.send(200, target.read_bytes(), mime)
                 static = {'/': ('index.html', 'text/html; charset=utf-8'), '/gui.js': ('gui.js', 'text/javascript; charset=utf-8'), '/gui.css': ('gui.css', 'text/css; charset=utf-8')}
                 if request.path in static:
                     name, mime = static[request.path]
