@@ -43,6 +43,12 @@ Las clases estructurales son: `baseplate`, `collar`, `head_tail_joining`,
 `major_capsid`, `major_tail`, `minor_capsid`, `minor_tail`, `portal`,
 `tail_fiber` y `tail_sheath`.
 
+## Hardware y ejecución local
+
+La inferencia actual necesita una GPU NVIDIA con CUDA y FAISS GPU, incluso con `--device cpu`: ese modo ejecuta ProstT5 y MLP en CPU y deja FAISS en GPU. No se admite inferencia completa sin GPU. El entorno validado usa Linux, Python 3.10 y una RTX 3060 de 12 GB. Se recomiendan 32 GB de RAM y unos 25 GB libres de disco para entorno, modelos y bancos; son recomendaciones prácticas, no mínimos garantizados. Abrir la GUI y los informes guardados no requiere GPU.
+
+Los modelos siempre se ejecutan localmente. Primero se reutilizan los archivos del paquete y la caché; **Allow model downloads** solo permite descargar lo que falte y guardarlo localmente. Desmarcarlo prohíbe las descargas. **Check installation** es opcional: no hace falta activarlo para usar modelos locales. Consulta la tabla de hardware y los detalles en el [README en inglés](README.md#hardware-and-execution-modes).
+
 ## Inicio rápido
 
 ### 1. Clonar e instalar
@@ -127,7 +133,7 @@ La interfaz está en inglés e incluye:
 
 - **Diseño compacto oscuro/claro:** entrada y salida en una fila; el flujo principal cabe en una vista de escritorio.
 - **Selección local:** un archivo FASTA de proteínas o una carpeta con búsqueda recursiva, conservando IDs, encabezados, archivos y carpetas originales.
-- **Opciones avanzadas:** dispositivo automático/CUDA/CPU para los modelos, batch, modo offline y generación opcional del informe interactivo.
+- **Opciones avanzadas:** dispositivo automático/CUDA/CPU para los modelos, batch, permiso para descargar modelos faltantes y generación opcional del informe interactivo.
 - **Seguimiento:** fase actual, conteos reales durante la clasificación, tiempo transcurrido, logs y cancelación.
 - **Historial local:** consulta de ejecuciones y destinos; la salida debe ser una carpeta nueva o vacía para proteger resultados existentes.
 - **Ayuda:** tooltips, comprobación de instalación y FAQ sobre preparación de entradas e interpretación biológica.
@@ -140,7 +146,7 @@ Para elegir puerto y abrir manualmente la URL:
 ./vydra gui --no-browser --port 8732
 ```
 
-En el paquete independiente, utiliza `python vydra_cli.py gui`. Consulta la [guía de la GUI](Vydra_Docker_HF/GUI.md) y el [FAQ de uso](docs/GUI_FAQ.md). Las ejecuciones completadas abren el informe interactivo, con filtros por carpeta/archivo, tres vistas de clasificación, tablas ordenables y descarga de CSV de la selección.
+Consulta la [guía de la GUI](vydra_core/GUI.md) y el [FAQ de uso](docs/GUI_FAQ.md). Las ejecuciones completadas abren el informe interactivo, con filtros por carpeta/archivo, tres vistas de clasificación, tablas ordenables y descarga de CSV de la selección.
 
 ## Ejecución offline
 
@@ -207,37 +213,21 @@ parcialmente diferentes.
 
 ```text
 Vydra/
-├── vydra                         # lanzador de la CLI
-├── Vydra_Docker_HF/
-│   ├── vydra_cli.py              # comandos y formatos de salida
-│   ├── inference_gradio.py       # núcleo de inferencia
-│   ├── app.py                    # API FastAPI e interfaz web
-│   ├── models/mlp_weights/       # seis cabezas MLP
-│   ├── artifacts/                # clases, metadata y bancos descargables
-│   └── web/                      # frontend
-├── docs/images/                  # figuras del proyecto
-├── environment.yml
-└── requirements.txt
+├── vydra                       # CLI / GUI launcher
+├── environment.yml             # CUDA and GPU FAISS environment
+├── requirements.txt            # local runtime Python dependencies
+├── vydra_core/
+│   ├── engine.py               # ProstT5 + MLP + GPU FAISS, no web-framework dependency
+│   ├── vydra_cli.py             # commands and output formats
+│   ├── local_gui.py             # loopback browser interface
+│   ├── gui/                    # local GUI assets
+│   ├── report/                 # interactive results template
+│   ├── models/mlp_weights/     # bundled classifier weights
+│   └── artifacts/              # reference metadata and downloaded banks
+├── tests/
+└── docs/
 ```
 
-Los datasets originales, embeddings de entrenamiento, notebooks de trabajo y
-checkpoints temporales no forman parte de la distribución ligera de GitHub.
-
-## Interfaz web
-
-La aplicación incluida permite cargar FASTA, explorar la ruta jerárquica,
-consultar confidencias y contexto biológico, y descargar las predicciones.
-
-![Interfaz web de Vydra](docs/images/web.png)
-
-La misma inferencia puede ejecutarse como aplicación local:
-
-```bash
-cd Vydra_Docker_HF
-uvicorn app:app --host 0.0.0.0 --port 7860
-```
-
-Después abre `http://localhost:7860`.
 
 ## Formato de embeddings
 
@@ -262,9 +252,8 @@ anidado usado por el proyecto es:
 
 ## Documentación
 
-- [Guía detallada de la CLI](Vydra_Docker_HF/CLI.md)
+- [Guía detallada de la CLI](vydra_core/CLI.md)
 - [Benchmark de límites de batch en RTX 3060](docs/BATCH_BENCHMARK_RTX3060.md)
-- [Documentación del servicio web](Vydra_Docker_HF/README.md)
 - [English version](README.md)
 
 ## Cita
@@ -272,4 +261,3 @@ anidado usado por el proyecto es:
 Vydra forma parte de un proyecto de tesis en desarrollo. La referencia formal se
 añadirá cuando el manuscrito esté disponible. Si utilizas este repositorio antes
 de su publicación, enlaza esta página y especifica el commit empleado.
-

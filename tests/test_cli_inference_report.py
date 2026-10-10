@@ -9,7 +9,7 @@ from types import SimpleNamespace
 from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
-spec = importlib.util.spec_from_file_location('vydra_cli', ROOT / 'Vydra_Docker_HF/vydra_cli.py')
+spec = importlib.util.spec_from_file_location('vydra_cli', ROOT / 'vydra_core/vydra_cli.py')
 cli = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(cli)
 
@@ -28,7 +28,7 @@ class CliReportTests(unittest.TestCase):
                 embed_records=lambda records, **kwargs: [0, 0],
                 run_hierarchy=lambda embedding: {'path': ['cellular', 'bacteria'], 'confidences': {'M1': .9}},
             )
-            with patch.object(cli, 'import_engine', return_value=engine):
+            with patch.object(cli, 'import_engine', return_value=engine), patch('folder_inputs.resolve_model_path', return_value=root / 'local-model'):
                 status = cli.main(['predict', '--fasta', str(fasta), '--format', 'csv', '--output', str(output)])
             self.assertEqual(status, 0)
             report_dir = root / 'informe_inferencia_predictions'

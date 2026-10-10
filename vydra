@@ -7,7 +7,7 @@ import sys
 from pathlib import Path
 
 
-PACKAGE_DIR = Path(__file__).resolve().parent / "Vydra_Docker_HF"
+PACKAGE_DIR = Path(__file__).resolve().parent / "vydra_core"
 sys.path.insert(0, str(PACKAGE_DIR))
 
 from vydra_cli import main  # noqa: E402

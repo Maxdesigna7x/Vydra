@@ -6,7 +6,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-spec = importlib.util.spec_from_file_location('report_inference', Path(__file__).resolve().parents[1] / 'Vydra_Docker_HF/inference_report.py')
+spec = importlib.util.spec_from_file_location('report_inference', Path(__file__).resolve().parents[1] / 'vydra_core/inference_report.py')
 report = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(report)
 

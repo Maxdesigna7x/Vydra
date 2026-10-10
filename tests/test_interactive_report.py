@@ -4,7 +4,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
-sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'Vydra_Docker_HF'))
+sys.path.insert(0,str(Path(__file__).resolve().parents[1]/'vydra_core'))
 from interactive_report import write_interactive_report
 
 class InteractiveReportTests(unittest.TestCase):

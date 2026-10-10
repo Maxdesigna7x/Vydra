@@ -43,6 +43,30 @@ The structural classes are `baseplate`, `collar`, `head_tail_joining`,
 `major_capsid`, `major_tail`, `minor_capsid`, `minor_tail`, `portal`,
 `tail_fiber`, and `tail_sheath`.
 
+## Hardware and execution modes
+
+The supported runtime targets Linux, Python 3.10, CUDA-enabled PyTorch, and **GPU FAISS** from the supplied Conda environment. A recent browser is sufficient for the local GUI; no hosted inference service is used.
+
+| Use | GPU | CPU / system RAM | Practical guidance |
+|---|---|---|---|
+| GPU inference (default) | NVIDIA CUDA GPU; validated on RTX 3060 12 GB | Multi-core CPU; plan for 32 GB RAM | ProstT5 and classifiers use CUDA; GPU FAISS searches references. Smaller GPUs have not been certified. |
+| CPU model inference (`--device cpu`) | NVIDIA CUDA GPU still required by FAISS | Multi-core CPU; 32 GB RAM recommended | ProstT5 and classifiers run on CPU. This hybrid mode is slower and is **not CPU-only inference**. |
+| Open GUI / saved reports, regenerate reports | No GPU needed | Ordinary desktop CPU; memory depends on result size | Starting a new inference still requires GPU FAISS. |
+| Full inference on a CPU-only computer | Unsupported in the current implementation | — | Installing `faiss-cpu` does not enable a supported fallback. |
+
+Allow approximately **25 GB of free disk** for the environment, model cache, reference banks, and small runs; large input/output collections need additional space. The pinned encoder cache occupies about 5.3 GB and the two FAISS prototype banks about 1.6 GB. These RAM/disk recommendations are planning guidance, not measured minimum guarantees. Protein length, batch size, other GPU workloads, and result size change memory use. The [RTX 3060 benchmark](docs/BATCH_BENCHMARK_RTX3060.md) documents the validated GPU baseline. Automatic batching adapts to available memory; use a smaller batch if needed.
+
+## Local models and downloads
+
+**All inference runs locally.** Vydra never sends your proteins to an online inference API. It looks for models in this order:
+
+1. An explicitly configured `VYDRA_PROSTT5_PATH`.
+2. `vydra_core/models/prostt5/`, if complete.
+3. The local Hugging Face cache for the pinned `Rostlab/ProstT5_fp16` snapshot.
+4. Only if missing and permitted: download missing files once, cache them, then run locally.
+
+The GUI always prefers local files. **Allow model downloads** only controls step 4; it does not choose a remote model or force a fresh download. Disable it, or use CLI `--offline`, to prohibit downloads. Missing local files then produce a clear error. **Check installation** is optional and does not enable local models. Reference banks are installed separately with `./vydra download-artifacts`; model loading never silently replaces them.
+
 ## Quick start
 
 ### 1. Clone and install
@@ -127,7 +151,7 @@ The English interface includes:
 
 - **Compact dark/light layout:** input and output share a row, with the main workflow fitting into one desktop viewport.
 - **Local input selection:** browse for one protein FASTA file or a folder searched recursively; original IDs, headers, files, and folders remain traceable.
-- **Advanced settings:** automatic/CUDA/CPU model device, batch size, offline mode, and optional generation of the interactive inference report.
+- **Advanced settings:** automatic/CUDA/CPU model device, batch size, permission to download missing models, and optional generation of the interactive inference report.
 - **Run monitoring:** current phase, actual classified-protein counts when available, elapsed time, live logs, and cancellation.
 - **Local history:** revisit previous runs and their output locations. New runs require a new or empty output folder to protect existing results.
 - **Help:** explanatory tooltips, an installation check, and a usage FAQ covering input preparation and biological interpretation.
@@ -140,7 +164,7 @@ To choose a port and open the URL manually:
 ./vydra gui --no-browser --port 8732
 ```
 
-For the standalone bundle, use `python vydra_cli.py gui`. See the [GUI guide](Vydra_Docker_HF/GUI.md) and [usage FAQ](docs/GUI_FAQ.md). Completed runs open the interactive results report, with folder/file filtering, three classification views, sortable tables, and selected CSV downloads.
+See the [GUI guide](vydra_core/GUI.md) and [usage FAQ](docs/GUI_FAQ.md). Completed runs open the interactive results report, with folder/file filtering, three classification views, sortable tables, and selected CSV downloads.
 
 ## How it works
 
@@ -186,22 +210,6 @@ different tools may solve partially different tasks.
 
 ![Comparison with state-of-the-art approaches](docs/images/sota-comparison-en.png)
 
-## Web interface
-
-The included FastAPI application provides FASTA upload, hierarchical results,
-confidence scores, cluster context, and downloadable predictions through a
-visual interface.
-
-![Vydra web interface](docs/images/web.png)
-
-Run it locally after downloading the inference artifacts:
-
-```bash
-cd Vydra_Docker_HF
-uvicorn app:app --host 0.0.0.0 --port 7860
-```
-
-Then open `http://localhost:7860`.
 
 ## Offline execution
 
@@ -223,21 +231,21 @@ export VYDRA_PROSTT5_PATH=/local/path/to/ProstT5
 
 ```text
 Vydra/
-├── vydra                         # CLI launcher
-├── Vydra_Docker_HF/
-│   ├── vydra_cli.py              # commands and output formats
-│   ├── inference_gradio.py       # inference engine
-│   ├── app.py                    # FastAPI API and web application
-│   ├── models/mlp_weights/       # six MLP heads
-│   ├── artifacts/                # labels, metadata, downloaded banks
-│   └── web/                      # frontend
-├── docs/images/                  # project figures
-├── environment.yml
-└── requirements.txt
+├── vydra                       # CLI / GUI launcher
+├── environment.yml             # CUDA and GPU FAISS environment
+├── requirements.txt            # local runtime Python dependencies
+├── vydra_core/
+│   ├── engine.py               # ProstT5 + MLP + GPU FAISS, no web-framework dependency
+│   ├── vydra_cli.py             # commands and output formats
+│   ├── local_gui.py             # loopback browser interface
+│   ├── gui/                    # local GUI assets
+│   ├── report/                 # interactive results template
+│   ├── models/mlp_weights/     # bundled classifier weights
+│   └── artifacts/              # reference metadata and downloaded banks
+├── tests/
+└── docs/
 ```
 
-Raw datasets, training embeddings, research notebooks, and temporary
-checkpoints are intentionally excluded from the lightweight GitHub distribution.
 
 ## Embedding format
 
@@ -262,9 +270,8 @@ The nested format used by the project is:
 
 ## Documentation
 
-- [CLI guide](Vydra_Docker_HF/CLI.md)
+- [CLI guide](vydra_core/CLI.md)
 - [RTX 3060 batch-limit benchmark](docs/BATCH_BENCHMARK_RTX3060.md)
-- [Web service documentation](Vydra_Docker_HF/README.md)
 - [Versión en español](README.es.md)
 
 ## Citation
@@ -272,4 +279,3 @@ The nested format used by the project is:
 Vydra is part of an ongoing thesis project. A formal citation will be added when
 the manuscript becomes available. Until then, please link to this repository
 and record the commit used in your analysis.
-

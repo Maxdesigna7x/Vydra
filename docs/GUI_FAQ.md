@@ -16,9 +16,9 @@ Yes. Keep separate FASTA files for each sample. Original files, folders, IDs, an
 
 Choose a new or empty folder outside the input folder. Existing results are not overwritten. Keep original inputs, complete predictions, manifests, run metadata, and the model/reference versions for reproducibility.
 
-### What does Offline mode do?
+### Are my models local?
 
-It asks the inference engine to use locally available model files and caches instead of downloading model resources. Download the required models and prototype banks beforehand. Missing local resources cause the run to fail; offline mode does not install them.
+All inference runs locally. Vydra checks its configured model, bundled files, and cache first. Allow model downloads only permits downloading missing files; it never sends proteins to an inference API. Disable it for fully offline use. Reference banks are installed separately.
 
 ### Do I need a GPU?
 

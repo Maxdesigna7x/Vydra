@@ -8,7 +8,7 @@ from unittest.mock import patch
 import urllib.request
 import urllib.error
 from pathlib import Path
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'Vydra_Docker_HF'))
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'vydra_core'))
 from local_gui import RunManager, make_server
 
 class LocalGuiTests(unittest.TestCase):
