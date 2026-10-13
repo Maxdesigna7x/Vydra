@@ -1,295 +1,224 @@
 <div align="center">
-  <p>
-    <a href="README.md"><img alt="English" src="https://img.shields.io/badge/Language-English-2563EB?style=for-the-badge"></a>
-    <a href="README.es.md"><img alt="Español" src="https://img.shields.io/badge/Idioma-Español-EAB308?style=for-the-badge"></a>
-  </p>
-  <img src="docs/images/vydra-icon.webp" width="96" alt="Vydra logo">
+  <img src="docs/images/vydra-icon.webp" width="88" alt="Vydra logo">
   <h1>Vydra</h1>
-  <p><strong>Hierarchical protein classification and biological contextualization with ProstT5, MLPs, and FAISS.</strong></p>
-  <p>
-    <img alt="Python 3.10+" src="https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white">
-    <img alt="PyTorch" src="https://img.shields.io/badge/PyTorch-2.1%2B-EE4C2C?logo=pytorch&logoColor=white">
-    <img alt="CLI and local GUI" src="https://img.shields.io/badge/interfaces-CLI%20%2B%20GUI-172B4D">
-    <img alt="CPU and CUDA supported" src="https://img.shields.io/badge/Execution-CPU_or_CUDA-76B900?logo=nvidia&logoColor=white">
-  </p>
+  <p><strong>Classify protein sequences and inspect the biological evidence behind their predictions.</strong></p>
+  <p><a href="README.md">English</a> · <a href="README.es.md">Español</a> · <a href="https://github.com/Maxdesigna7x/Vydra/issues">Report a problem</a></p>
+  <p>Local browser interface · CPU or NVIDIA GPU · Interactive reports · CSV and FASTA exports</p>
 </div>
 
-Vydra takes a protein sequence through a cascade of six classifiers. It separates
-cellular from viral proteins, distinguishes bacteriophages from eukaryotic
-viruses, and identifies structural phage proteins and their functional class.
-For phage predictions, it also searches reference neighborhoods to provide
-interpretable biological context.
+Vydra analyzes **amino-acid sequences** in protein FASTA files. It distinguishes cellular and viral proteins, separates bacteriophages from eukaryotic viruses, and predicts ten structural components of phages. For phage proteins, it also retrieves nearby reference proteins and their annotations so you can inspect the evidence.
 
-> **Status:** active research project. FAISS assignments provide similarity-based
-> context and should not be interpreted as direct taxonomic classification of a
-> query sequence.
+**Research software:** predictions and reference annotations support biological interpretation. They do not establish a query's species, host, or experimentally confirmed function.
 
-![Vydra hierarchical classification workflow](docs/images/diagram-en.png)
+[Install](#install-once) · [Run the interface](#analyze-your-proteins) · [Read the results](#understand-the-results) · [Export proteins](#filter-and-export) · [Troubleshooting](#troubleshooting)
 
-## What Vydra predicts
+## What you receive
 
-All six classifiers share a 1,024-dimensional ProstT5 embedding:
-
-| Model | Decision |
+| Result | What it tells you |
 |---|---|
-| M1 | Viral or cellular |
-| M2 | Bacteria, Archaea, or Eukaryota |
-| M3 | Bacteriophage or eukaryotic virus |
-| M4 | One of 978 eukaryotic-virus classes |
-| M5 | Structural or non-structural phage protein |
-| M6 | One of 10 structural phage classes |
+| Cellular classification | Bacteria, Archaea, or Eukaryota. |
+| Viral classification | Phage or eukaryotic-virus protein. |
+| Eukaryotic-virus group | One of 978 protein groups, with published VirDetect-AI class annotations. These are not 978 species or 978 distinct functions. |
+| Phage structural category | Baseplate, collar, head–tail joining, major/minor capsid, major/minor tail, portal, tail fiber, or tail sheath. |
+| Phage reference evidence | Up to five nearest prototypes within the predicted class, their similarities and individual annotations, plus context from the assigned cluster. |
+| Saved report and files | An interactive HTML report, complete prediction tables, input provenance, run timings, and filtered exports. |
 
-The structural classes are `baseplate`, `collar`, `head_tail_joining`,
-`major_capsid`, `major_tail`, `minor_capsid`, `minor_tail`, `portal`,
-`tail_fiber`, and `tail_sheath`.
+All inference runs on your computer. Internet access is needed only to obtain software, models, and reference banks when they are not already installed.
 
-## Hardware and execution modes
+## Before you start
 
-The local runtime supports Linux and Python 3.10 with either CPU or CUDA inference. The selected device applies to ProstT5, classifiers, and FAISS together.
+- **Input:** protein FASTA files containing amino acids. DNA/RNA must first be translated with a suitable gene-prediction workflow; Vydra does not translate nucleotide sequences.
+- **Platform:** Linux is the validated local runtime. Other operating systems have not been validated.
+- **Software:** Git and [Conda](https://docs.conda.io/projects/conda/en/stable/user-guide/install/index.html). Conda creates an isolated environment containing Vydra's dependencies. You do not need to install Python packages individually.
+- **Storage:** plan for about 25 GB free for software, models, and small runs; large inputs and reports require extra space.
 
-| Use | GPU | Minimum system RAM* | Recommended system RAM | Practical guidance |
-|---|---|---|---|---|
-| GPU inference | NVIDIA CUDA GPU; validated on RTX 3060 12 GB | 16 GB | 32 GB | Install `environment.yml`. Smaller GPUs have not been certified. |
-| CPU inference | None required | 16 GB | 32 GB | Install `environment-cpu.yml`. All stages run on CPU; expect longer runtimes. |
-| GUI / saved reports | None required | No inference RAM requirement | Depends on report size and browser | Viewing reports does not load the inference models. |
+| Execution | Environment | Hardware guidance |
+|---|---|---|
+| CPU | `vydra-cpu` | No GPU needed; slower inference. |
+| NVIDIA GPU | `vydra` | CUDA support required; validated on RTX 3060 with 12 GB VRAM. This environment can also use CPU. |
+| Viewing a saved report | No Conda environment needed | A modern browser; memory needs grow with report size. |
 
-\* **16 GB is an estimated practical minimum for small inputs with batch size 1, not a guaranteed absolute minimum for every workload.** A complete two-protein run measured peak process RAM of 7.54 GiB on CPU and 7.97 GiB on GPU; the operating system, browser, and other applications need additional memory. GPU execution still uses host RAM while loading the model and reference banks. Use `--batch-size 1` on memory-constrained machines (or Batch size = 1 in the GUI). Larger collections, long sequences, and larger batches can require more than 16 GB. **32 GB is recommended, not mandatory.** A full run on a physical 16 GB machine has not yet been validated. See [RAM measurements](docs/CPU_GPU_VALIDATION.md#ram-measurements).
+**32 GB RAM is recommended.** 16 GB is an estimated practical minimum for small inputs with batch size 1, not a certified minimum. Longer proteins and larger inputs may require more. See the [CPU/GPU validation and RAM measurements](docs/CPU_GPU_VALIDATION.md).
 
-For a CPU-only installation:
+## Install once
 
-```bash
-conda env create -f environment-cpu.yml
-conda activate vydra-cpu
-./vydra doctor
-./vydra gui
-```
-
-The GPU environment also supports CPU execution. Install one FAISS variant per environment; `faiss-gpu` already includes CPU indexes.
-
-Allow approximately **25 GB of free disk** for the environment, model cache, reference banks, and small runs; large input/output collections need additional space. The pinned encoder cache occupies about 5.3 GB and the two FAISS prototype banks about 1.6 GB. These RAM/disk values are planning guidance, not universal minimum guarantees. Protein length, batch size, other GPU workloads, and result size change memory use. The [RTX 3060 benchmark](docs/BATCH_BENCHMARK_RTX3060.md) documents the validated GPU baseline. Automatic batching adapts to available memory; use a smaller batch if needed.
-
-## Local models and downloads
-
-**All inference runs locally.** Vydra never sends your proteins to an online inference API. It looks for models in this order:
-
-1. An explicitly configured `VYDRA_PROSTT5_PATH`.
-2. `vydra_core/models/prostt5/`, if complete.
-3. The local Hugging Face cache for the pinned `Rostlab/ProstT5_fp16` snapshot.
-4. Only if missing and permitted: download missing files once, cache them, then run locally.
-
-The GUI always prefers local files. **Allow model downloads** only controls step 4; it does not choose a remote model or force a fresh download. Disable it, or use CLI `--offline`, to prohibit downloads. Missing local files then produce a clear error. **Check installation** is optional and does not enable local models. Reference banks are installed separately with `./vydra download-artifacts`; model loading never silently replaces them.
-
-## Quick start
-
-### 1. Clone and install
+Open a terminal and clone the repository:
 
 ```bash
 git clone https://github.com/Maxdesigna7x/Vydra.git
 cd Vydra
+```
+
+Choose **one** environment:
+
+<details>
+<summary><strong>CPU installation — no NVIDIA GPU required</strong></summary>
+
+```bash
+conda env create -f environment-cpu.yml
+conda activate vydra-cpu
+```
+
+</details>
+
+<details>
+<summary><strong>NVIDIA GPU installation</strong></summary>
+
+```bash
 conda env create -f environment.yml
 conda activate vydra
 ```
 
-### 2. Download the large artifacts
+</details>
 
-The MLP weights are included in the repository. The FAISS prototype banks are
-published separately in GitHub Releases because together they occupy about 1.6
-GB:
+With that environment active, download the models and check the installation:
 
 ```bash
 ./vydra download-artifacts
-```
-
-Raw protein sequences also require ProstT5. Downloading it once stores a local
-copy inside the bundle for later offline use:
-
-```bash
 ./vydra download-model
 ./vydra doctor
 ```
 
-For a private clone, `download-artifacts` automatically uses an authenticated
-GitHub CLI session. Run `gh auth login` first when needed.
+The classifier weights and reference annotations are included in the repository. The two large reference banks are downloaded separately, about 1.6 GB combined; the pinned ProstT5 encoder requires about 5.3 GB. Downloads are reused in later runs. Do not install CPU and GPU FAISS variants together in one environment.
 
-### 3. Run a prediction
+## Analyze your proteins
+
+After installation, open a terminal in the repository folder and start the interface. The launcher activates Conda for you:
 
 ```bash
-./vydra predict --seq "MSTNPKPQRKTKRNTNRRPQDVKFPGGGQIVGGVYLLPRRGPRLG"
+# NVIDIA/GPU environment, also capable of CPU inference
+./run_vydra_ui.sh
+
+# CPU-only environment
+VYDRA_CONDA_ENV=vydra-cpu ./run_vydra_ui.sh
 ```
 
-FASTA input and CSV output:
+![Vydra local interface for choosing protein inputs and an output folder](docs/images/local-gui-dark.png)
+
+1. Select a **protein FASTA file** or a **folder**. Folders are searched recursively; keeping one file per sample preserves sample provenance.
+2. Choose a **new or empty output folder outside the input folder**.
+3. Keep **Generate inference report** enabled. Automatic device selection uses a compatible GPU when available, otherwise CPU.
+4. Start the run. Progress shows the processing stage, classified-protein counts when available, and elapsed time.
+5. Select the completed run in the history to open its results. You can also open the saved `informe_inferencia/informe.html` directly in a browser.
+
+**Keep the server terminal open.** Closing the browser tab leaves inference running; Ctrl+C in the terminal stops the server and its active run. Cancellation retains partial output, so restart in a new folder.
+
+The interface and report are currently in English. The CLI offers English and Spanish messages. Advanced settings include batch size, device, model-download permission, and report generation. **Check installation** is optional; models are used locally without pressing it.
+
+## Understand the results
+
+The report separates **model predictions**, **annotations of nearby references**, and **context of the reference group**.
+
+<p align="center">
+  <a href="docs/images/inference-results.jpg"><img src="docs/images/inference-results.jpg" width="560" alt="Vydra results report showing hierarchical classification, phage reference evidence, timings, and a filterable protein table with CSV and FASTA export"></a>
+</p>
+
+*Example saved report with 293 protein records. Counts and timings describe this particular run; they are not an accuracy benchmark. Click the image to view it at full resolution.*
+
+- **Classification overview:** counts of predicted proteins at each step. Percentages use the corresponding parent category; they do not measure organism or virus abundance.
+- **Phage reference evidence:** five nearest prototypes from the predicted class, including other clusters as alternatives. The initial reference view shows a genus/family label only when all retrieved neighbors with that field agree. Open a protein's detail to see how many annotations are available and where they disagree.
+- **Cluster context:** a secondary view of the whole assigned cluster, which may be larger and more diverse than the local neighborhood.
+- **Eukaryotic-virus class context:** published group annotations, including representative accession, protein description, function category, and taxonomic context when available. This branch does not use FAISS retrieval.
+- **Timing:** inference time and total processing time, including report generation when enabled; these are whole-run times, not per-protein timings.
+
+Three quantities must be read separately:
+
+| Quantity | Interpretation |
+|---|---|
+| Classifier score | Softmax preference for a category at one classification step; not calibrated biological accuracy. |
+| Reference similarity | Cosine similarity between embeddings; not amino-acid identity or probability of a shared function. |
+| Annotation agreement | Agreement among references with known annotations, accompanied by coverage; not independent evidence from five unrelated organisms. |
+
+A construction threshold is reported for phage clusters. Being above it does **not** validate the new query; the engine retains the nearest-cluster assignment even below it. `Hypothetical protein` or `uncharacterized protein` means the source annotation supplies no specific function. Vydra preserves this text as reference information instead of claiming it as a known function of the query.
+
+## Filter and export
+
+Use the final protein table to combine filters such as **Collar + reference genus + reference family**. Choose whether phage taxonomy refers to the five nearest prototypes or the assigned cluster.
+
+- **Export filtered CSV:** exports every matching row, with reference evidence and annotations.
+- **Export filtered FASTA:** exports every matching original protein, including matches on other pages. Complete original headers, repeated original IDs, residue spelling, and terminal `*` are preserved; line wrapping is normalized.
+
+The HTML embeds compressed original sequences for portable offline FASTA export. Export requires a modern browser and available original sequences. Embedding-only inputs and older runs without original-sequence snapshots cannot supply FASTA. Old predictions also cannot acquire five saved neighbors simply by regenerating the report; a new inference is needed.
+
+### Files to keep
+
+GUI runs save these files inside the selected output folder:
+
+| File | Purpose |
+|---|---|
+| `informe_inferencia/informe.html` | Open to explore the results; works offline. |
+| `predicciones_completas.csv` / `.jsonl` | Complete per-protein predictions and evidence. CSV contains numbered columns for the five neighbors. |
+| `manifest_secuencias.csv` | Maps internal IDs to original headers, files, and lengths. |
+| `secuencias_excluidas.csv` | Records excluded during input preparation and their reasons. |
+| `original_sequences.jsonl` | Original headers and residues used for FASTA export and report regeneration. |
+| `metadata_inferencia.json` | Settings, paths, models, run status, and timings. |
+| `informe_inferencia/tiempos.csv` | Inference, report, and total processing times. |
+| `informe_inferencia/secuencias.csv.gz` | Additional complete table, compressed without data loss. |
+
+CSV files grow with the annotations of five neighbors; gzip saves space because reference text often repeats. The HTML size also grows with its embedded evidence and compressed sequences. Keep predictions, source inputs, snapshots, and metadata together for reproducibility. [Complete output guide](vydra_core/SALIDAS.md).
+
+## Troubleshooting
+
+| Problem | What to do |
+|---|---|
+| `conda` is not found | Install Conda, reopen the terminal, then follow its initialization instructions. The launcher also accepts `VYDRA_CONDA_ROOT=/path/to/conda`. |
+| The launcher cannot activate the environment | Finish installation; CPU users must set `VYDRA_CONDA_ENV=vydra-cpu`. |
+| Models or reference banks are missing | Activate the chosen environment; run `download-artifacts`, `download-model`, then `doctor`. |
+| CUDA is unavailable | Select CPU or Automatic; CPU inference does not require CUDA. |
+| Memory is insufficient | Close other heavy workloads and try Batch size = 1. Large inputs may need more RAM. |
+| Input records were excluded | Check `secuencias_excluidas.csv`; verify that the input contains protein sequences. |
+| FASTA export is unavailable | Check for original sequence snapshots and use a modern browser. Embeddings alone contain no recoverable residues. |
+| The browser does not open | Run `./run_vydra_ui.sh --no-browser --port 8732` and open the printed local URL. Add the CPU environment override if needed. |
+
+For offline operation, disable **Allow model downloads** after the models and banks are installed. This prohibits missing-model downloads, not local model use. [Usage FAQ](docs/GUI_FAQ.md).
+
+## Command-line use
+
+For automation or larger workflows, activate the appropriate Conda environment and use:
 
 ```bash
-./vydra predict --fasta proteins.fasta --format csv --output predictions.csv
-```
-
-Read FASTA from a pipe:
-
-```bash
-cat proteins.fasta | ./vydra predict --stdin --format jsonl
-```
-
-Use existing 1,024-dimensional ProstT5 embeddings without loading the base
-model:
-
-```bash
+./vydra predict --fasta proteins.faa --format csv --output results/predictions.csv
+./vydra predict --offline --device cpu --fasta proteins.faa --format jsonl --output results/predictions.jsonl
 ./vydra predict --embedding embeddings.npy --offline --format json
 ```
 
-The CLI supports `table`, `json`, `jsonl`, and `csv` output. It detects CUDA
-automatically, while `--device cpu` and `--device cuda` provide explicit control.
+With `--output`, the CLI generates a report by default; `--no-report` disables it. Without `--output`, predictions go to the terminal and no report is created. CLI report folders are named `informe_inferencia_<output_stem>/`. [CLI guide](vydra_core/CLI.md).
 
-`--device auto` selects CUDA when both PyTorch and GPU FAISS can initialize; otherwise it selects CPU for every stage. `--device cpu` requires no CUDA. `--device cuda` requires a working GPU backend and reports an error if unavailable. CPU and GPU FAISS use float32 inner-product indexes with the same normalization and thresholds. Small floating-point differences can affect ties or predictions exactly at a threshold.
+<details>
+<summary><strong>Technical overview and validation</strong></summary>
 
-Batching is memory-aware by default: Vydra sorts chunks by real sequence length,
-groups similar lengths, checks currently available VRAM or RAM after loading the
-encoder, and preserves a safety reserve. The initial GPU limits are calibrated
-from an RTX 3060 benchmark (11.63 GiB), then scaled to the detected device. If
-memory is fragmented or another process consumes memory, Vydra halves the batch
-and retries automatically. Advanced controls are available through
-`--batch-size`, `--max-batch-size`, `--memory-fraction`,
-`--reserve-memory-gb`, and `--length-bin`.
+ProstT5 produces a 1,024-dimensional embedding shared by six MLP heads. A protein visits only the decisions on its predicted route.
 
-## Local graphical interface
+| Head | Decision |
+|---|---|
+| M1 | Cellular / viral |
+| M2 | Bacteria / Archaea / Eukaryota |
+| M3 | Phage / eukaryotic virus |
+| M4 | 978 eukaryotic viral protein groups |
+| M5 | Structural / non-structural phage |
+| M6 | Ten structural categories |
 
-Vydra includes a local browser interface for running protein inference without writing CLI commands. Launch it from the installed environment:
+Phage assignments use exact FAISS inner-product search on normalized reference embeddings within the predicted class. Five retrieved prototypes provide descriptive evidence; the first preserves the existing nearest-cluster assignment. Proteins longer than 2,048 amino acids use overlapping windows whose embeddings are averaged.
 
-```bash
-conda activate vydra
-./vydra gui
-```
+CPU/GPU execution checks and RAM measurements are documented separately from biological performance. Internal head evaluations do not establish end-to-end accuracy on arbitrary external samples. Reference coverage, annotation quality, short fragments, and earlier classification errors affect interpretation. Additional taxonomic or functional transfer rules require independent evaluation.
 
-![Vydra local inference GUI in dark mode](docs/images/local-gui-dark.png)
+- [Biological evidence and export design](docs/EVIDENCIA_BIOLOGICA_Y_EXPORTACION.md)
+- [CPU/GPU validation](docs/CPU_GPU_VALIDATION.md)
+- [RTX 3060 batch benchmark](docs/BATCH_BENCHMARK_RTX3060.md)
+- [Historical classifier evaluation figure](docs/images/classifiers-en.png)
 
-The English interface includes:
+Run software regression checks with `python -m unittest discover -s tests -p 'test_*.py'` in the installed environment. Software tests do not certify biological accuracy.
 
-- **Compact dark/light layout:** input and output share a row, with the main workflow fitting into one desktop viewport.
-- **Local input selection:** browse for one protein FASTA file or a folder searched recursively; original IDs, headers, files, and folders remain traceable.
-- **Advanced settings:** automatic/CUDA/CPU model device, batch size, permission to download missing models, and optional generation of the interactive inference report.
-- **Run monitoring:** current phase, actual classified-protein counts when available, elapsed time, live logs, and cancellation.
-- **Local history:** revisit previous runs and their output locations. New runs require a new or empty output folder to protect existing results.
-- **Help:** explanatory tooltips, an installation check, and a usage FAQ covering input preparation and biological interpretation.
+</details>
 
-The server runs on `127.0.0.1` and uses the installed Python environment. Keep its terminal open; closing the browser tab leaves inference running. Offline mode requires models and reference artifacts to be available locally. The device selection applies to models and FAISS; CPU inference requires no GPU.
+## Documentation and support
 
-To choose a port and open the URL manually:
+Current CLI: **0.4.0**. [Changes in this version](CHANGELOG.md).
 
-```bash
-./vydra gui --no-browser --port 8732
-```
+- [GUI guide](vydra_core/GUI.md) and [usage FAQ](docs/GUI_FAQ.md)
+- [CLI guide](vydra_core/CLI.md) and [output dictionary](vydra_core/SALIDAS.md)
+- [Reference evidence, FASTA export, and timings](docs/EVIDENCIA_BIOLOGICA_Y_EXPORTACION.md)
+- [Report guide](docs/INFORMES_INFERENCIA.md)
+- [Report an issue](https://github.com/Maxdesigna7x/Vydra/issues): include your command/settings, error log, device, and software revision; a small reproducible input helps when it can be shared.
 
-See the [GUI guide](vydra_core/GUI.md) and [usage FAQ](docs/GUI_FAQ.md). Completed runs open the interactive results report, with folder/file filtering, three classification views, sortable tables, and selected CSV downloads.
-
-## How it works
-
-```text
-Protein sequence
-      │
-      ▼
-ProstT5 → 1,024-dimensional embedding
-      │
-      ▼
-M1: cellular ─────────────► M2: Bacteria / Archaea / Eukaryota
- │
- └── viral ───────────────► M3: eukaryotic virus / bacteriophage
-                              │                    │
-                              ▼                    ▼
-                         M4: 978 classes     M5: structural / non-structural
-                                                   │
-                                                   ▼
-                                             M6: 10 classes
-                                                   │
-                                                   ▼
-                                      FAISS + biological context
-```
-
-Sequences longer than 2,048 amino acids are split into overlapping windows and
-their embeddings are averaged. The final search uses inner product over
-normalized vectors and class-specific prototype banks.
-
-![FAISS contextualization of viral proteins](docs/images/faiss-context-en.png)
-
-## Experimental performance
-
-Across the internal test sets used during development, the six local classifier
-heads achieved accuracies between 91.76% and 99.31%. These values describe each
-head under its own evaluation split; they are not a claim of end-to-end accuracy
-on every external distribution.
-
-![Performance and convergence of the hierarchical classifiers](docs/images/classifiers-en.png)
-
-The project also compares Vydra with established protein-annotation approaches.
-Interpret this figure together with the evaluation protocol and dataset scope;
-different tools may solve partially different tasks.
-
-![Comparison with state-of-the-art approaches](docs/images/sota-comparison-en.png)
-
-
-## Offline execution
-
-After `download-artifacts` and `download-model`, inference can run without
-network access:
-
-```bash
-./vydra predict --offline --fasta proteins.fasta
-```
-
-You may also point Vydra to an existing local ProstT5 installation:
-
-```bash
-export VYDRA_PROSTT5_PATH=/local/path/to/ProstT5
-./vydra predict --offline --fasta proteins.fasta
-```
-
-## Repository layout
-
-```text
-Vydra/
-├── vydra                       # CLI / GUI launcher
-├── environment.yml             # CUDA and GPU FAISS environment
-├── requirements.txt            # local runtime Python dependencies
-├── vydra_core/
-│   ├── engine.py               # ProstT5 + MLP + CPU/GPU FAISS, no web-framework dependency
-│   ├── vydra_cli.py             # commands and output formats
-│   ├── local_gui.py             # loopback browser interface
-│   ├── gui/                    # local GUI assets
-│   ├── report/                 # interactive results template
-│   ├── models/mlp_weights/     # bundled classifier weights
-│   └── artifacts/              # reference metadata and downloaded banks
-├── tests/
-└── docs/
-```
-
-
-## Embedding format
-
-The CLI accepts NumPy matrices with shape `(n, 1024)` or PyTorch dictionaries.
-The nested format used by the project is:
-
-```python
-{
-    "class_name": {
-        "sequence_id": torch.Tensor(shape=(1024,))
-    }
-}
-```
-
-## Limitations
-
-- Performance depends on the coverage and distribution of the reference data.
-- High MLP confidence does not replace independent biological validation.
-- A cluster label summarizes known neighbors; it does not establish taxonomy.
-- ProstT5 and the prototype banks require several GB of storage.
-- Embeddings and classifiers can run on CPU; current inference still requires CUDA GPU FAISS.
-
-## Documentation
-
-- [CLI guide](vydra_core/CLI.md)
-- [RTX 3060 batch-limit benchmark](docs/BATCH_BENCHMARK_RTX3060.md)
-- [Versión en español](README.es.md)
-
-## Citation
-
-Vydra is part of an ongoing thesis project. A formal citation will be added when
-the manuscript becomes available. Until then, please link to this repository
-and record the commit used in your analysis.
+Vydra is part of an ongoing thesis project. Until a formal publication is available, cite this repository and record its commit, model/reference versions, and analysis settings. Do not cite the results screenshot as evidence of predictive accuracy.

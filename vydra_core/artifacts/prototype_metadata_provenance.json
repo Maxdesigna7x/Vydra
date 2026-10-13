@@ -1,0 +1,39 @@
+{
+  "prototypes": 268124,
+  "matched_metadata": 268119,
+  "missing_metadata": [
+    [
+      "structural",
+      "collar",
+      "AOV62395.1"
+    ],
+    [
+      "structural",
+      "collar",
+      "YP_001165273.1"
+    ],
+    [
+      "structural",
+      "collar",
+      "YP_009005964.1"
+    ],
+    [
+      "structural",
+      "collar",
+      "YP_007674975.1"
+    ],
+    [
+      "structural",
+      "major_tail",
+      "ATN93640.1"
+    ]
+  ],
+  "output": "vydra_core/artifacts/prototype_sequence_metadata.csv.gz",
+  "source_sha256": "9cbbbb4f0008ad2e3955247b93fd1601439f6df9088a075e3f88a7528b9292a5",
+  "source": "data/metadata/phage_sequence_metadata.csv",
+  "metadata_source": "existing FASTA headers; no new biological validation",
+  "bank_csv_sha256": {
+    "Struct_prototype_bank.csv": "6fee4a307a2b7074aae9c543948cd8022832d7b023439d704658f705acdae7cd",
+    "Non_Struct_prototype_bank.csv": "4c74eefd6e4f6d59e6797f8b402e42ecefde703f03cd7a2df43d28c326965db6"
+  }
+}

@@ -1,6 +1,8 @@
 # Salidas de Vydra y cómo interpretarlas
 
-Esta guía describe la implementación local revisada el 5 de octubre de 2026.
+Esta guía describe la implementación local revisada el 13 de octubre de 2026.
+La [guía de evidencia y exportación](../docs/EVIDENCIA_BIOLOGICA_Y_EXPORTACION.md)
+detalla los cinco prototipos, sus anotaciones y la exportación FASTA filtrada.
 La [CLI](CLI.md), la [web/API](README.md) y el procesador de carpetas del proyecto
 comparten motor, pero entregan archivos y esquemas diferentes.
 
@@ -20,6 +22,10 @@ No se ejecutan ni se reportan las seis decisiones para cada proteína.
 | `cluster_id` | Cluster de referencia; `-1` indica ausencia de asignación. Se interpreta junto con rama y clase, no como ID global independiente. |
 | `cluster_similarity` | Producto interno de embeddings normalizados, equivalente a similitud coseno con el prototipo más cercano. |
 | `cluster_nearest_seq_id` | ID del prototipo/medoid más cercano, no una búsqueda exhaustiva entre todas las secuencias originales. |
+| `nearest_neighbors` | Hasta cinco prototipos de la clase predicha, con similitud, cluster y metadatos individuales; incluye clusters alternativos. |
+| `neighbor_summary` | Coincidencias, campos conocidos y distribuciones; no predice taxonomía ni función validada. |
+| `cluster_threshold_role` | `cluster_construction_only`: el umbral no es un criterio calibrado de aceptación. |
+| `run_inference_seconds` | Tiempo de la corrida de inferencia, no tiempo individual de la proteína. |
 | `cluster_similarity_threshold` | Umbral de referencia informado para esa clase. El motor no rechaza al vecino por estar bajo él. |
 | `cluster_annotation` | Contexto del cluster: tamaño, cobertura de metadata, taxones/productos dominantes, purezas, representante y estadísticas de longitud. |
 | `cluster_biological_label` | Etiqueta resumida del contexto de referencia. |
@@ -43,8 +49,8 @@ comprobar ambos bancos antes de inferir.
 
 La CLI con `--output` crea `informe_inferencia_<nombre>/`. El procesador de
 carpetas crea `informe_inferencia/`. El informe se abre desde `informe.html`,
-funciona offline e incorpora selector EN/ES. Las figuras se exportan en PNG/SVG
-(en inglés y en `es/`); las guías TXT se entregan en ambos idiomas.
+funciona offline y está actualmente en inglés. Las figuras adicionales se exportan
+en PNG/SVG (en inglés y en `es/`); las guías TXT se entregan en ambos idiomas.
 
 | Archivo | Para qué sirve |
 |---|---|
@@ -60,6 +66,7 @@ funciona offline e incorpora selector EN/ES. Las figuras se exportan en PNG/SVG
 | `calidad_anotacion.csv` | Procedencia de anotaciones y control bajo umbral. |
 | `asignaciones_taxonomicas.csv` | Auditoría por proteína viral; no incluye celulares. |
 | `procedencia.json` | Hash de entrada, referencia taxonómica usada, idioma, reglas y comprobaciones del informe. |
+| `tiempos.csv` | Tiempo de inferencia, generación de reporte y procesamiento total. |
 | `README.txt`, `README_en.txt`, `README_es.txt` | Guías breves de archivos; en la carpeta de resultados se generan `README_ARCHIVOS*.txt`. |
 
 `--sequence-export csv|none` cambia únicamente la exportación adicional

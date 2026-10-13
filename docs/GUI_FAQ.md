@@ -40,6 +40,22 @@ Model loading and embedding generation show their current phase. During classifi
 
 The local workflow writes complete CSV/JSONL predictions, a sequence manifest, exclusion records, summaries, and metadata. Generate inference report adds the interactive HTML report and its supporting exports. The HTML report is interactive and can be opened directly from completed runs.
 
+### Which references support a phage prediction?
+
+Open the protein's detail to inspect up to five nearest prototypes from its predicted class, with individual annotations, cosine similarities, and cluster IDs. They may belong to different clusters. The assigned cluster summary remains secondary context; its representative may differ from the nearest prototype. The eukaryotic-virus branch displays its published M4 class dictionary without FAISS retrieval.
+
+### What does hypothetical protein mean?
+
+It is a source annotation that supplies no specific function. Vydra keeps that original description and distinguishes it from the predicted structural category. Putative or probable descriptions propose a candidate function but do not demonstrate experimental validation.
+
+### Can I export only the proteins I selected?
+
+Yes. Combine table filters and choose Export filtered CSV or Export filtered FASTA. Both include every matching row, even on other pages. FASTA preserves original headers and residues, including repeated original IDs. The standalone HTML embeds compressed sequences for offline export; embedding-only inputs or older reports without snapshots cannot provide FASTA. A modern browser is required.
+
+### How long did my analysis take?
+
+The report header, run metadata, and tiempos.csv record whole-run inference and total processing times. Total time includes report generation when enabled; it is not time per protein. Input preparation, model loading and first-time downloads may affect the duration.
+
 ### Are confidence, similarity, and taxonomy equivalent?
 
 No. Classifier confidence expresses model preference at a particular step. Embedding similarity compares a protein to a reference prototype and is not sequence identity. Genus, family, and host labels describe reference context; they do not certify the taxonomy or host of your query.

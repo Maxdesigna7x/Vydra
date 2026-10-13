@@ -19,8 +19,10 @@ from transformers import T5EncoderModel, T5Tokenizer
 
 try:
     from . import gpu_faiss
+    from .biological_context import load_reference_metadata, summarize_neighbors, function_annotation_status
 except ImportError:
     import gpu_faiss
+    from biological_context import load_reference_metadata, summarize_neighbors, function_annotation_status
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -31,6 +33,7 @@ NON_STRUCTURAL_PROTOTYPE_BANK = ARTIFACTS_DIR / "Non_Struct_prototype_bank.pt"
 CLUSTER_TAXONOMY_CSV = ARTIFACTS_DIR / "cluster_taxonomy_summary.csv"
 VIRAL_EUK_CLASS_METADATA_CSV = ARTIFACTS_DIR / "viral_euk_class_metadata.csv"
 THRESHOLD_CONFIG_JSON = ARTIFACTS_DIR / "recommended_thresholds_config.json"
+PROTOTYPE_METADATA_CSV = ARTIFACTS_DIR / "prototype_sequence_metadata.csv.gz"
 
 MODEL_NAME = "Rostlab/ProstT5"
 EMB_DIM = 1024
@@ -235,6 +238,7 @@ def build_prototype_bank(bank_path: Path, dataset_type: str) -> dict[str, dict]:
         raise ValueError(f"Expected non-empty prototype bank dict in {bank_path}")
 
     bank: dict[str, dict] = {}
+    metadata = load_reference_metadata(PROTOTYPE_METADATA_CSV, dataset_type)
 
     for class_name, entry in raw.items():
         class_name = str(class_name)
@@ -276,6 +280,7 @@ def build_prototype_bank(bank_path: Path, dataset_type: str) -> dict[str, dict]:
             "n_vectors": int(len(seq_ids)),
             "prototype_threshold": entry.get("prototype_threshold", ""),
             "prototype_source": entry.get("prototype_source", ""),
+            "metadata": [metadata.get((dataset_type, class_name, str(sid)), {}) for sid in seq_ids],
         }
         print(f"Loaded prototype bank {dataset_type}/{class_name}: {len(seq_ids)} prototypes")
         del x
@@ -808,6 +813,40 @@ def assign_cluster_prototype(emb: np.ndarray, class_name: str, bank: dict[str, d
     return cluster_id, float(distances[0, 0]), prototype_seq_id
 
 
+def retrieve_reference_neighbors(emb: np.ndarray, class_name: str, bank: dict[str, dict], k: int = 5) -> list[dict]:
+    """Exact top-k in the existing class bank; include other clusters as alternatives."""
+    if class_name not in bank:
+        return []
+    entry = bank[class_name]
+    count = min(k, len(entry['seq_ids']))
+    if not count:
+        return []
+    scores, indices = gpu_faiss.search_index(entry['index'], normalize_embedding(emb).reshape(1, -1), count)
+    # Preserve the previous k=1 assignment if equal-score ties are reordered.
+    if count > 1:
+        first_score, first_index = gpu_faiss.search_index(entry['index'], normalize_embedding(emb).reshape(1, -1), 1)
+        chosen = int(first_index[0, 0])
+        ranked = ([(float(first_score[0, 0]), chosen)] + [
+            (float(score), int(index)) for score, index in zip(scores[0], indices[0]) if int(index) != chosen])[:count]
+    else:
+        ranked = zip(scores[0], indices[0])
+    neighbors = []
+    for score, index in ranked:
+        index = int(index)
+        if index < 0:
+            continue
+        metadata = entry.get('metadata', [])
+        annotation = metadata[index] if index < len(metadata) else {}
+        neighbors.append({**annotation, 'rank': len(neighbors) + 1,
+                          'seq_id': str(entry['seq_ids'][index]),
+                          'cluster_id': int(entry['cluster_ids'][index]),
+                          'similarity': float(score), 'class_name': class_name,
+                          'dataset_type': entry.get('dataset_type', ''),
+                          'metadata_available': any(bool(v) for v in annotation.values()),
+                          'function_annotation_status': function_annotation_status(annotation.get('product'))})
+    return neighbors
+
+
 @serialized_inference
 def run_hierarchy(emb: np.ndarray) -> dict:
     release_prost_t5()
@@ -820,6 +859,7 @@ def run_hierarchy(emb: np.ndarray) -> dict:
     cluster_class = ""
     cluster_dataset_type = ""
     cluster_nearest_seq_id = ""
+    nearest_neighbors = []
     cluster_annotation = empty_annotation()
     viral_euk_metadata = empty_viral_euk_class_metadata()
 
@@ -847,17 +887,20 @@ def run_hierarchy(emb: np.ndarray) -> dict:
                 cluster_branch = "structural"
                 cluster_dataset_type = "structural"
                 cluster_class = m6
-                cluster_id, cluster_sim, cluster_nearest_seq_id = assign_cluster_prototype(emb, m6, get_structural_prototype_bank())
+                nearest_neighbors = retrieve_reference_neighbors(emb, m6, get_structural_prototype_bank())
             elif m5 == "non_structural":
                 cluster_branch = "non_structural"
                 cluster_dataset_type = "non_structural"
                 cluster_class = "phage_non_struct"
-                cluster_id, cluster_sim, cluster_nearest_seq_id = assign_cluster_prototype(
+                nearest_neighbors = retrieve_reference_neighbors(
                     emb,
                     "phage_non_struct",
                     get_non_structural_prototype_bank(),
                 )
 
+    if nearest_neighbors:
+        closest = nearest_neighbors[0]
+        cluster_id, cluster_sim, cluster_nearest_seq_id = closest['cluster_id'], closest['similarity'], closest['seq_id']
     if cluster_dataset_type and cluster_class:
         cluster_annotation = get_cluster_annotation(cluster_dataset_type, cluster_class, cluster_id)
 
@@ -870,6 +913,9 @@ def run_hierarchy(emb: np.ndarray) -> dict:
         "cluster_id": cluster_id,
         "cluster_similarity": cluster_sim,
         "cluster_nearest_seq_id": cluster_nearest_seq_id,
+        "nearest_neighbors": nearest_neighbors,
+        "neighbor_summary": summarize_neighbors(nearest_neighbors) if cluster_dataset_type else {},
+        "cluster_threshold_role": 'cluster_construction_only' if cluster_dataset_type else '',
         "cluster_similarity_threshold": thresholds_by_class.get(cluster_class, ""),
         "cluster_annotation": cluster_annotation,
         "cluster_biological_label": biological_label(cluster_annotation),

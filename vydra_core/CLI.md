@@ -49,8 +49,14 @@ mkdir -p resultados
 | `csv` | Una fila por proteína; objetos aplanados con nombres como `confidences.M1` y `cluster_annotation.dominant_genus`; `path` separado por `/`. |
 
 Sin `--output`, las predicciones se escriben a stdout y no se crea informe.
-Los mensajes del motor y progreso se envían a stderr. Con `--output`, crea
-primero la carpeta destino: la CLI no crea el directorio padre de ese archivo.
+Los mensajes del motor, progreso y tiempos se envían a stderr. Con `--output`,
+la CLI crea la carpeta destino si hace falta. Guarda también metadata de tiempos
+y una copia de las secuencias originales cuando la entrada contiene proteínas.
+
+El informe recupera hasta cinco prototipos por fago con sus metadatos. Permite
+filtrar por categoría y contexto de género/familia, y exportar todas las filas
+filtradas a CSV o FASTA con encabezados originales. Consulte la
+[guía de evidencia y exportación](../docs/EVIDENCIA_BIOLOGICA_Y_EXPORTACION.md).
 
 ## Informe automático y archivos entregados
 
@@ -86,9 +92,9 @@ resultados/
 ```
 
 El directorio se llama `informe_inferencia_<nombre de salida sin extensión>`.
-El HTML tiene selector EN/ES, cascada con porcentajes respecto al padre,
+El HTML está actualmente en inglés, con cascada y porcentajes respecto al padre,
 resolución taxonómica, rankings, distribución por etiqueta y control FAISS.
-`--language en|es` fija el idioma inicial y las guías TXT (default: `en`);
+`--language en|es` fija los mensajes de CLI y las guías TXT (default: `en`);
 no cambia los nombres de archivos, campos ni etiquetas científicas.
 
 `secuencias.csv.gz` es un CSV comprimido sin pérdida; contiene predicciones,
@@ -139,7 +145,7 @@ Releases `Maxdesigna7x/Vydra`, etiqueta `artifacts-v1`:
 
 `download-artifacts` omite bancos existentes; `--force` los reemplaza y verifica
 su SHA-256. Para descargas privadas puede usar una sesión autenticada de `gh`.
-`download-model` guarda `Rostlab/ProstT5` en `models/prostt5`; con `--directory`
+`download-model` guarda el snapshot fijado de `Rostlab/ProstT5_fp16` en `models/prostt5`; con `--directory`
 puedes elegir otro destino y luego configurarlo:
 
 ```bash

@@ -12,6 +12,8 @@ import os
 import shutil
 import subprocess
 import sys
+import time
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
 from urllib.error import HTTPError
@@ -21,6 +23,8 @@ from urllib.request import urlopen
 BASE_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(BASE_DIR))
 from inference_i18n import language_from_argv, localize_parser
+from biological_context import flatten_output
+from report_payloads import original_records, write_original_snapshot, update_report_timing
 ARTIFACTS_DIR = BASE_DIR / "artifacts"
 WEIGHTS_DIR = BASE_DIR / "models" / "mlp_weights"
 BUNDLED_PROSTT5_DIR = BASE_DIR / "models" / "prostt5"
@@ -41,6 +45,7 @@ REQUIRED_ARTIFACTS = (
     "cluster_taxonomy_summary.csv",
     "viral_euk_class_metadata.csv",
     "recommended_thresholds_config.json",
+    "prototype_sequence_metadata.csv.gz",
 )
 
 RELEASE_TAG = "artifacts-v1"
@@ -97,16 +102,7 @@ def rows_from_records(engine, records, embeddings, progress_callback=None) -> li
 
 
 def flatten_row(row: dict[str, Any]) -> dict[str, Any]:
-    flat: dict[str, Any] = {}
-    for key, value in row.items():
-        if isinstance(value, dict):
-            for nested_key, nested_value in value.items():
-                flat[f"{key}.{nested_key}"] = nested_value
-        elif isinstance(value, list):
-            flat[key] = "/".join(str(item) for item in value)
-        else:
-            flat[key] = value
-    return flat
+    return flatten_output(row)
 
 
 def json_safe(value: Any) -> Any:
@@ -187,6 +183,8 @@ def emit(rows: list[dict[str, Any]], output_format: str, output: str | None, lan
 
 
 def command_predict(args: argparse.Namespace) -> int:
+    started = time.perf_counter()
+    started_at = datetime.now(timezone.utc).isoformat()
     engine = import_engine(args.device, args.offline)
     with contextlib.redirect_stdout(sys.stderr):
         engine.require_faiss_gpu()
@@ -225,7 +223,9 @@ def command_predict(args: argparse.Namespace) -> int:
     with contextlib.redirect_stdout(sys.stderr):
         rows = rows_from_records(engine, records, embeddings, getattr(args, "_progress_callback", None))
     source = args.fasta or args.embedding
-    headers = [line.strip()[1:] for line in text.splitlines() if line.strip().startswith('>')] if not args.embedding else []
+    originals = list(original_records(text)) if not args.embedding else []
+    if originals and len(originals) != len(rows):
+        raise ValueError('Original FASTA records do not match inference records')
     id_counts = {}
     for row in rows:
         id_counts[row['seq_id']] = id_counts.get(row['seq_id'], 0) + 1
@@ -234,13 +234,29 @@ def command_predict(args: argparse.Namespace) -> int:
     for index, row in enumerate(rows, 1):
         original_id = row['seq_id']
         row['original_id'] = original_id
-        row['original_header'] = headers[index - 1] if len(headers) == len(rows) else original_id
+        row['original_header'] = originals[index - 1][0] if originals else original_id
         if duplicate_ids:
             row['seq_id'] = f'R{index:07d}:{original_id}'
         if source:
             resolved = source.expanduser().resolve()
             row.update(source_path=str(resolved), source_relative_path=resolved.name,
                        source_file=resolved.name, source_folder=str(resolved.parent), source_file_sha256=source_hash)
+    inference_seconds = round(time.perf_counter() - started, 6)
+    for row in rows:
+        row['run_inference_seconds'] = inference_seconds
+    timing = {'started_at': started_at, 'inference_seconds': inference_seconds,
+              'scope': 'whole run; model/input loading, embeddings and classification; report time separate'}
+    report_dir = None
+    metadata_path = None
+    if args.output:
+        output = Path(args.output).resolve()
+        output.parent.mkdir(parents=True, exist_ok=True)
+        metadata_path = output.with_suffix(output.suffix + '.metadata.json')
+        snapshot_path = output.with_suffix(output.suffix + '.original_sequences.jsonl')
+        if originals:
+            write_original_snapshot(snapshot_path, ((row['seq_id'], h, s) for row, (h, s) in zip(rows, originals)))
+        timing.update(status='complete', input_type='embedding' if args.embedding else 'protein',
+                      original_sequences_path=str(snapshot_path) if originals else None)
     emit(rows, args.format, args.output, args.language)
     if args.report and args.output:
         report_path = BASE_DIR / 'inference_report.py'
@@ -250,16 +266,29 @@ def command_predict(args: argparse.Namespace) -> int:
         output = Path(args.output).resolve()
         report_dir = output.parent / f'informe_inferencia_{output.stem}'
         report_dir.mkdir(parents=True, exist_ok=True)
+        (report_dir / 'metadata_inferencia.json').write_text(json.dumps(timing, indent=2) + '\n', encoding='utf-8')
         # Keep a structured input even when the requested output is a table or JSON.
         report_input = report_dir / 'predicciones.jsonl'
         with report_input.open('w', encoding='utf-8') as stream:
             for row in rows:
                 stream.write(json.dumps(json_safe(row), ensure_ascii=False, allow_nan=False) + '\n')
+        report_started = time.perf_counter()
         report_module.generate_report(report_input, report_dir,
                                       report_module.DEFAULT_TAXONOMY if report_module.DEFAULT_TAXONOMY.is_file() else None,
                                       sequence_export=args.sequence_export, language=args.language)
+        timing['report_seconds'] = round(time.perf_counter() - report_started, 6)
         report_module.write_run_readme(output.parent, report_dir, prediction_path=output, language=args.language)
         eprint(f'Report saved to {report_dir / "informe.html"}' if args.language == 'en' else f'Informe guardado en {report_dir / "informe.html"}')
+    timing['total_processing_seconds'] = round(time.perf_counter() - started, 6)
+    timing['finished_at'] = datetime.now(timezone.utc).isoformat()
+    if metadata_path:
+        metadata_path.write_text(json.dumps(timing, indent=2) + '\n', encoding='utf-8')
+    if report_dir:
+        (report_dir / 'metadata_inferencia.json').write_text(json.dumps(timing, indent=2) + '\n', encoding='utf-8')
+        update_report_timing(report_dir, timing)
+    eprint((f"Inference: {inference_seconds:.2f} s · Total processing: {timing['total_processing_seconds']:.2f} s")
+           if args.language == 'en' else
+           (f"Inferencia: {inference_seconds:.2f} s · Procesamiento total: {timing['total_processing_seconds']:.2f} s"))
     return 0
 
 
@@ -416,7 +445,7 @@ def build_parser(language='en') -> argparse.ArgumentParser:
         description="Clasificador jerarquico local de proteinas Vydra.",
         epilog="Ayuda de inferencia: vydra predict --help. Cada subcomando admite --help.",
     )
-    parser.add_argument("--version", action="version", version="Vydra CLI 0.3.0", help="mostrar la versión del CLI")
+    parser.add_argument("--version", action="version", version="Vydra CLI 0.4.0", help="mostrar la versión del CLI")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     predict = subparsers.add_parser("predict", help="clasificar secuencias o embeddings",

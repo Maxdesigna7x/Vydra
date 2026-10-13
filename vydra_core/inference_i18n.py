@@ -106,6 +106,14 @@ TEXT = {
 def tr(text, language='en'):
     if language == 'es':
         return text
+    if text == 'Mixto / sin predominio suficiente':
+        return 'Mixed / no sufficient predominance'
+    if text == 'Tiempo de inferencia, reporte y procesamiento total de la corrida.':
+        return 'Inference, report and total processing time for the run.'
+    if text == 'Copia de encabezados y residuos originales para exportar FASTA filtrado.':
+        return 'Snapshot of original headers and residues for filtered FASTA export.'
+    if text == 'Los residuos originales se conservan en el snapshot de secuencias y comprimidos en el HTML para exportar FASTA filtrado.':
+        return 'Original residues are preserved in the sequence snapshot and compressed in the HTML for filtered FASTA export.'
     if text in TEXT:
         return TEXT[text]
     m = re.fullmatch(r'([\d,]+) proteínas · conteos de proteínas, no abundancia de organismos\.', text)

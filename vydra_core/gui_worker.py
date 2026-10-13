@@ -5,8 +5,10 @@ import json
 import os
 import time
 import traceback
+from datetime import datetime, timezone
 from folder_inputs import prepare_inputs, postprocess, write_json, resolve_model_path
 from vydra_cli import build_parser, command_predict
+from report_payloads import update_report_timing
 
 
 def run(path):
@@ -50,19 +52,31 @@ def run(path):
         command_predict(args)
         update(stage='Writing results', processed=state['total'])
         results = postprocess(output / 'predicciones_motor_temporal.jsonl', output, manifest)
-        write_json(output / 'metadata_inferencia.json', {
+        inference_seconds = round(time.monotonic() - started, 6)
+        metadata = {
+            'started_at': state.get('created_at'),
             'status': 'complete', 'output_language': 'en', 'input_root': str(source if source.is_dir() else source.parent),
             'output_root': str(output), 'result': results, 'preparation': preparation,
             'device_requested': state['device'], 'offline': state['offline'], 'gui_run_id': state['id'],
             'model_path': str(model_path),
-        })
+            'inference_seconds': inference_seconds,
+            'original_sequences_path': str(output / 'original_sequences.jsonl'),
+        }
+        write_json(output / 'metadata_inferencia.json', metadata)
         if state['report']:
             update(stage='Generating report')
             from inference_report import generate_report, DEFAULT_TAXONOMY
+            report_started = time.monotonic()
             generate_report(output / 'predicciones_completas.jsonl', output / 'informe_inferencia',
                             taxonomy_path=DEFAULT_TAXONOMY if DEFAULT_TAXONOMY.is_file() else None,
                             language='en')
             state['report_path'] = str(output / 'informe_inferencia' / 'informe.html')
+            metadata['report_seconds'] = round(time.monotonic() - report_started, 6)
+        metadata['total_processing_seconds'] = round(time.monotonic() - started, 6)
+        metadata['finished_at'] = datetime.now(timezone.utc).isoformat()
+        write_json(output / 'metadata_inferencia.json', metadata)
+        if state['report']:
+            update_report_timing(output / 'informe_inferencia', metadata)
         update(status='complete', stage='Completed', result=results)
     except Exception as exc:
         traceback.print_exc()

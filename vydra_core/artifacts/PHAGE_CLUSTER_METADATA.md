@@ -54,3 +54,18 @@ length statistics.
 
 The UI reports this as cluster-level context. It should not be interpreted as a
 direct taxonomic validation of the query sequence.
+
+## Nearest-reference metadata
+
+`prototype_sequence_metadata.csv.gz` supplies source annotations for the exact
+deployed prototype IDs. It is joined by dataset, class and sequence ID and is
+separate from this cluster dictionary. Generate it with
+`python scripts/export_prototype_metadata.py`; distribute the CSV and
+`prototype_metadata_provenance.json` with the bundle. The latter records source
+hashes and missing annotations. Missing fields are retained as unavailable.
+
+Inference retrieves up to five prototypes across the predicted class, including
+alternative clusters, while preserving the previous nearest-cluster assignment.
+The HTML prioritizes these individual references; the cluster representative and
+summary remain secondary context. See the
+[evidence guide](../../docs/EVIDENCIA_BIOLOGICA_Y_EXPORTACION.md).

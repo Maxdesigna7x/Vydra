@@ -24,6 +24,10 @@ from collections import Counter, defaultdict
 from datetime import datetime
 from pathlib import Path
 from typing import Any
+try:
+    from .biological_context import flatten_output
+except ImportError:
+    from biological_context import flatten_output
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
@@ -87,7 +91,7 @@ def parse_fasta(path: Path):
             if line.startswith(">"):
                 if header is not None:
                     yield header, "".join(pieces)
-                header = line[1:].strip()
+                header = raw.lstrip()[1:].rstrip('\r\n')
                 pieces = []
             elif header is None:
                 raise ValueError(f"Secuencia antes del primer encabezado FASTA en {path}")
@@ -131,6 +135,7 @@ def prepare_inputs(input_root: Path, output_root: Path, input_files=None) -> tup
     excluded_handle = excluded_path.open("w", encoding="utf-8", newline="")
     excluded_writer = csv.DictWriter(excluded_handle, fieldnames=["source_relative_path", "source_folder", "source_file", "record_number", "original_header", "sequence_length", "reason"])
     excluded_writer.writeheader()
+    snapshot = (output_root / 'original_sequences.jsonl').open('w', encoding='utf-8')
 
     for file_number, path in enumerate(files, start=1):
         relative_path = path.relative_to(input_root).as_posix()
@@ -181,6 +186,7 @@ def prepare_inputs(input_root: Path, output_root: Path, input_files=None) -> tup
             }
             all_records.append((len(sequence), file_number, record_number, sequence, row))
             manifest.append(row)
+            snapshot.write(json.dumps({'seq_id': seq_id, 'header': header, 'sequence': raw_sequence}, ensure_ascii=False) + '\n')
             sequence_count += 1
             total_original_residues += original_length
             total_model_residues += len(sequence)
@@ -198,6 +204,7 @@ def prepare_inputs(input_root: Path, output_root: Path, input_files=None) -> tup
             else:
                 embedding_windows += 1
     excluded_handle.close()
+    snapshot.close()
     if not manifest:
         raise ValueError(f"No se encontraron proteínas identificables; consulta {excluded_path}")
 
@@ -248,10 +255,7 @@ def flatten(value: Any, prefix: str = "", output: dict[str, Any] | None = None) 
     if output is None:
         output = {}
     if isinstance(value, dict):
-        for key, nested in value.items():
-            flatten(nested, f"{prefix}.{key}" if prefix else str(key), output)
-    elif isinstance(value, list):
-        output[prefix] = "/".join(str(v) for v in value)
+        output.update(flatten_output(value, prefix))
     else:
         output[prefix] = value
     return output
@@ -406,4 +410,8 @@ def postprocess(raw_jsonl: Path, output_root: Path, manifest: list[dict[str, Any
     summary = finish_stats(overall)
     write_json(output_root / "resumen_general.json", summary)
     raw_jsonl.unlink()
+    # The internal CLI also saves provenance/snapshots. The wrapper retains its
+    # own original-source snapshot and timing, so retire these canonical-input copies.
+    for suffix in ('.metadata.json', '.original_sequences.jsonl'):
+        raw_jsonl.with_suffix(raw_jsonl.suffix + suffix).unlink(missing_ok=True)
     return {"rows": source_count, "csv_columns": len(columns), "overall": summary}

@@ -19,15 +19,17 @@ from pathlib import Path
 
 try:
     from .inference_i18n import tr, bilingual_document, language_from_argv, localize_parser
+    from .biological_context import flatten_output
 except ImportError:
     sys.path.insert(0, str(Path(__file__).resolve().parent))
     from inference_i18n import tr, bilingual_document, language_from_argv, localize_parser
+    from biological_context import flatten_output
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_TAXONOMY = ROOT / 'results/viral_euk_class_metadata/viral_euk_class_taxonomy_summary.csv'
 LEVELS = ('genus', 'family', 'host', 'mixed_or_functional', 'insufficient_metadata', 'unannotated')
 LABELS = {'genus': 'Género', 'family': 'Familia',
-          'host': 'Solo hospedero', 'mixed_or_functional': 'Mixto / funcional',
+          'host': 'Solo hospedero', 'mixed_or_functional': 'Mixto / sin predominio suficiente',
           'insufficient_metadata': 'Metadatos insuficientes', 'unannotated': 'Sin anotación'}
 RANKS = ('genus', 'family', 'virus_name_context')
 RANK_LABELS = {'genus': 'Género', 'family': 'Familia', 'virus_name_context': 'Nombre viral de referencia'}
@@ -52,13 +54,10 @@ def sha256(path):
 
 
 def flatten(obj, prefix=''):
-    result = {}
-    for key, value in obj.items():
-        name = f'{prefix}.{key}' if prefix else key
-        if isinstance(value, dict):
-            result.update(flatten(value, name))
-        else:
-            result[name] = value
+    result = flatten_output(obj, prefix)
+    # Preserve the historical in-memory path contract; CSV serializers join it.
+    if isinstance(obj.get('path'), list):
+        result[f'{prefix}.path' if prefix else 'path'] = obj['path']
     return result
 
 
@@ -135,12 +134,16 @@ def annotation_for(row, path, taxonomy):
         annotation = {k.removeprefix('cluster_annotation.'): v for k, v in row.items()
                       if k.startswith('cluster_annotation.')}
         return annotation, 'embedded_cluster_annotation'
+    official = {k.removeprefix('viral_euk_class_metadata.'): v for k, v in row.items()
+                if k.startswith('viral_euk_class_metadata.')}
     annotation = {k.removeprefix('viral_euk_class_annotation.'): v for k, v in row.items()
                   if k.startswith('viral_euk_class_annotation.')}
     if annotation.get('best_taxonomic_level'):
-        return annotation, 'embedded_viral_euk_annotation'
+        return {**official, **annotation}, 'embedded_viral_euk_annotation'
     if len(path) > 2 and path[2] in taxonomy:
-        return taxonomy[path[2]], 'local_class_summary_reconstructed'
+        return {**official, **taxonomy[path[2]]}, 'local_class_summary_reconstructed'
+    if any(official.values()):
+        return official, 'VirDetect-AI_Table_S1_class_dictionary'
     return {}, 'missing'
 
 
@@ -584,6 +587,8 @@ $('scope').onchange=parents;['parent','group','rank'].forEach(id=>$(id).onchange
 
 
 FILE_DESCRIPTIONS = {
+    'tiempos.csv': 'Tiempo de inferencia, reporte y procesamiento total de la corrida.',
+    'original_sequences.jsonl': 'Copia de encabezados y residuos originales para exportar FASTA filtrado.',
     'README.txt': 'Guía breve de los archivos del informe.',
     'README_ARCHIVOS.txt': 'Guía breve de los archivos de la corrida.',
     'README_resultados.md': 'Documentación histórica de la corrida.',
@@ -664,7 +669,7 @@ def file_inventory(directory, report_dir=None, prediction_path=None, language='e
 
 def storage_notes(language='en'):
     return [tr(line, language) for line in ['', 'Los archivos grandes repiten resultados y anotaciones por proteína.',
-            'Las cadenas de aminoácidos están en los FASTA, no en el CSV ni JSONL.',
+            'Los residuos originales se conservan en el snapshot de secuencias y comprimidos en el HTML para exportar FASTA filtrado.',
             'El HTML no necesita cargar las predicciones ni secuencias.csv.gz para abrirse.',
             'Descomprima .gz para abrir el CSV. Gzip es el formato predeterminado, sin pérdida.',
             'Para omitir esta copia adicional: --sequence-export none; sin comprimir: --sequence-export csv.',
@@ -743,7 +748,15 @@ def generate_report(input_path, output_dir, taxonomy_path=DEFAULT_TAXONOMY, sequ
                       species_supported=False, source='existing predictions; no model inference repeated',
                       below_threshold_policy='flag only; preserves original engine assignments',
                       counts_unit='protein records', checks=['unique nonempty seq_id', 'valid root path', 'exclusive levels sum to class count', 'children do not exceed parent'])
+    provenance.update(schema_version=6, neighbor_context_policy='descriptive; same label among known neighbors only, with missing fields reported',
+                      run_timing={k: metadata[k] for k in ('inference_seconds', 'report_seconds', 'total_processing_seconds') if k in metadata},
+                      fasta_policy='original headers and residues from run snapshot; normalized wrapping; export all filtered rows')
     (output_dir / 'procedencia.json').write_text(json.dumps(provenance, ensure_ascii=False, indent=2)+'\n', encoding='utf-8')
+    try:
+        from .report_payloads import update_report_timing
+    except ImportError:
+        from report_payloads import update_report_timing
+    update_report_timing(output_dir, metadata)
     write_report_readme(output_dir, language)
     if metadata_path.is_file():
         write_run_readme(input_path.parent, output_dir, language=language)

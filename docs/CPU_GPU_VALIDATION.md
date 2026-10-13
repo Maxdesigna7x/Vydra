@@ -22,3 +22,20 @@ Measured with `/usr/bin/time -v`, offline, batch size 1, two short FASTA protein
 | CUDA, GPU FAISS | 8,353,056 | 7.97 |
 
 These are process memory measurements on a 32 GB host, not minimum-machine certifications. They exclude other applications and do not bound long-sequence activation memory, very large inputs, or loading all reference branches. The README therefore distinguishes an estimated practical minimum of 16 GB from the recommended 32 GB and does not claim a universal absolute minimum.
+
+## Reference-evidence update, 2026-10-13
+
+CLI 0.4.0 adds five prototype neighbors, source annotations, original FASTA
+snapshots and richer reports. The RAM measurements above describe the October 10
+runtime, before that metadata/report expansion; they are historical measurements,
+not new memory bounds for 0.4.0.
+
+The distribution's updated suite passed 41 tests in the installed environment,
+including exact retrieval, stable k=1 assignment under ties, CSV evidence,
+original-sequence preservation, and no neighbor retrieval for cellular/M4 routes.
+A browser check verified combined structural/taxonomic filters, eight exported
+FASTA records across six-row pages, repeated headers, original residue spelling,
+CSV export and standalone offline HTML. A three-reference embedding smoke check
+in the research workspace used actual model weights and CPU FAISS to recover
+five neighbors per query. These are software/execution checks, not independent
+functional or taxonomic validation.
