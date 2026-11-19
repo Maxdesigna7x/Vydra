@@ -17,10 +17,8 @@ preparación se puede ejecutar ProstT5 sin conexión.
 
 ## Antes de descargar pesos
 
-1. Trabajar en `desktop/v1`. La copia de investigación está en
-   `/home/randy/Tesis/Vydra` y el checkout de distribución en
-   `/home/randy/Tesis/Vydra-github`. El worktree de Desktop está en
-   `/home/randy/Tesis/Vydra-desktop`.
+1. Trabajar en un checkout separado de la rama `desktop/v1`.
+   La rama principal sigue siendo la base de la herramienta actual.
 2. Desde la raíz, ejecutar `npm --prefix desktop test`. Estas pruebas usan
    archivos pequeños y un servidor de prueba en la misma máquina.
 3. El workflow **Vydra Desktop** compila los instaladores al actualizar la rama
@@ -80,15 +78,13 @@ carpeta de datos y el estado de la etapa en `app/<versión>/setup-<modo>.json`.
 
 - Base de Vydra `76e36d0`. Implementado el lanzador, el asistente, las dos
   configuraciones de dispositivo y el workflow de construcción y borrador.
-- En esta máquina se reservó `/media/randy/3TB5/VydraDesktop-build` para cachés
-  y pruebas. La partición es NTFS y permite crear enlaces simbólicos. Todavía
-  hay que verificar una instalación completa del entorno Linux allí.
 - La preparación inicial instala ProstT5 con MLP. Los perfiles adicionales
   que ya estén en `profiles/` se detectan desde la interfaz. La instalación de
   perfiles opcionales desde la app queda pendiente.
-- [Primera matriz completa](https://github.com/Maxdesigna7x/Vydra/actions/runs/44593236218).
+- [Matriz inicial de arranque](https://github.com/Maxdesigna7x/Vydra/actions/runs/44594050844).
   Se generaron ambos instaladores y se importaron las dependencias CPU y CUDA
-  de ambos sistemas en una carpeta con espacios. Las pruebas no usaron GPU.
+  de ambos sistemas en una carpeta con espacios. Abrió el asistente instalado
+  en Ubuntu y el asistente empaquetado en Windows. Las pruebas no usaron GPU.
 - La prueba ligera local inició y cerró el servidor, con el historial en una
   carpeta de NTFS con espacios. También se probaron las descargas parciales y
   las regresiones del núcleo con CUDA oculta.

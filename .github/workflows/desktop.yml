@@ -60,9 +60,16 @@ jobs:
         run: |
           sudo apt-get install -y ./out/make/deb/x64/*.deb
           xvfb-run -a node smoke-window.cjs /usr/bin/vydra-desktop
-      - name: Open the packaged setup window on Windows
+      - name: Install on Windows and open the setup window
         if: runner.os == 'Windows'
-        run: node smoke-window.cjs
+        shell: pwsh
+        run: |
+          $setup = Get-ChildItem ./out/make/squirrel.windows/x64/Vydra-Setup-x64.exe
+          $installer = Start-Process -FilePath $setup.FullName -ArgumentList '--silent' -Wait -PassThru
+          if ($installer.ExitCode -ne 0) { throw "Installer exited with code $($installer.ExitCode)" }
+          $app = Get-ChildItem "$env:LOCALAPPDATA/vydra_desktop/app-*/vydra-desktop.exe" | Select-Object -First 1
+          if (!$app) { throw 'The installer did not install vydra-desktop.exe' }
+          node smoke-window.cjs $app.FullName
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.artifact }}

@@ -22,6 +22,7 @@ async function stage() {
   for (const name of ['requirements.txt', 'desktop_bootstrap.py']) {
     await copyFile(path.join(__dirname, name), path.join(output, name));
   }
+  await copyFile(path.join(__dirname, 'third-party', 'micromamba-LICENSE.txt'), path.join(output, 'micromamba-LICENSE.txt'));
   const [asset, digest] = builds[process.platform];
   const target = path.join(output, process.platform === 'win32' ? 'micromamba.exe' : 'micromamba');
   const hash = bytes => createHash('sha256').update(bytes).digest('hex');

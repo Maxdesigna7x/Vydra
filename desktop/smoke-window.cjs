@@ -1,5 +1,5 @@
 const { spawn } = require('node:child_process');
-const { mkdtemp, readdir, rm } = require('node:fs/promises');
+const { access, mkdtemp, realpath, rm } = require('node:fs/promises');
 const { tmpdir } = require('node:os');
 const path = require('node:path');
 const { setTimeout: sleep } = require('node:timers/promises');
@@ -26,13 +26,12 @@ async function evaluate(target, expression) {
 }
 
 async function smoke() {
-  let executable = process.argv[2];
-  if (!executable) {
-    const output = path.join(__dirname, 'out');
-    const packageFolder = (await readdir(output)).find(name => name.endsWith(`-${process.platform}-x64`));
-    if (!packageFolder) throw new Error('No packaged Desktop application found.');
-    executable = path.join(output, packageFolder, 'vydra-desktop.exe');
-  }
+  const executable = process.argv[2];
+  if (!executable) throw new Error('Pass the installed Vydra executable.');
+  const resources = path.join(path.dirname(await realpath(executable)), 'resources', 'resources');
+  const tools = process.platform === 'win32' ? 'micromamba.exe' : 'micromamba';
+  await Promise.all([tools, 'requirements.txt', 'desktop_bootstrap.py', 'micromamba-LICENSE.txt',
+    path.join('vydra_core', 'gui', 'index.html')].map(file => access(path.join(resources, file))));
   const isolated = await mkdtemp(path.join(tmpdir(), 'vydra-window-'));
   const args = ['--setup', '--disable-gpu', '--remote-debugging-port=0', `--user-data-dir=${isolated}`];
   const child = spawn(executable, args,
