@@ -80,6 +80,7 @@ $('device').onchange = updateClassifier;
       ? 'This Vydra Desktop environment uses CPU. Close this window to prepare NVIDIA in the setup assistant.'
       : gpu.textContent + '. You can also select CPU for this run.';
     $('offline').checked = false;
+    document.querySelector('footer').textContent = 'Keep Vydra Desktop open while an analysis is running.';
   }
   updateClassifier();
 $('output').placeholder=config.home+'/vydra-results/new-run';await poll();setInterval(poll,1500)}catch(e){$('form-error').textContent=e.message}})();

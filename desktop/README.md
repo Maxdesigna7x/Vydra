@@ -12,7 +12,8 @@ los resultados se eligen en cada análisis.
 Cada computadora con NVIDIA debe tener un controlador compatible con CUDA
 12.9 en Linux o CUDA 12.6 en Windows. El entorno
 de escritorio tiene sus propias dependencias. Para la primera instalación se
-necesita conexión y espacio libre en la carpeta seleccionada. Después de la
+necesita conexión y espacio libre en la carpeta seleccionada. Reserva unos
+34 GiB para una instalación NVIDIA de Linux, incluido el caché de paquetes. Después de la
 preparación se puede ejecutar ProstT5 sin conexión.
 
 ## Antes de descargar pesos

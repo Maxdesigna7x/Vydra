@@ -6,7 +6,7 @@ const path = require('node:path');
 const version = require('./package.json').version;
 const windows = process.platform === 'win32';
 const gib = 1024 ** 3;
-const minimum = { cpu: 12 * gib, cuda: 22 * gib };
+const minimum = { cpu: 12 * gib, cuda: (windows ? 22 : 34) * gib };
 
 function layout(root, mode, resources) {
   const environment = path.join(root, 'env', `${version}-${mode}`);
