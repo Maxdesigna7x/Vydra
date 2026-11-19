@@ -59,10 +59,11 @@ def is_esm():
 
 
 BASE_DIR = Path(__file__).resolve().parent
-ARTIFACTS_DIR = Path(os.environ.get("VYDRA_DESKTOP_ARTIFACTS", BASE_DIR / "artifacts"))
+ARTIFACTS_DIR = BASE_DIR / "artifacts"
+BANKS_DIR = Path(os.environ.get("VYDRA_DESKTOP_BANKS", ARTIFACTS_DIR))
 WEIGHTS_DIR = BASE_DIR / "models/mlp_weights"
-STRUCTURAL_PROTOTYPE_BANK = ARTIFACTS_DIR / "Struct_prototype_bank.pt"
-NON_STRUCTURAL_PROTOTYPE_BANK = ARTIFACTS_DIR / "Non_Struct_prototype_bank.pt"
+STRUCTURAL_PROTOTYPE_BANK = BANKS_DIR / "Struct_prototype_bank.pt"
+NON_STRUCTURAL_PROTOTYPE_BANK = BANKS_DIR / "Non_Struct_prototype_bank.pt"
 CLUSTER_TAXONOMY_CSV = ARTIFACTS_DIR / "cluster_taxonomy_summary.csv"
 VIRAL_EUK_CLASS_METADATA_CSV = ARTIFACTS_DIR / "viral_euk_class_metadata.csv"
 THRESHOLD_CONFIG_JSON = ARTIFACTS_DIR / "recommended_thresholds_config.json"

@@ -26,6 +26,7 @@ let engineWindow;
 let engine;
 let installation;
 let quitting = false;
+let reconfigure = false;
 let config;
 
 function configFile() { return path.join(app.getPath('userData'), 'settings.json'); }
@@ -112,7 +113,10 @@ async function startEngine(paths) {
   configureContents(engineWindow.webContents);
   engineWindow.on('closed', () => {
     engineWindow = null;
-    if (engine === child) child.stdin.end();
+    if (engine === child) {
+      child.stdin.end();
+      if (!quitting && !reconfigure && opened) app.quit();
+    }
   });
   try {
     await engineWindow.loadURL(url);
@@ -164,9 +168,20 @@ async function start() {
   Menu.setApplicationMenu(Menu.buildFromTemplate([
     { label: 'Vydra', submenu: [
       { label: 'Ver carpeta de datos', click: () => { if (config) shell.openPath(config.root); } },
-      { label: 'Configurar almacenamiento y dispositivo', click: () => {
-        if (engine) dialog.showMessageBox(engineWindow, { message: 'Cierra la ventana de análisis para cambiar la configuración.' });
-        else setup();
+      { label: 'Configurar almacenamiento y dispositivo', click: async () => {
+        if (!engineWindow || !engine) { setup(); return; }
+        const { response } = await dialog.showMessageBox(engineWindow, {
+          message: 'Vydra cerrará la sesión de análisis para abrir la configuración.',
+          detail: 'Si hay un análisis activo, se conservarán sus puntos de reanudación.',
+          buttons: ['Abrir configuración', 'Cancelar'], defaultId: 1, cancelId: 1,
+        });
+        if (response !== 0 || !engine || !engineWindow) return;
+        reconfigure = true;
+        engine.once('close', () => { reconfigure = false; setup(); });
+        // Keep the single-instance desktop app alive until the engine exits.
+        setup();
+        setupWindow.hide();
+        engineWindow.close();
       } },
       { role: 'quit', label: 'Salir' },
     ] },

@@ -30,7 +30,7 @@ function layout(root, mode, resources) {
       HF_HUB_ETAG_TIMEOUT: '60',
       HF_HUB_DISABLE_XET: '1',
       VYDRA_PROFILE_ROOT: path.join(root, 'profiles'),
-      VYDRA_DESKTOP_ARTIFACTS: artifacts,
+      VYDRA_DESKTOP_BANKS: artifacts,
       VYDRA_PROSTT5_PATH: path.join(root, 'models', 'prostt5-07a6547'),
       VYDRA_DESKTOP_MODE: mode,
       TMPDIR: temp, TEMP: temp, TMP: temp,
@@ -173,7 +173,6 @@ async function prepare(root, mode, resources, log, { dependenciesOnly = false, s
     await writeAtomic(journal, JSON.stringify({ phase: 'dependencies' }));
   }
   await cp(paths.engine, paths.core, { recursive: true });
-  await cp(path.join(paths.engine, 'artifacts'), paths.artifacts, { recursive: true });
   const bootstrap = path.join(paths.core, 'desktop_bootstrap.py');
   await cp(path.join(resources, 'desktop_bootstrap.py'), bootstrap);
   await python([bootstrap, dependenciesOnly ? 'imports' : 'prepare', mode]);

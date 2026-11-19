@@ -9,7 +9,8 @@ los resultados se eligen en cada análisis.
 | CPU | PyTorch y FAISS en CPU | PyTorch y FAISS en CPU |
 | NVIDIA | PyTorch y FAISS en CUDA | PyTorch en CUDA, FAISS en CPU |
 
-Cada computadora con NVIDIA debe tener un controlador compatible. El entorno
+Cada computadora con NVIDIA debe tener un controlador compatible con CUDA
+12.9 en Linux o CUDA 12.6 en Windows. El entorno
 de escritorio tiene sus propias dependencias. Para la primera instalación se
 necesita conexión y espacio libre en la carpeta seleccionada. Después de la
 preparación se puede ejecutar ProstT5 sin conexión.
@@ -27,7 +28,8 @@ preparación se puede ejecutar ProstT5 sin conexión.
    modelos. El job CUDA sin una GPU verifica los paquetes y sus importaciones.
    Una segunda prueba en hardware validará la ejecución CUDA.
 4. Revisar o volver a ejecutar en [GitHub Actions](https://github.com/Maxdesigna7x/Vydra/actions/workflows/desktop.yml).
-   Los instaladores de prueba están en los artefactos de los jobs de compilación.
+   Los jobs abren el asistente empaquetado sin bajar modelos. Los instaladores
+   de prueba están en los artefactos de los jobs de compilación.
    Para compilar manualmente en el sistema objetivo, usar Node 22 y ejecutar
    `npm ci`, `npm run stage` y `npm run make -- --arch=x64` desde `desktop/`.
    Linux requiere `fakeroot` y `dpkg`.
@@ -84,6 +86,12 @@ carpeta de datos y el estado de la etapa en `app/<versión>/setup-<modo>.json`.
 - La preparación inicial instala ProstT5 con MLP. Los perfiles adicionales
   que ya estén en `profiles/` se detectan desde la interfaz. La instalación de
   perfiles opcionales desde la app queda pendiente.
-- Punto de reanudación inicial. Revisar las ejecuciones de GitHub Actions.
-  Luego comprobar la experiencia gráfica e instalación y ejecutar las pruebas
-  NVIDIA y offline. Requieren los instaladores y el hardware indicado arriba.
+- [Primera matriz completa](https://github.com/Maxdesigna7x/Vydra/actions/runs/44593236218).
+  Se generaron ambos instaladores y se importaron las dependencias CPU y CUDA
+  de ambos sistemas en una carpeta con espacios. Las pruebas no usaron GPU.
+- La prueba ligera local inició y cerró el servidor, con el historial en una
+  carpeta de NTFS con espacios. También se probaron las descargas parciales y
+  las regresiones del núcleo con CUDA oculta.
+- Punto de reanudación. Revisar la última ejecución de GitHub Actions. Si la
+  compilación y las comprobaciones ligeras están en verde, avanzar a la
+  instalación limpia y a las pruebas NVIDIA y offline.

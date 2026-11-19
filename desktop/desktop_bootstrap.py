@@ -116,11 +116,12 @@ def verify_prostt5(model_dir):
 
 def prepare(mode):
     from folder_inputs import resolve_model_path
-    from vydra_cli import ARTIFACTS_DIR, DOWNLOADABLE_ARTIFACTS, RELEASE_BASE_URL, main
+    from vydra_cli import BANKS_DIR, DOWNLOADABLE_ARTIFACTS, RELEASE_BASE_URL, main
 
     verify_dependencies(mode, check_gpu=True)
+    BANKS_DIR.mkdir(parents=True, exist_ok=True)
     for filename, digest in DOWNLOADABLE_ARTIFACTS.items():
-        fetch_verified(f"{RELEASE_BASE_URL}/{filename}", ARTIFACTS_DIR / filename, BANK_SIZES[filename], digest)
+        fetch_verified(f"{RELEASE_BASE_URL}/{filename}", BANKS_DIR / filename, BANK_SIZES[filename], digest)
     model_dir = Path(os.environ["VYDRA_PROSTT5_PATH"])
     if not (model_dir / ".vydra-model-ready").is_file() or not (model_dir / "pytorch_model.bin").is_file():
         print("Preparando ProstT5. Se reutilizarán los archivos completos y los parciales de la descarga.", flush=True)

@@ -25,7 +25,8 @@ sys.path.insert(0, str(BASE_DIR))
 from inference_i18n import language_from_argv, localize_parser
 from biological_context import flatten_output
 from report_payloads import original_records, write_original_snapshot, update_report_timing
-ARTIFACTS_DIR = Path(os.environ.get("VYDRA_DESKTOP_ARTIFACTS", BASE_DIR / "artifacts"))
+ARTIFACTS_DIR = BASE_DIR / "artifacts"
+BANKS_DIR = Path(os.environ.get("VYDRA_DESKTOP_BANKS", ARTIFACTS_DIR))
 WEIGHTS_DIR = BASE_DIR / "models" / "mlp_weights"
 BUNDLED_PROSTT5_DIR = BASE_DIR / "models" / "prostt5"
 
@@ -432,7 +433,7 @@ def command_doctor(args: argparse.Namespace) -> int:
         problems += int(not path.is_file())
 
     for name in REQUIRED_ARTIFACTS:
-        path = ARTIFACTS_DIR / name
+        path = (BANKS_DIR if name in DOWNLOADABLE_ARTIFACTS else ARTIFACTS_DIR) / name
         label = path.relative_to(BASE_DIR) if path.is_relative_to(BASE_DIR) else path
         print(f"[{'OK' if path.is_file() else missing}] {label}")
         problems += int(not path.is_file())
@@ -479,9 +480,9 @@ def sha256_file(path: Path) -> str:
 
 
 def command_download_artifacts(args: argparse.Namespace) -> int:
-    ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
+    BANKS_DIR.mkdir(parents=True, exist_ok=True)
     for filename, expected_hash in DOWNLOADABLE_ARTIFACTS.items():
-        destination = ARTIFACTS_DIR / filename
+        destination = BANKS_DIR / filename
         if destination.exists() and not args.force:
             eprint(f"Ya existe: {destination}")
             continue
@@ -517,7 +518,7 @@ def command_download_artifacts(args: argparse.Namespace) -> int:
                         "gh", "release", "download", RELEASE_TAG,
                         "--repo", "Maxdesigna7x/Vydra",
                         "--pattern", filename,
-                        "--dir", str(ARTIFACTS_DIR),
+                        "--dir", str(BANKS_DIR),
                         "--clobber",
                     ],
                     check=True,
