@@ -25,7 +25,7 @@ sys.path.insert(0, str(BASE_DIR))
 from inference_i18n import language_from_argv, localize_parser
 from biological_context import flatten_output
 from report_payloads import original_records, write_original_snapshot, update_report_timing
-ARTIFACTS_DIR = BASE_DIR / "artifacts"
+ARTIFACTS_DIR = Path(os.environ.get("VYDRA_DESKTOP_ARTIFACTS", BASE_DIR / "artifacts"))
 WEIGHTS_DIR = BASE_DIR / "models" / "mlp_weights"
 BUNDLED_PROSTT5_DIR = BASE_DIR / "models" / "prostt5"
 
@@ -68,10 +68,10 @@ def import_engine(device_name: str, offline: bool):
     with contextlib.redirect_stdout(sys.stderr):
         import engine
 
-    from gpu_faiss import select_device
+    from gpu_faiss import faiss_device, select_device
     with contextlib.redirect_stdout(sys.stderr):
         engine.device = select_device(device_name)
-        print(f"Inference device: {engine.device} (models and FAISS)")
+        print(f"Inference devices: models={engine.device}, FAISS={faiss_device(engine.device)}")
 
     model_dir = os.environ.get("VYDRA_PROSTT5_PATH")
     if model_dir:
@@ -416,11 +416,12 @@ def command_doctor(args: argparse.Namespace) -> int:
     try:
         if str(BASE_DIR) not in sys.path:
             sys.path.insert(0, str(BASE_DIR))
-        from gpu_faiss import select_device, require_backend
+        from gpu_faiss import faiss_device, select_device, require_backend
 
         selected = select_device("auto")
-        require_backend(selected)
-        print(f"[OK] Inference backend: {selected} (models and FAISS)")
+        index_backend = faiss_device(selected)
+        require_backend(index_backend)
+        print(f"[OK] Inference backends: models={selected}, FAISS={index_backend}")
     except (ImportError, RuntimeError) as exc:
         print(f"[{missing}] FAISS unavailable: {exc}" if english else f"[FALTA] FAISS no disponible: {exc}")
         problems += 1
@@ -432,7 +433,8 @@ def command_doctor(args: argparse.Namespace) -> int:
 
     for name in REQUIRED_ARTIFACTS:
         path = ARTIFACTS_DIR / name
-        print(f"[{'OK' if path.is_file() else missing}] {path.relative_to(BASE_DIR)}")
+        label = path.relative_to(BASE_DIR) if path.is_relative_to(BASE_DIR) else path
+        print(f"[{'OK' if path.is_file() else missing}] {label}")
         problems += int(not path.is_file())
 
     local_prostt5 = None

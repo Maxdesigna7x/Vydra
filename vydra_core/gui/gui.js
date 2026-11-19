@@ -67,6 +67,20 @@ $('device').onchange = updateClassifier;
     option.disabled = !model.installed;
     return option;
   }));
+  if (config.desktop) {
+    const device = $('device');
+    const gpu = device.querySelector('option[value="cuda"]');
+    gpu.textContent = config.desktop.windows ? 'NVIDIA (models) · CPU (FAISS)' : 'NVIDIA (models and FAISS)';
+    gpu.disabled = config.desktop.mode === 'cpu';
+    device.value = config.desktop.mode;
+    const help = 'Select CPU or the NVIDIA mode prepared in Vydra Desktop.';
+    device.dataset.help = help;
+    device.setAttribute('aria-description', help);
+    device.closest('dialog').querySelector('.hint').textContent = config.desktop.mode === 'cpu'
+      ? 'This Vydra Desktop environment uses CPU. Close this window to prepare NVIDIA in the setup assistant.'
+      : gpu.textContent + '. You can also select CPU for this run.';
+    $('offline').checked = false;
+  }
   updateClassifier();
 $('output').placeholder=config.home+'/vydra-results/new-run';await poll();setInterval(poll,1500)}catch(e){$('form-error').textContent=e.message}})();
 })();

@@ -59,7 +59,7 @@ def is_esm():
 
 
 BASE_DIR = Path(__file__).resolve().parent
-ARTIFACTS_DIR = BASE_DIR / "artifacts"
+ARTIFACTS_DIR = Path(os.environ.get("VYDRA_DESKTOP_ARTIFACTS", BASE_DIR / "artifacts"))
 WEIGHTS_DIR = BASE_DIR / "models/mlp_weights"
 STRUCTURAL_PROTOTYPE_BANK = ARTIFACTS_DIR / "Struct_prototype_bank.pt"
 NON_STRUCTURAL_PROTOTYPE_BANK = ARTIFACTS_DIR / "Non_Struct_prototype_bank.pt"
@@ -139,12 +139,12 @@ def normalize_matrix(x: np.ndarray) -> np.ndarray:
 
 def require_faiss_gpu():
     """Validate the selected backend (name retained for runtime compatibility)."""
-    return gpu_faiss.require_backend(device)
+    return gpu_faiss.require_backend(gpu_faiss.faiss_device(device))
 
 
 def build_faiss_index(x: np.ndarray):
-    selected = device.index if device.type == "cuda" else None
-    return gpu_faiss.build_index(x, selected, device=device)
+    backend = gpu_faiss.faiss_device(device)
+    return gpu_faiss.build_index(x, backend.index, device=backend)
 
 
 def load_cluster_annotations(path: Path) -> dict[tuple[str, str, int], dict]:

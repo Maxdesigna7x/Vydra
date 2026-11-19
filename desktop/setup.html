@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; object-src 'none'; base-uri 'none'">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Configurar Vydra</title>
+  <link rel="stylesheet" href="setup.css">
+  <script defer src="setup.js"></script>
+</head>
+<body>
+<main>
+  <h1>Configurar Vydra</h1>
+  <form>
+    <fieldset>
+      <legend>Carpeta de datos</legend>
+      <p>Aquí se guardarán el entorno, los modelos y los archivos de descarga.</p>
+      <label for="folder">Ubicación</label>
+      <input id="folder" required spellcheck="false">
+      <div class="buttons">
+        <button type="button" id="choose">Elegir carpeta</button>
+        <button type="button" id="default-folder">Usar recomendada</button>
+      </div>
+      <p id="space" role="status"></p>
+    </fieldset>
+    <fieldset>
+      <legend>Dispositivo</legend>
+      <label><input type="radio" name="mode" value="cuda" checked> NVIDIA <span id="cuda-label"></span></label>
+      <label><input type="radio" name="mode" value="cpu"> CPU</label>
+    </fieldset>
+    <button class="primary" type="submit" id="install">Preparar y abrir Vydra</button>
+  </form>
+  <p id="status" role="status"></p>
+  <details id="details" hidden>
+    <summary>Registro de instalación</summary>
+    <pre id="log" tabindex="0"></pre>
+  </details>
+</main>
+</body>
+</html>

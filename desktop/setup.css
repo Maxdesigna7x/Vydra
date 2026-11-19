@@ -1,0 +1,19 @@
+:root { font: 16px system-ui, sans-serif; color-scheme: light; color: #192925; background: #f4f7f5; }
+body { margin: 0; }
+main { max-width: 40rem; padding: 1.75rem 2rem; margin: auto; }
+h1 { font-size: 1.95rem; margin: 0 0 1.4rem; letter-spacing: -.035em; }
+fieldset { border: 1px solid #bdcdc6; border-radius: .55rem; padding: .9rem 1.1rem 1.1rem; margin: 0 0 1rem; background: #fff; }
+legend { font-weight: 650; padding: 0 .4rem; }
+p { margin: .25rem 0 .85rem; color: #39574c; }
+label { display: block; margin: .25rem 0 .4rem; }
+input, button { font: inherit; }
+input:not([type]) { display: block; width: 100%; box-sizing: border-box; border: 1px solid #829b91; border-radius: .35rem; padding: .55rem; }
+input[type="radio"] { accent-color: #165c49; }
+button { background: #fff; color: #164d3d; cursor: pointer; border: 1px solid #829b91; border-radius: .4rem; padding: .55rem .85rem; }
+button:disabled { opacity: .55; cursor: wait; }
+.buttons { display: flex; gap: .6rem; margin: .7rem 0; }
+.primary { color: #fff; background: #165c49; border-color: #165c49; }
+#space, #cuda-label, details { font-size: .9rem; }
+#space { margin: .8rem 0 0; }
+#status { margin: .9rem 0; }
+pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 180px; overflow: auto; background: #e6eee9; padding: .7rem; }

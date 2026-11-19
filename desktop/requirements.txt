@@ -1,0 +1,6 @@
+transformers==4.56.2
+huggingface-hub==0.35.3
+sentencepiece==0.2.1
+protobuf==6.32.1
+matplotlib==3.10.6
+pandas==2.3.3

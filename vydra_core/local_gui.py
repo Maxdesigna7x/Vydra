@@ -39,7 +39,27 @@ class RunManager:
                         pid = int((self.directory / (state['id'] + '.pid')).read_text())
                         if pid < 1:
                             raise ValueError('Invalid PID')
-                        os.kill(pid, 0)
+                        if os.name == 'nt':
+                            # Windows os.kill(pid, 0) calls TerminateProcess.
+                            import ctypes
+                            from ctypes import wintypes
+
+                            kernel = ctypes.WinDLL('kernel32', use_last_error=True)
+                            kernel.OpenProcess.argtypes = (wintypes.DWORD, wintypes.BOOL, wintypes.DWORD)
+                            kernel.OpenProcess.restype = wintypes.HANDLE
+                            kernel.CloseHandle.argtypes = (wintypes.HANDLE,)
+                            handle = kernel.OpenProcess(0x1000, False, pid)
+                            if not handle:
+                                raise OSError('Worker is unavailable.')
+                            try:
+                                kernel.GetExitCodeProcess.argtypes = (wintypes.HANDLE, ctypes.POINTER(wintypes.DWORD))
+                                status = wintypes.DWORD()
+                                if not kernel.GetExitCodeProcess(handle, ctypes.byref(status)) or status.value != 259:
+                                    raise OSError('Worker has exited.')
+                            finally:
+                                kernel.CloseHandle(handle)
+                        else:
+                            os.kill(pid, 0)
                     except (OSError, ValueError, KeyError):
                         state.update(status='interrupted', stage='Interrupted', error='The previous process exited before completing. Resume this run to reuse saved checkpoints.')
                         write_json(path, state)
@@ -245,7 +265,11 @@ def make_server(manager, port=0):
             request = urlsplit(self.path)
             try:
                 if request.path == '/api/config':
-                    return self.send(200, {'token': token, 'home': str(Path.home()), 'cwd': str(Path.cwd()), 'python': sys.executable, 'models': available_profiles()})
+                    config = {'token': token, 'home': str(Path.home()), 'cwd': str(Path.cwd()),
+                              'python': sys.executable, 'models': available_profiles()}
+                    if desktop_mode := os.environ.get('VYDRA_DESKTOP_MODE'):
+                        config['desktop'] = {'mode': desktop_mode, 'windows': os.name == 'nt'}
+                    return self.send(200, config)
                 if request.path == '/api/runs':
                     return self.send(200, manager.runs())
                 if request.path == '/api/browse':

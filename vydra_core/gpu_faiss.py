@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import os
 import threading
 
 import faiss
@@ -48,10 +49,24 @@ def require_gpu(device_id: int | None = None) -> tuple[object, int]:
         return _resources[selected], selected
 
 
+def faiss_device(selected):
+    """Use CPU FAISS with CUDA PyTorch in the managed Windows Desktop build."""
+    if os.name == "nt" and os.environ.get("VYDRA_DESKTOP_MODE") == "cuda":
+        return torch.device("cpu")
+    return torch.device(selected)
+
+
 def select_device(requested="auto"):
     """Resolve one device for models and FAISS; explicit CUDA never falls back."""
     requested = str(requested)
     if requested == "cpu":
+        return torch.device("cpu")
+    if requested in ("auto", "cuda") and os.name == "nt" and os.environ.get("VYDRA_DESKTOP_MODE") == "cuda":
+        if torch.cuda.is_available():
+            require_backend("cpu")
+            return torch.device("cuda")
+        if requested == "cuda":
+            raise RuntimeError("PyTorch no puede acceder a una GPU NVIDIA compatible.")
         return torch.device("cpu")
     if requested == "auto":
         try:

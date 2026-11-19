@@ -1,0 +1,111 @@
+name: Vydra Desktop
+
+on:
+  push:
+    branches: ['desktop/**']
+    tags: ['desktop-v*']
+    paths: ['desktop/**', 'vydra_core/**', '.github/workflows/desktop.yml']
+  pull_request:
+    paths: ['desktop/**', 'vydra_core/**', '.github/workflows/desktop.yml']
+  workflow_dispatch:
+    inputs:
+      check_dependencies:
+        description: Install and validate CPU/CUDA libraries without downloading models
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: desktop-${{ github.ref }}
+  cancel-in-progress: ${{ !startsWith(github.ref, 'refs/tags/') }}
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+            artifact: vydra-linux-x64
+            installer: desktop/out/make/deb/x64/*.deb
+          - os: windows-2025
+            artifact: vydra-windows-x64
+            installer: desktop/out/make/squirrel.windows/x64/*.exe
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 35
+    defaults:
+      run:
+        working-directory: desktop
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: desktop/package-lock.json
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Install Linux packaging tools
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y fakeroot dpkg xvfb
+      - run: npm ci
+      - run: npm test
+      - run: npm run stage
+      - run: npm run make -- --arch=x64
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.installer }}
+          if-no-files-found: error
+
+  dependencies:
+    if: (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/desktop/')) || (github.event_name == 'workflow_dispatch' && inputs.check_dependencies)
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, windows-2025]
+        device: [cpu, cuda]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 60
+    defaults:
+      run:
+        working-directory: desktop
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: node stage.cjs
+      - name: Check dependencies without models or a GPU
+        run: node check-dependencies.cjs "${{ runner.temp }}/Vydra data" "${{ matrix.device }}"
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/desktop-v')
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+      RELEASE_TAG: ${{ github.ref_name }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: vydra-*-x64
+          merge-multiple: true
+          path: installers
+      - name: Prepare a draft release
+        shell: bash
+        run: |
+          cd installers
+          sha256sum -- *.deb *.exe > SHA256SUMS.txt
+          if ! gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --verify-tag \
+              --draft --title "Vydra Desktop ${RELEASE_TAG#desktop-v}" \
+              --notes "Install Vydra Desktop on Debian/Ubuntu or Windows x64. The setup assistant installs the CPU or NVIDIA environment and models in the chosen folder."
+          fi
+          test "$(gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --json isDraft --jq .isDraft)" = true
+          gh release upload "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --clobber *.deb *.exe SHA256SUMS.txt
