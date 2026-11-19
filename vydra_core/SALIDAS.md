@@ -141,4 +141,4 @@ La GUI usa el mismo motor y conserva predicciones completas CSV/JSONL, manifiest
 
 ## Model profiles
 
-Las salidas y la metadata identifican el perfil en **model_profile** y el clasificador en **classifier**. Los scores de FAISS son cosenos al vecino de train; los de MLP son softmax. [Profile setup and benchmark scope](../docs/MODEL_PROFILES.md).
+Las salidas y la metadata identifican el perfil en **model_profile** y el clasificador de M4 en **m4_classifier**. Los scores de FAISS son cosenos al vecino de train; los de MLP son softmax. [Profile setup and benchmark scope](../docs/MODEL_PROFILES.md).

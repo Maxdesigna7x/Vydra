@@ -12,7 +12,7 @@ Vydra analyzes **amino-acid sequences** in protein FASTA files. It distinguishes
 
 [Install](#install-once) · [Run the interface](#analyze-your-proteins) · [Read the results](#understand-the-results) · [Export proteins](#filter-and-export) · [Troubleshooting](#troubleshooting)
 
-**Choose an embedding model:** ProstT5 (default), ESM‑2 8M, 35M or 150M. Select a profile in the GUI or use `vydra predict --model esm2-8m`. See [model sizes, GPU throughput and installation](docs/MODEL_PROFILES.md) for each profile and for the optional FAISS classifier.
+**Choose an embedding model:** ProstT5 (default), ESM‑2 8M, 35M or 150M. Select a profile in the GUI or use `vydra predict --model esm2-8m`. See [model sizes, GPU throughput and installation](docs/MODEL_PROFILES.md) for each profile and for the optional M4 FAISS classifier.
 
 ## What you receive
 

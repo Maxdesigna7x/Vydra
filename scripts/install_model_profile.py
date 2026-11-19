@@ -12,7 +12,7 @@ from urllib.request import urlopen
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "vydra_core"))
 from model_profiles import PROFILES, profile_root, sha256, verify_manifest
 
-RELEASE = "https://github.com/Maxdesigna7x/Vydra/releases/download/model-profiles-v1"
+RELEASE = "https://github.com/Maxdesigna7x/Vydra/releases/download/model-profiles-m4-v1"
 LIMITS_GIB = {"esm2-8m": 2, "esm2-35m": 3, "esm2-150m": 4, "prostt5": 5}
 
 
@@ -108,7 +108,7 @@ def install(profile, root, downloads, local_only):
         package = staging / profile
         if profile != "prostt5":
             verify_manifest(package, "manifest.json", profile)
-        verify_manifest(package, "train_manifest.json", profile)
+        verify_manifest(package, "m4_manifest.json", profile)
         package.rename(destination)
     print(f"Installed {profile}: {destination}")
 

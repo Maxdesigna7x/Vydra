@@ -86,7 +86,7 @@ class RunManager:
         if profile not in available or not available[profile]['installed']:
             raise ValueError('Install the selected model profile before starting.')
         if classifier not in ('mlp', 'faiss') or (classifier == 'faiss' and not available[profile]['faiss']):
-            raise ValueError('The selected classifier requires an installed FAISS training bank.')
+            raise ValueError('The selected classifier requires an installed FAISS M4 bank.')
         batch = values.get('batch_size')
         if batch not in (None, ''):
             try:

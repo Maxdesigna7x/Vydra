@@ -37,7 +37,7 @@ def run(path):
             args_list.append('--resume')
         profile = state.get('model') or 'prostt5'
         classifier = state.get('classifier') or 'mlp'
-        args_list.extend(['--model', profile, '--classifier', classifier])
+        args_list.extend(['--model', profile, '--m4-classifier', classifier])
         if state['offline']:
             args_list.append('--offline')
         if state.get('batch_size'):
@@ -95,7 +95,7 @@ def run(path):
             'status': 'complete', 'output_language': 'en', 'input_root': str(source if source.is_dir() else source.parent),
             'output_root': str(output), 'result': results, 'preparation': preparation,
             'device_requested': state['device'], 'offline': state['offline'], 'gui_run_id': state['id'],
-            'model_path': str(model_path), 'model_profile': profile, 'classifier': classifier,
+            'model_path': str(model_path), 'model_profile': profile, 'classifier': classifier, 'm4_classifier': classifier,
             'inference_seconds': inference_seconds,
             'profile_artifacts': engine_metadata.get('profile_artifacts'),
             'classifier_artifacts': engine_metadata.get('classifier_artifacts'),

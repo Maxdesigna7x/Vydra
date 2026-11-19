@@ -19,7 +19,7 @@ class ModelProfileTests(unittest.TestCase):
             profile.mkdir()
             (profile / "manifest.json").write_text("{}")
             (root / "prostt5").mkdir()
-            (root / "prostt5/train_manifest.json").write_text("{}")
+            (root / "prostt5/m4_manifest.json").write_text("{}")
             models = {model["id"]: model for model in available_profiles()}
             self.assertTrue(models["esm2-8m"]["installed"])
             self.assertFalse(models["esm2-8m"]["faiss"])
@@ -43,31 +43,21 @@ class ModelProfileTests(unittest.TestCase):
                 verify_manifest(root, "manifest.json", "esm2-8m")
 
 
-    def test_batched_faiss_tracks_row_after_checkpoint_writes(self):
+    def test_m4_choice_does_not_apply_to_phage_heads(self):
         from types import SimpleNamespace
-        from vydra_cli import rows_from_records
-
-        class Profile:
-            classifier = "faiss"
-
-            def classify(self, embeddings):
-                return [str(x) for x in embeddings]
-
-            def for_row(self, predictions, row):
-                return predictions[row]
-
-        engine = SimpleNamespace(active_profile=Profile(), release_prost_t5=lambda: None,
-                                 run_hierarchy=lambda _, prediction: {"path": [prediction]})
-        records = [SimpleNamespace(seq_id=f"q{i}", original_length=1, chunked=False)
-                   for i in range(3)]
-        for resumed in ([], [{"seq_id": "q0", "path": ["0"]}]):
-            with self.subTest(already_saved=len(resumed)):
-                checkpoint = SimpleNamespace(predictions=lambda: list(resumed),
-                                             save_predictions=lambda rows, index: None,
-                                             save_progress=lambda **kwargs: None)
-                results = rows_from_records(engine, records, [0, 1, 2], checkpoint=checkpoint)
-                self.assertEqual([row["path"] for row in results], [["0"], ["1"], ["2"]])
-
+        from unittest.mock import Mock
+        from vydra_core import engine
+        runtime = SimpleNamespace(id="esm2-8m", classifier="faiss",
+                                  predict_m4=Mock(return_value=("0", .7)),
+                                  predict=Mock(return_value=("phage", .9)))
+        with patch.object(engine, "active_profile", runtime), patch.object(engine, "EMB_DIM", 320):
+            import numpy as np
+            embedding = np.ones(320, dtype=np.float32)
+            self.assertEqual(engine.predict_step(engine.MODEL_NAMES[3], embedding), ("0", .7))
+            for i in (0, 1, 2, 4, 5):
+                self.assertEqual(engine.predict_step(engine.MODEL_NAMES[i], embedding), ("phage", .9))
+            self.assertEqual(runtime.predict_m4.call_count, 1)
+            self.assertEqual(runtime.predict.call_count, 5)
 
     def test_report_timing_keeps_profile_and_classifier(self):
         from report_payloads import update_report_timing

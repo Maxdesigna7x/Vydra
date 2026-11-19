@@ -6,9 +6,9 @@ from pathlib import Path
 
 PROFILES = {
     "prostt5": dict(name="ProstT5", dimension=1024, size="5.64 GB", speed="1×"),
-    "esm2-8m": dict(name="ESM-2 8M", dimension=320, size="31 MB", speed="≈97×"),
-    "esm2-35m": dict(name="ESM-2 35M", dimension=480, size="136 MB", speed="≈31×"),
     "esm2-150m": dict(name="ESM-2 150M", dimension=640, size="595 MB", speed="≈8.5×"),
+    "esm2-35m": dict(name="ESM-2 35M", dimension=480, size="136 MB", speed="≈31×"),
+    "esm2-8m": dict(name="ESM-2 8M", dimension=320, size="31 MB", speed="≈97×"),
 }
 
 
@@ -27,7 +27,7 @@ def sha256(path):
 def available_profiles():
     root = profile_root()
     return [dict(id=key, **value, installed=key == "prostt5" or (root / key / "manifest.json").is_file(),
-                 faiss=(root / key / "train_manifest.json").is_file())
+                 faiss=(root / key / "m4_manifest.json").is_file())
             for key, value in PROFILES.items()]
 
 

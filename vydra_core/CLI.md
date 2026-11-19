@@ -187,4 +187,4 @@ La CLI y la GUI reutilizan primero el modelo configurado, el modelo completo del
 
 ## Model profiles
 
-Use `--model esm2-8m`, `--model esm2-35m`, or `--model esm2-150m` with `predict`. Use `--classifier faiss` to classify by train neighbors when the corresponding full bank is installed. Defaults are `prostt5` and `mlp`. [Profile setup and benchmark scope](../docs/MODEL_PROFILES.md).
+Use `--model esm2-8m`, `--model esm2-35m`, or `--model esm2-150m` with `predict`. Use `--m4-classifier faiss` to classify M4 by train neighbors when the corresponding M4 bank is installed. Defaults are `prostt5` and `mlp`. [Profile setup and benchmark scope](../docs/MODEL_PROFILES.md).

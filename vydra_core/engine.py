@@ -855,8 +855,11 @@ def normalize_embedding(embedding: np.ndarray) -> np.ndarray:
 
 
 def predict_step(model_name: str, emb: np.ndarray) -> tuple[str, float]:
-    if active_profile is not None and active_profile.classifier == "mlp":
-        return active_profile.predict(model_name, normalize_embedding(emb))
+    if active_profile is not None:
+        if model_name == MODEL_NAMES[3] and active_profile.classifier == "faiss":
+            return active_profile.predict_m4(normalize_embedding(emb))
+        if is_esm():
+            return active_profile.predict(model_name, normalize_embedding(emb))
     loaded_models, loaded_label_classes = load_models()
     model = loaded_models[model_name]
     classes = loaded_label_classes[model_name]
@@ -963,11 +966,11 @@ def retrieve_reference_neighbors(emb: np.ndarray, class_name: str, bank: dict[st
 
 
 @serialized_inference
-def run_hierarchy(emb: np.ndarray, predictions=None) -> dict:
+def run_hierarchy(emb: np.ndarray) -> dict:
     release_prost_t5()
 
     def step(name):
-        return predictions[name] if predictions is not None else predict_step(name, emb)
+        return predict_step(name, emb)
     m1, c1 = step("M1_L1_viral_vs_cellular")
     path = [m1]
     confidences = {"M1": c1}

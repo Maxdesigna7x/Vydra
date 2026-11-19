@@ -87,21 +87,14 @@ def import_engine(device_name: str, offline: bool):
 def rows_from_records(engine, records, embeddings, progress_callback=None, checkpoint=None) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = checkpoint.predictions() if checkpoint else []
     saved = len(rows)
-    first_query = saved
     if progress_callback:
         progress_callback(saved, len(records))
-    profile = getattr(engine, "active_profile", None)
-    predictions = None
-    if profile is not None and profile.classifier == "faiss" and saved < len(records):
-        engine.release_prost_t5()
-        predictions = profile.classify(embeddings[saved:])
     for index, (record, embedding) in enumerate(zip(records, embeddings), 1):
         if index <= saved:
             if rows[index - 1]["seq_id"] != record.seq_id:
                 raise ValueError("Checkpoint record order differs")
             continue
-        prediction = (engine.run_hierarchy(embedding, profile.for_row(predictions, index - 1 - first_query))
-                      if predictions is not None else engine.run_hierarchy(embedding))
+        prediction = engine.run_hierarchy(embedding)
         rows.append(
             {
                 "seq_id": record.seq_id,
@@ -318,7 +311,7 @@ def _command_predict(args, stack):
                 **({"checkpoint": checkpoint} if checkpoint else {}),
             )
 
-    eprint(f"Classifying {len(records)} record(s): {classifier.upper()} on {engine.device}..." if args.language == 'en' else f"Clasificando {len(records)} registro(s): {classifier.upper()} en {engine.device}...")
+    eprint(f"Classifying {len(records)} record(s): MLP routing (M4: {classifier.upper()}) on {engine.device}..." if args.language == 'en' else f"Clasificando {len(records)} registro(s): ruta MLP (M4: {classifier.upper()}) en {engine.device}...")
     with contextlib.redirect_stdout(sys.stderr):
         rows = rows_from_records(engine, records, embeddings, getattr(args, "_progress_callback", None), checkpoint)
     source = args.fasta or args.embedding
@@ -343,10 +336,10 @@ def _command_predict(args, stack):
     inference_seconds = round(time.perf_counter() - started, 6)
     for row in rows:
         row['run_inference_seconds'] = inference_seconds
-        row.update(model_profile=profile_id, classifier=classifier)
+        row.update(model_profile=profile_id, classifier=classifier, m4_classifier=classifier)
     runtime_profile = getattr(engine, 'active_profile', None)
     timing = {'started_at': started_at, 'inference_seconds': inference_seconds,
-              'model_profile': profile_id, 'classifier': classifier,
+              'model_profile': profile_id, 'classifier': classifier, 'm4_classifier': classifier,
               'profile_artifacts': runtime_profile.manifest if runtime_profile else None,
               'classifier_artifacts': runtime_profile.train_manifest if runtime_profile and classifier == "faiss" else None,
               'resumed': bool(getattr(args, 'resume', False)),
@@ -573,8 +566,8 @@ def build_parser(language='en') -> argparse.ArgumentParser:
     from model_profiles import PROFILES
     predict.add_argument("--model", choices=tuple(PROFILES), default="prostt5",
                          help="embedding model profile (default: ProstT5)")
-    predict.add_argument("--classifier", choices=("mlp", "faiss"), default="mlp",
-                         help="hierarchical classification method (default: MLP)")
+    predict.add_argument("--m4-classifier", "--classifier", dest="classifier", choices=("mlp", "faiss"), default="mlp",
+                         help="classifier for M4 only (default: MLP)")
     predict.add_argument("--device", choices=("auto", "cpu", "cuda"), default="auto", help="dispositivo para ProstT5, MLP y FAISS; auto usa GPU compatible o CPU")
     predict.add_argument("--offline", action="store_true", help="prohibir descargas y usar solo archivos locales")
     predict.add_argument("--batch-size", type=int, help="batch fijo inicial; por defecto se calcula automaticamente")

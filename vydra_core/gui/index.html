@@ -2,9 +2,9 @@
 <body><main>
 <header><div><h1>Vydra</h1><p class="muted">Local protein inference</p></div><div class="header-actions"><button id="faq-open" class="button quiet" type="button">FAQ</button><button id="theme" class="button quiet" type="button">Switch to light</button></div></header>
 <form id="run-form">
-<div class="options-grid"><label>Embedding model<select id="model"><option value="prostt5">ProstT5 · 5.64 GB · 1×</option></select></label><label>Classifier<select id="classifier"><option value="mlp">MLP</option><option value="faiss" disabled>FAISS</option></select></label></div>
+<div class="options-grid"><label>Embedding model<select id="model"><option value="prostt5">ProstT5 · 5.64 GB · 1×</option></select></label><label>M4 classifier · eukaryotic viruses<select id="classifier"><option value="mlp">MLP</option><option value="faiss" disabled>FAISS</option></select></label></div>
 <a href="https://github.com/Maxdesigna7x/Vydra/blob/main/docs/MODEL_PROFILES.md" target="_blank" rel="noopener noreferrer">Install or compare models</a>
-<p id="model-note" class="muted">Encoder speed on RTX 3060 at full batches, 75–1022 aa. Speed depends on sequence length and hardware.</p>
+<p id="model-note" class="muted">Encoder speed on RTX 3060 at full batches, 75–1022 aa. Phage cluster search is available for both phage branches.</p>
 <div class="section-heading"><h2>Input</h2><label class="compact">Input type<select id="mode"><option value="folder">Folder</option><option value="file">FASTA file</option></select></label></div>
 <div class="input-output"><div><label id="source-label" for="source">Input folder</label><div class="path-field"><input id="source" required autocomplete="off" placeholder="/path/to/proteins"><button type="button" class="button" id="browse-source">Browse</button></div>
 <p class="hint" id="input-hint">FASTA files are discovered recursively. Original file names and folders are retained.</p>

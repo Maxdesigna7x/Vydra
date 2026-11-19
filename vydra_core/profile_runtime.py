@@ -29,17 +29,17 @@ class ProfileRuntime:
         if profile != "prostt5":
             self.manifest = verify_manifest(self.directory, "manifest.json", profile)
             self.classes = json.loads((self.directory / "labels.json").read_text())
-        if classifier == "faiss" or (self.manifest and self.manifest["prototypes_from_train"]):
-            self.train_manifest = verify_manifest(self.directory, "train_manifest.json", profile)
-            if self.manifest and self.train_manifest["split_sha256"] != self.manifest["split_sha256"]:
-                raise ValueError("FAISS references use a different training split")
+        if self.manifest and self.manifest["prototypes_from_train"]:
+            legacy = verify_manifest(self.directory, "train_manifest.json", profile)
+            if any(legacy[key] != self.manifest[key] for key in ("split_sha256", "source_matrix_sha256")):
+                raise ValueError("Phage prototype vectors differ from the selected encoder or split")
             self.train = np.load(self.directory / "train_vectors.npy", mmap_mode="r", allow_pickle=False)
-            if self.train.ndim != 2 or self.train.shape[1] != self.dimension or self.train.dtype != np.float32:
-                raise ValueError("Invalid FAISS reference matrix")
-            train_classes = json.loads((self.directory / "train_labels.json").read_text())
-            if self.classes is not None and self.classes != train_classes:
-                raise ValueError("FAISS and MLP label order differs")
-            self.classes = train_classes
+        self.m4_index = None
+        if classifier == "faiss":
+            self.train_manifest = verify_manifest(self.directory, "m4_manifest.json", profile)
+            if self.manifest and any(self.manifest[key] != self.train_manifest[key]
+                                     for key in ("split_sha256", "source_matrix_sha256")):
+                raise ValueError("M4 bank differs from the selected encoder or split")
 
     def encoder(self):
         from transformers import AutoTokenizer, EsmModel
@@ -104,75 +104,35 @@ class ProfileRuntime:
 
     def predict(self, name, vector):
         classes = self.classes[name]
-        if self.classifier == "mlp":
-            with torch.inference_mode():
-                x = torch.from_numpy(vector).to(self.engine.device).unsqueeze(0)
-                values = self.mlp(name)(x).softmax(dim=1)[0]
-                score, label = values.max(0)
-            return classes[int(label)], float(score)
-        raise RuntimeError("FAISS classifications must be prepared in batches")
+        with torch.inference_mode():
+            x = torch.from_numpy(vector).to(self.engine.device).unsqueeze(0)
+            values = self.mlp(name)(x).softmax(dim=1)[0]
+            score, label = values.max(0)
+        return classes[int(label)], float(score)
 
-    def classify(self, vectors):
-        """Route in batches, holding only one head index at any time."""
-        vectors = np.asarray(vectors, dtype=np.float32)
-        if (vectors.ndim != 2 or vectors.shape[1] != self.dimension
-                or not np.isfinite(vectors).all()):
-            raise ValueError("Invalid FAISS query matrix")
-        norms = np.linalg.norm(vectors, axis=1)
-        if np.any(norms <= 0):
-            raise ValueError("Cannot search with a zero embedding")
-        vectors = vectors / norms[:, None]
-        names = self.engine.MODEL_NAMES
-        predictions = {}
-
-        def search(j, query_rows):
-            if not len(query_rows):
-                return
-            name = names[j]
-            classes = self.classes[name]
-            head = name[:2]
-            with np.load(self.directory / f"train_{head}.npz", allow_pickle=False) as data:
-                rows, labels = data["rows"], data["labels"]
-            if (not len(rows) or rows.shape != labels.shape or rows.min() < 0 or rows.max() >= len(self.train)
+    def predict_m4(self, vector):
+        if self.m4_index is None:
+            matrix = np.load(self.directory / "m4_vectors.npy", mmap_mode="r", allow_pickle=False)
+            labels = np.load(self.directory / "m4_targets.npy", allow_pickle=False)
+            classes = json.loads((self.directory / "m4_classes.json").read_text())
+            if (matrix.ndim != 2 or matrix.shape != (len(labels), self.dimension)
+                    or matrix.dtype != np.float32 or not len(labels)
                     or labels.min() < 0 or labels.max() >= len(classes)):
-                raise ValueError(f"Invalid FAISS row map for {head}")
-            matrix = self.train[rows]
-            index = self.engine.build_faiss_index(matrix)
-            assigned = np.full(len(vectors), -1, dtype=np.int32)
-            similarities = np.full(len(vectors), np.nan, dtype=np.float32)
-            for start in range(0, len(query_rows), 8192):
-                batch = query_rows[start:start+8192]
-                scores, ids = self.engine.gpu_faiss.search_index(index, vectors[batch], min(len(rows), 2))
-                if scores.shape[1] == 2:
-                    ties = np.flatnonzero(np.abs(scores[:, 0] - scores[:, 1]) <= 2e-7)
-                    for offset in ties:
-                        exact = matrix @ vectors[batch[offset]]
-                        best = np.flatnonzero(exact == exact.max())
-                        index_in_head = best[np.argmin(rows[best])]
-                        ids[offset, 0], scores[offset, 0] = index_in_head, exact[index_in_head]
-                if (ids[:, 0] < 0).any():
-                    raise ValueError(f"FAISS returned no neighbor for {head}")
-                assigned[batch] = labels[ids[:, 0]]
-                similarities[batch] = scores[:, 0]
-            predictions[name] = assigned, similarities
-
-        def routed(j, label):
-            name = names[j]
-            if name not in predictions:
-                return np.empty(0, dtype=np.int64)
-            return np.flatnonzero(predictions[name][0] == self.classes[name].index(label))
-
-        search(0, np.arange(len(vectors)))
-        search(1, routed(0, "cellular"))
-        search(2, routed(0, "viral"))
-        search(3, routed(2, "eukariota"))
-        search(4, routed(2, "phage"))
-        search(5, routed(4, "structural"))
-        return predictions
-
-    def for_row(self, predictions, row):
-        return {name: (self.classes[name][int(labels[row])], float(scores[row]))
-                for name, (labels, scores) in predictions.items() if labels[row] >= 0}
+                raise ValueError("Invalid M4 reference bank")
+            if self.classes is not None and self.classes[self.engine.MODEL_NAMES[3]] != classes:
+                raise ValueError("M4 class order differs from the MLP vocabulary")
+            self.m4_index = self.engine.build_faiss_index(matrix)
+            self.m4_matrix, self.m4_labels, self.m4_classes = matrix, labels, classes
+        scores, ids = self.engine.gpu_faiss.search_index(
+            self.m4_index, vector.reshape(1, -1), min(len(self.m4_labels), 2))
+        index, score = int(ids[0, 0]), float(scores[0, 0])
+        if index < 0:
+            raise ValueError("FAISS returned no neighbor for M4")
+        if scores.shape[1] == 2 and abs(score - scores[0, 1]) <= 2e-7:
+            exact = self.m4_matrix @ vector
+            index = int(exact.argmax())
+            score = float(exact[index])
+        return self.m4_classes[int(self.m4_labels[index])], score
 
     def prototypes(self, dataset_type):
         branch = "Struct" if dataset_type == "structural" else "Non_Struct"
