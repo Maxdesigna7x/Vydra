@@ -32,6 +32,15 @@ class DeviceTests(unittest.TestCase):
             with self.assertRaises(RuntimeError):
                 backend.select_device('cuda')
 
+    def test_windows_desktop_uses_cuda_with_cpu_faiss(self):
+        with (patch.object(backend.os, 'name', 'nt'),
+                patch.dict(backend.os.environ, {'VYDRA_DESKTOP_MODE': 'cuda'}),
+                patch.object(torch.cuda, 'is_available', return_value=True),
+                patch.object(backend, 'require_gpu', side_effect=AssertionError('GPU FAISS called'))):
+            self.assertEqual(backend.select_device('cuda').type, 'cuda')
+            self.assertEqual(backend.select_device('auto').type, 'cuda')
+            self.assertEqual(backend.faiss_device('cuda').type, 'cpu')
+
     def test_gpu_cpu_search_parity(self):
         try:
             backend.require_gpu()

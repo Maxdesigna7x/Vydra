@@ -122,7 +122,7 @@ def prepare(mode):
     for filename, digest in DOWNLOADABLE_ARTIFACTS.items():
         fetch_verified(f"{RELEASE_BASE_URL}/{filename}", ARTIFACTS_DIR / filename, BANK_SIZES[filename], digest)
     model_dir = Path(os.environ["VYDRA_PROSTT5_PATH"])
-    if not (model_dir / ".vydra-model-ready").is_file():
+    if not (model_dir / ".vydra-model-ready").is_file() or not (model_dir / "pytorch_model.bin").is_file():
         print("Preparando ProstT5. Se reutilizarán los archivos completos y los parciales de la descarga.", flush=True)
         try:
             resolve_model_path(model_dir, offline=True)

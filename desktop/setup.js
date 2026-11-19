@@ -4,6 +4,7 @@ const folder = document.getElementById('folder');
 const status = document.getElementById('status');
 const space = document.getElementById('space');
 const log = document.getElementById('log');
+const pause = document.getElementById('pause');
 const mode = () => new FormData(form).get('mode');
 const controls = Array.from(form.querySelectorAll('button, input'));
 let settings;
@@ -53,10 +54,17 @@ form.addEventListener('input', () => {
   clearTimeout(timer);
   timer = setTimeout(showSpace, 300);
 });
+pause.addEventListener('click', async () => {
+  pause.disabled = true;
+  status.textContent = 'Pausando preparación…';
+  await api.pause();
+});
 form.addEventListener('submit', async event => {
   event.preventDefault();
   const selectedMode = mode();
   for (const control of controls) control.disabled = true;
+  pause.hidden = false;
+  pause.disabled = false;
   status.textContent = 'Preparando Vydra. Puedes consultar el registro mientras avanza.';
   try {
     await api.install(folder.value.trim(), selectedMode);
@@ -64,6 +72,7 @@ form.addEventListener('submit', async event => {
   } catch (error) {
     status.textContent = error.message.replace(/^Error invoking remote method .*?: (Error: )?/u, '');
   } finally {
+    pause.hidden = true;
     for (const control of controls) control.disabled = false;
   }
 });

@@ -69,30 +69,70 @@ async function writeAtomic(file, value) {
 }
 
 async function ready(paths) {
-  return await readFile(paths.marker, 'utf8').then(value => value === version).catch(() => false);
+  try {
+    if (await readFile(paths.marker, 'utf8') !== version) return false;
+    await Promise.all([
+      paths.python,
+      path.join(paths.core, 'desktop_bootstrap.py'),
+      path.join(paths.artifacts, 'Struct_prototype_bank.pt'),
+      path.join(paths.artifacts, 'Non_Struct_prototype_bank.pt'),
+      path.join(paths.env.VYDRA_PROSTT5_PATH, '.vydra-model-ready'),
+      path.join(paths.env.VYDRA_PROSTT5_PATH, 'pytorch_model.bin'),
+    ].map(file => access(file)));
+    return true;
+  } catch {
+    return false;
+  }
 }
 
-function run(command, args, options, log) {
-  const child = spawn(command, args, { ...options, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });
+function run(command, args, options, log, signal) {
+  signal?.throwIfAborted();
+  const child = spawn(command, args, {
+    ...options, windowsHide: true, detached: !windows, stdio: ['ignore', 'pipe', 'pipe'],
+  });
+  function stop() {
+    if (!child.pid) return;
+    if (windows) {
+      const killer = spawn('taskkill', ['/pid', String(child.pid), '/t', '/f'], { windowsHide: true, stdio: 'ignore' });
+      killer.once('error', () => child.kill());
+      return;
+    }
+    try { process.kill(-child.pid, 'SIGTERM'); }
+    catch (error) { if (error.code !== 'ESRCH') child.kill(); }
+  }
+  signal?.addEventListener('abort', stop, { once: true });
   for (const pipe of [child.stdout, child.stderr]) pipe.on('data', bytes => log(bytes.toString()));
   return new Promise((resolve, reject) => {
     child.once('error', reject);
     child.once('close', code => {
-      if (code === 0) resolve();
+      signal?.removeEventListener('abort', stop);
+      if (signal?.aborted) reject(signal.reason);
+      else if (code === 0) resolve();
       else reject(new Error(`El proceso terminó con código ${code}. Consulta el registro de instalación.`));
     });
   });
 }
 
-function pythonCommand(paths, args) {
-  return ['run', '-p', paths.environment, paths.python, ...args];
+function pythonProcess(paths, args) {
+  if (!windows) {
+    return { command: paths.tools, args: ['run', '-p', paths.environment, paths.python, ...args], env: paths.env };
+  }
+  // Micromamba's Windows batch wrapper splits some paths containing spaces.
+  // Start the managed interpreter directly with the environment's DLL paths.
+  const env = { ...paths.env, CONDA_PREFIX: paths.environment };
+  const originalPath = Object.keys(env).find(key => key.toLowerCase() === 'path');
+  const directories = ['', 'Library/mingw-w64/bin', 'Library/usr/bin', 'Library/bin', 'Scripts', 'bin'];
+  env[originalPath || 'PATH'] = [
+    ...directories.map(directory => path.join(paths.environment, directory)), env[originalPath] || '',
+  ].join(path.delimiter);
+  return { command: paths.python, args, env };
 }
 
-async function prepare(root, mode, resources, log, { dependenciesOnly = false } = {}) {
+async function prepare(root, mode, resources, log, { dependenciesOnly = false, signal } = {}) {
   const paths = layout(root, mode, resources);
   if (!dependenciesOnly && await ready(paths)) return paths;
   if (!windows && mode === 'cuda' && !dependenciesOnly) {
-    await run('nvidia-smi', ['--query-gpu=name,driver_version', '--format=csv,noheader'], {}, log);
+    await run('nvidia-smi', ['--query-gpu=name,driver_version', '--format=csv,noheader'], {}, log, signal);
   }
   const available = await freeSpace(root);
   if (available < gib) throw new Error('La unidad necesita al menos 1 GiB libre para continuar.');
@@ -106,19 +146,23 @@ async function prepare(root, mode, resources, log, { dependenciesOnly = false } 
   }
   const logfile = path.join(root, 'setup.log');
   const progress = message => {
-    appendFileSync(logfile, message, 'utf8');
+    try { appendFileSync(logfile, message, 'utf8'); }
+    catch (error) { console.error('Could not write setup.log', error); }
     log(message);
   };
-  const invoke = args => run(paths.tools, args, { env: paths.env }, progress);
-  const python = args => invoke(pythonCommand(paths, args));
-  if (!previous.phase || previous.phase === 'installing') {
+  const python = args => {
+    const launch = pythonProcess(paths, args);
+    return run(launch.command, launch.args, { env: launch.env }, progress, signal);
+  };
+  const hasPython = await access(paths.python).then(() => true).catch(() => false);
+  if (!hasPython || !previous.phase || previous.phase === 'installing') {
     await writeAtomic(journal, JSON.stringify({ phase: 'installing' }));
     progress('Preparando el entorno de Vydra…\n');
     const solveEnv = mode === 'cuda' && !windows && dependenciesOnly
       ? { ...paths.env, CONDA_OVERRIDE_CUDA: '12.9' } : paths.env;
     const exists = await access(path.join(paths.environment, 'conda-meta', 'history')).then(() => true).catch(() => false);
     await run(paths.tools, ['--no-rc', exists ? 'install' : 'create', '-y', '--always-copy', '-p', paths.environment,
-      '-c', 'conda-forge', '--override-channels', ...packages(mode)], { env: solveEnv }, progress);
+      '-c', 'conda-forge', '--override-channels', ...packages(mode)], { env: solveEnv }, progress, signal);
     if (windows) {
       const index = mode === 'cuda' ? 'cu126' : 'cpu';
       await python(['-m', 'pip', 'install', '--retries', '6', '--timeout', '120',
@@ -140,4 +184,4 @@ async function prepare(root, mode, resources, log, { dependenciesOnly = false } 
   return paths;
 }
 
-module.exports = { layout, minimum, ready, prepare, pythonCommand, writeAtomic, freeSpace };
+module.exports = { layout, minimum, ready, prepare, pythonProcess, writeAtomic, freeSpace };

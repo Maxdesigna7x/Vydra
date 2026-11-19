@@ -3,7 +3,7 @@ const { spawn } = require('node:child_process');
 const { createInterface } = require('node:readline');
 const { mkdir, readFile } = require('node:fs/promises');
 const path = require('node:path');
-const { layout, minimum, ready, prepare, pythonCommand, writeAtomic, freeSpace } = require('./runtime.cjs');
+const { layout, minimum, ready, prepare, pythonProcess, writeAtomic, freeSpace } = require('./runtime.cjs');
 
 function handleSquirrelEvent() {
   if (process.platform !== 'win32') return false;
@@ -24,7 +24,7 @@ function handleSquirrelEvent() {
 let setupWindow;
 let engineWindow;
 let engine;
-let installing = false;
+let installation;
 let quitting = false;
 let config;
 
@@ -48,7 +48,7 @@ function setup() {
   setupWindow.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
   setupWindow.webContents.on('will-navigate', event => event.preventDefault());
   setupWindow.on('close', event => {
-    if (installing) {
+    if (installation) {
       event.preventDefault();
       progress('La preparación sigue en curso. Si se interrumpe, Vydra recuperará las etapas completadas.\n');
     }
@@ -59,8 +59,9 @@ function setup() {
 
 async function startEngine(paths) {
   const runtime = path.join(paths.core, 'desktop_bootstrap.py');
-  const child = spawn(paths.tools, pythonCommand(paths, [runtime, 'serve', paths.state]), {
-    env: paths.env, cwd: paths.core, stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true,
+  const launch = pythonProcess(paths, [runtime, 'serve', paths.state]);
+  const child = spawn(launch.command, launch.args, {
+    env: launch.env, cwd: paths.core, stdio: ['pipe', 'pipe', 'pipe'], windowsHide: true,
   });
   engine = child;
   child.stdin.on('error', () => {});
@@ -137,20 +138,22 @@ function registerSetupHandlers() {
     return result.filePaths[0];
   });
   handle('setup:space', folder => freeSpace(path.resolve(folder)));
+  handle('setup:pause', () => installation?.abort(new Error('Preparación pausada. Vuelve a usar la misma carpeta y el mismo modo para continuar.')));
   handle('setup:install', async (root, mode) => {
-    if (installing || engine) throw new Error('Ya hay una sesión de Vydra activa.');
+    if (installation || engine) throw new Error('Ya hay una sesión de Vydra activa.');
     if (typeof root !== 'string' || !path.isAbsolute(root) || !Object.hasOwn(minimum, mode)) {
       throw new Error('Selecciona una carpeta absoluta y un modo de instalación.');
     }
-    installing = true;
+    installation = new AbortController();
     try {
       config = { root: path.normalize(root), mode };
       await mkdir(path.dirname(configFile()), { recursive: true });
       await writeAtomic(configFile(), JSON.stringify(config));
-      const paths = await prepare(config.root, config.mode, resourceFolder(), progress);
+      const paths = await prepare(config.root, config.mode, resourceFolder(), progress, { signal: installation.signal });
+      installation.signal.throwIfAborted();
       await startEngine(paths);
     } finally {
-      installing = false;
+      installation = null;
     }
   });
 }
@@ -192,7 +195,7 @@ if (handleSquirrelEvent()) {
     window?.focus();
   });
   app.on('before-quit', event => {
-    if (installing) { event.preventDefault(); return; }
+    if (installation) { event.preventDefault(); return; }
     quitting = true;
     if (engine) engine.stdin.end();
   });

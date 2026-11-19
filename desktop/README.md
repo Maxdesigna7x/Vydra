@@ -52,7 +52,8 @@ preparación se puede ejecutar ProstT5 sin conexión.
 
 ## Reanudar una instalación
 
-Vuelve a elegir la misma carpeta y el mismo modo. Consulta `setup.log` en la
+Pulsa **Pausar preparación** si necesitas detener la descarga. Vuelve a
+elegir la misma carpeta y el mismo modo. Consulta `setup.log` en la
 carpeta de datos y el estado de la etapa en `app/<versión>/setup-<modo>.json`.
 
 - Si se interrumpió el entorno, el asistente vuelve a ejecutar su instalación
