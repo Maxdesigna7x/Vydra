@@ -50,6 +50,26 @@ preparación se puede ejecutar ProstT5 sin conexión.
   Revisar el borrador y publicar los dos juntos. Las etiquetas de Desktop son
   independientes de las etiquetas de artefactos de Vydra.
 
+## Compilar cambios y preparar otra versión
+
+- La ventana de configuración vive en `desktop/setup.html`, `setup.css` y
+  `setup.js`. La preparación del entorno vive en `desktop/runtime.cjs` y
+  `desktop/desktop_bootstrap.py`. La pantalla de análisis reutiliza
+  `vydra_core/gui/`.
+- Sube los cambios a una rama con prefijo `desktop/`. Las modificaciones de
+  Desktop o del núcleo disparan la compilación de Linux y Windows. En
+  **Actions → Vydra Desktop** se pueden descargar ambos instaladores desde
+  **Artifacts**. Los pull requests que tocan esos archivos también compilan.
+- Cuando quieras distribuir otra versión, actualiza la versión desde
+  `desktop/` con `npm version <versión> --no-git-tag-version`, confirma los
+  cambios de `package.json` y `package-lock.json` y sube el commit. Añade una
+  etiqueta al commit elegido con `git tag desktop-v<versión>` y súbela con
+  `git push origin desktop-v<versión>`. GitHub verifica que la etiqueta y el
+  paquete coincidan y prepara el borrador con ambos archivos y sus hashes.
+- Revisa los resultados antes de publicar. Para una prueba pública usa
+  **Set as a pre-release**. La publicación estable queda reservada a versiones
+  que superen la validación completa.
+
 ## Reanudar una instalación
 
 Pulsa **Pausar preparación** si necesitas detener la descarga. Vuelve a
