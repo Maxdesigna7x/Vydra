@@ -60,7 +60,8 @@ def fasta_payload(input_path, rows, metadata):
 
 def update_report_timing(report_dir, timing):
     timing = {k: timing[k] for k in ('inference_seconds', 'elapsed_seconds', 'report_seconds',
-              'total_processing_seconds', 'started_at', 'finished_at', 'scope', 'fixture') if k in timing}
+              'total_processing_seconds', 'started_at', 'finished_at', 'scope', 'fixture',
+              'model_profile', 'classifier') if k in timing}
     with (Path(report_dir) / 'tiempos.csv').open('w', encoding='utf-8', newline='') as stream:
         fields = ['inference_seconds', 'report_seconds', 'total_processing_seconds', 'started_at', 'finished_at']
         writer = csv.DictWriter(stream, fieldnames=fields)

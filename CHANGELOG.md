@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Added selectable ProstT5, ESM‑2 8M, 35M and 150M profiles, profile-specific MLP and FAISS classification, and reference evidence from the frozen phage groups.
+
+
 ## 0.4.0 — 2026-10-13
 
 - Phage results now include up to five nearest prototypes, individual source

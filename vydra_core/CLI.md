@@ -184,3 +184,7 @@ etapa; MLP/FAISS se conservan para reutilizarlos.
 ## Modelos locales
 
 La CLI y la GUI reutilizan primero el modelo configurado, el modelo completo del paquete y la caché local. Solo descargan archivos faltantes cuando se permiten descargas. `--offline` las prohíbe. Las secuencias siempre se procesan en el equipo; no se envían a una API de inferencia.
+
+## Model profiles
+
+Use `--model esm2-8m`, `--model esm2-35m`, or `--model esm2-150m` with `predict`. Use `--classifier faiss` to classify by train neighbors when the corresponding full bank is installed. Defaults are `prostt5` and `mlp`. [Profile setup and benchmark scope](../docs/MODEL_PROFILES.md).

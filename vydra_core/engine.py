@@ -4,6 +4,7 @@ from __future__ import annotations
 import gc
 import json
 import os
+import sys
 import threading
 from dataclasses import dataclass
 from functools import wraps
@@ -23,6 +24,38 @@ try:
 except ImportError:
     import gpu_faiss
     from biological_context import load_reference_metadata, summarize_neighbors, function_annotation_status
+
+
+try:
+    from .profile_runtime import ProfileRuntime
+except ImportError:
+    from profile_runtime import ProfileRuntime
+
+active_profile = None
+
+
+def configure_profile(profile, classifier):
+    global active_profile, EMB_DIM, MAX_PROT_LEN, CHUNK_OVERLAP
+    global structural_prototype_bank, non_structural_prototype_bank
+    global cluster_annotations, viral_euk_class_metadata, thresholds_by_class
+    candidate = None if (profile, classifier) == ("prostt5", "mlp") else ProfileRuntime(
+        profile, classifier, sys.modules[__name__])
+    if candidate is None and active_profile is None:
+        return
+    release_prost_t5()
+    active_profile = candidate
+    esm = is_esm()
+    EMB_DIM = candidate.dimension if esm else 1024
+    MAX_PROT_LEN, CHUNK_OVERLAP = (1022, 255) if esm else (2048, 512)
+    structural_prototype_bank = non_structural_prototype_bank = None
+    directory = candidate.directory if esm else ARTIFACTS_DIR
+    cluster_annotations = load_cluster_annotations(directory / CLUSTER_TAXONOMY_CSV.name)
+    viral_euk_class_metadata = load_viral_euk_class_metadata(directory / VIRAL_EUK_CLASS_METADATA_CSV.name)
+    thresholds_by_class = load_json(directory / THRESHOLD_CONFIG_JSON.name).get("thresholds_by_class", {})
+
+
+def is_esm():
+    return active_profile is not None and active_profile.id != "prostt5"
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -231,14 +264,18 @@ def biological_label(annotation: dict) -> str:
 
 
 def build_prototype_bank(bank_path: Path, dataset_type: str) -> dict[str, dict]:
-    if not bank_path.exists():
-        raise FileNotFoundError(f"Missing prototype bank artifact: {bank_path}")
-    raw = torch.load(bank_path, map_location="cpu", weights_only=False)
+    if is_esm():
+        raw = active_profile.prototypes(dataset_type)
+    else:
+        if not bank_path.exists():
+            raise FileNotFoundError(f"Missing prototype bank artifact: {bank_path}")
+        raw = torch.load(bank_path, map_location="cpu", weights_only=False)
     if not isinstance(raw, dict) or not raw:
         raise ValueError(f"Expected non-empty prototype bank dict in {bank_path}")
 
     bank: dict[str, dict] = {}
-    metadata = load_reference_metadata(PROTOTYPE_METADATA_CSV, dataset_type)
+    metadata_path = active_profile.directory / PROTOTYPE_METADATA_CSV.name if is_esm() else PROTOTYPE_METADATA_CSV
+    metadata = load_reference_metadata(metadata_path, dataset_type)
 
     for class_name, entry in raw.items():
         class_name = str(class_name)
@@ -347,7 +384,7 @@ def get_structural_prototype_bank() -> dict[str, dict]:
 
 def get_non_structural_prototype_bank() -> dict[str, dict]:
     global non_structural_prototype_bank
-    if not NON_STRUCTURAL_PROTOTYPE_BANK.exists():
+    if not is_esm() and not NON_STRUCTURAL_PROTOTYPE_BANK.exists():
         print(f"Missing non-structural prototype bank: {NON_STRUCTURAL_PROTOTYPE_BANK}. Skipping non-structural FAISS assignment.")
         non_structural_prototype_bank = {}
         return non_structural_prototype_bank
@@ -373,6 +410,8 @@ def preload_inference_artifacts() -> None:
 @serialized_inference
 def load_prost_t5() -> tuple[T5Tokenizer, T5EncoderModel]:
     global t5_tokenizer, t5_model
+    if t5_model is None and is_esm():
+        t5_tokenizer, t5_model = active_profile.encoder()
     if t5_model is None:
         require_faiss_gpu()
         print("Loading Rostlab/ProstT5...")
@@ -410,7 +449,7 @@ def release_prost_t5() -> None:
     gc.collect()
     if device.type == "cuda":
         torch.cuda.empty_cache()
-    print("ProstT5 released from memory before classification/FAISS.")
+    print(f"{active_profile.id if is_esm() else 'ProstT5'} released before classification/FAISS.")
 
 
 def canonicalize_sequence(seq: str) -> str:
@@ -594,6 +633,8 @@ def memory_aware_batch_size(
 
 def _embed_items(items: list[dict], tokenizer, model) -> np.ndarray:
     batch_texts = [item["text"] for item in items]
+    if is_esm():
+        return active_profile.pool(batch_texts, tokenizer, model)
     inputs = tokenizer(batch_texts, add_special_tokens=True, padding=True, return_tensors="pt").to(device)
     with torch.inference_mode():
         if device.type == "cuda":
@@ -626,6 +667,8 @@ def embed_records(
     memory_fraction: float | None = None,
     reserve_memory_gb: float | None = None,
     length_bin: int | None = None,
+    checkpoint=None,
+    chunk_progress_callback=None,
 ) -> np.ndarray:
     with inference_lock:
         try:
@@ -633,7 +676,8 @@ def embed_records(
                 records, progress_callback,
                 batch_size=batch_size, max_batch_size=max_batch_size,
                 memory_fraction=memory_fraction, reserve_memory_gb=reserve_memory_gb,
-                length_bin=length_bin,
+                length_bin=length_bin, checkpoint=checkpoint,
+                chunk_progress_callback=chunk_progress_callback,
             )
         finally:
             release_prost_t5()
@@ -648,25 +692,83 @@ def _embed_records(
     memory_fraction: float | None = None,
     reserve_memory_gb: float | None = None,
     length_bin: int | None = None,
+    checkpoint=None,
+    chunk_progress_callback=None,
 ) -> np.ndarray:
-    tokenizer, model = load_prost_t5()
     if not records:
         raise ValueError("No records to embed")
     bin_width = length_bin if length_bin is not None else _env_number("VYDRA_LENGTH_BIN", int, 128)
     if bin_width is None or bin_width < 1:
         raise ValueError("length_bin must be >= 1")
+    completed = checkpoint.completed() if checkpoint else np.zeros(len(records), dtype=bool)
+    cached = checkpoint.load_chunks(completed) if checkpoint else {}
     expanded = []
-    chunk_counts = [0 for _ in records]
+    chunk_vectors = [{} for _ in records]
+    chunk_lengths = []
+    total_chunks = done_chunks = 0
     for idx, rec in enumerate(records):
-        for chunk in chunk_sequence(rec.sequence):
-            model_input = to_prost_t5_input(chunk)
-            expanded.append({"record_idx": idx, "text": model_input, "length": len(chunk)})
-            chunk_counts[idx] += 1
-
+        chunks = chunk_sequence(rec.sequence, MAX_PROT_LEN, CHUNK_OVERLAP)
+        chunk_lengths.append([len(chunk) for chunk in chunks])
+        total_chunks += len(chunks)
+        if completed[idx]:
+            done_chunks += len(chunks)
+            continue
+        for chunk_idx, chunk in enumerate(chunks):
+            key = (idx, chunk_idx)
+            if key in cached:
+                chunk_vectors[idx][chunk_idx] = cached.pop(key)
+                done_chunks += 1
+            else:
+                expanded.append({"record_idx": idx, "chunk_idx": chunk_idx,
+                                 "text": (chunk if is_esm() else to_prost_t5_input(chunk)), "length": len(chunk)})
+    if cached:
+        raise ValueError("Checkpoint chunk does not match sequence windows")
     expanded.sort(key=lambda item: item["length"])
-    chunk_vectors = [[] for _ in records]
-    processed_chunks = [0 for _ in records]
-    processed_records = 0
+    processed_records = int(completed.sum())
+
+    def merged_vector(idx):
+        # Preserve the stable length-sorted order used by uninterrupted inference.
+        order = sorted(chunk_vectors[idx], key=lambda key: chunk_lengths[idx][key])
+        vectors = np.stack([chunk_vectors[idx][key] for key in order]).astype(np.float32)
+        merged = vectors[0] if len(vectors) == 1 else vectors.mean(axis=0)
+        return (merged / max(float(np.linalg.norm(merged)), EMB_NORM_EPS)).astype(np.float32)
+
+    # Recover an interruption between chunk commit and final embedding commit.
+    recovered = [(i, merged_vector(i)) for i in range(len(records))
+                 if not completed[i] and len(chunk_vectors[i]) == len(chunk_lengths[i])]
+    if checkpoint and recovered:
+        checkpoint.save_embeddings(recovered)
+        checkpoint.discard_chunks(i for i, _ in recovered)
+        for i, _ in recovered:
+            chunk_vectors[i].clear()
+        processed_records += len(recovered)
+
+    def report(batch_size=0, computing=False):
+        details = dict(processed=processed_records, total=len(records),
+                       chunks_done=done_chunks, chunks_total=total_chunks,
+                       batch_size=batch_size, computing=computing,
+                       checkpoint_saved_at=checkpoint.last_saved_at if checkpoint else None)
+        if progress_callback and not computing:
+            progress_callback(processed_records, len(records))
+        if chunk_progress_callback:
+            chunk_progress_callback(details)
+        if not computing:
+            print(f"Embedding progress: sequences {processed_records}/{len(records)}; "
+                  f"chunks {done_chunks}/{total_chunks}; remaining {total_chunks - done_chunks}", flush=True)
+
+    if checkpoint and recovered:
+        checkpoint.save_progress(stage='embeddings', sequences_done=processed_records,
+                                 sequences_total=len(records), chunks_done=done_chunks, chunks_total=total_chunks)
+    # Existing progress may overstate work after integrity repair: report verified counts.
+    if checkpoint and checkpoint.last_saved_at is None:
+        progress_path = checkpoint.directory / 'progress.json'
+        if progress_path.is_file():
+            import json
+            checkpoint.last_saved_at = json.loads(progress_path.read_text()).get('saved_at')
+    report()
+    if not expanded:
+        return checkpoint.vectors if checkpoint else np.stack([merged_vector(i) for i in range(len(records))])
+    tokenizer, model = load_prost_t5()
     cursor = 0
 
     while cursor < len(expanded):
@@ -692,6 +794,7 @@ def _embed_records(
         while cursor < bucket_end:
             current_size = min(active_batch_size, bucket_end - cursor)
             items = expanded[cursor : cursor + current_size]
+            report(current_size, computing=True)
             try:
                 pooled_np = _embed_items(items, tokenizer, model)
             except (torch.cuda.OutOfMemoryError, MemoryError, RuntimeError) as exc:
@@ -711,15 +814,26 @@ def _embed_records(
                 print(f"Memory OOM avoided: retrying with batch={active_batch_size}")
                 continue
 
+            if checkpoint:
+                checkpoint.save_chunks([(item["record_idx"], item["chunk_idx"], vector)
+                                        for item, vector in zip(items, pooled_np)])
+            ready = []
             for item, vector in zip(items, pooled_np):
                 record_idx = item["record_idx"]
-                chunk_vectors[record_idx].append(vector.astype(np.float32))
-                processed_chunks[record_idx] += 1
-                if processed_chunks[record_idx] == chunk_counts[record_idx]:
+                chunk_vectors[record_idx][item["chunk_idx"]] = vector.astype(np.float32)
+                done_chunks += 1
+                if len(chunk_vectors[record_idx]) == len(chunk_lengths[record_idx]):
                     processed_records += 1
-
-            if progress_callback:
-                progress_callback(processed_records, len(records))
+                    if checkpoint:
+                        ready.append((record_idx, merged_vector(record_idx)))
+            if checkpoint:
+                checkpoint.save_embeddings(ready)
+                checkpoint.discard_chunks(i for i, _ in ready)
+                for i, _ in ready:
+                    chunk_vectors[i].clear()
+                checkpoint.save_progress(stage='embeddings', sequences_done=processed_records,
+                                         sequences_total=len(records), chunks_done=done_chunks, chunks_total=total_chunks)
+            report()
 
             del pooled_np
             gc.collect()
@@ -727,21 +841,22 @@ def _embed_records(
                 torch.cuda.empty_cache()
             cursor += current_size
 
-    per_record = []
-    for idx, vectors in enumerate(chunk_vectors):
-        chunk_vecs = np.stack(vectors).astype(np.float32)
-        merged = chunk_vecs[0] if len(chunk_vecs) == 1 else chunk_vecs.mean(axis=0)
-        merged = merged / max(float(np.linalg.norm(merged)), EMB_NORM_EPS)
-        per_record.append(merged.astype(np.float32))
-    return np.stack(per_record).astype(np.float32)
+    if checkpoint:
+        return checkpoint.vectors
+    return np.stack([merged_vector(i) for i in range(len(records))]).astype(np.float32)
 
 
 def normalize_embedding(embedding: np.ndarray) -> np.ndarray:
-    emb = np.asarray(embedding, dtype=np.float32).reshape(-1)[:EMB_DIM]
+    emb = np.asarray(embedding, dtype=np.float32).reshape(-1)
+    if is_esm() and emb.size != EMB_DIM:
+        raise ValueError(f"Expected {EMB_DIM} embedding components")
+    emb = emb[:EMB_DIM]
     return (emb / max(float(np.linalg.norm(emb)), EMB_NORM_EPS)).astype(np.float32)
 
 
 def predict_step(model_name: str, emb: np.ndarray) -> tuple[str, float]:
+    if active_profile is not None and active_profile.classifier == "mlp":
+        return active_profile.predict(model_name, normalize_embedding(emb))
     loaded_models, loaded_label_classes = load_models()
     model = loaded_models[model_name]
     classes = loaded_label_classes[model_name]
@@ -848,9 +963,12 @@ def retrieve_reference_neighbors(emb: np.ndarray, class_name: str, bank: dict[st
 
 
 @serialized_inference
-def run_hierarchy(emb: np.ndarray) -> dict:
+def run_hierarchy(emb: np.ndarray, predictions=None) -> dict:
     release_prost_t5()
-    m1, c1 = predict_step("M1_L1_viral_vs_cellular", emb)
+
+    def step(name):
+        return predictions[name] if predictions is not None else predict_step(name, emb)
+    m1, c1 = step("M1_L1_viral_vs_cellular")
     path = [m1]
     confidences = {"M1": c1}
     cluster_id = -1
@@ -864,24 +982,24 @@ def run_hierarchy(emb: np.ndarray) -> dict:
     viral_euk_metadata = empty_viral_euk_class_metadata()
 
     if m1 == "cellular":
-        m2, c2 = predict_step("M2_cellular_3_clases", emb)
+        m2, c2 = step("M2_cellular_3_clases")
         path.append(m2)
         confidences["M2"] = c2
     elif m1 == "viral":
-        m3, c3 = predict_step("M3_viral_phage_vs_euk", emb)
+        m3, c3 = step("M3_viral_phage_vs_euk")
         path.append(m3)
         confidences["M3"] = c3
         if m3 == "eukariota":
-            m4, c4 = predict_step("M4_viral_euk_978_clases", emb)
+            m4, c4 = step("M4_viral_euk_978_clases")
             path.append(m4)
             confidences["M4"] = c4
             viral_euk_metadata = get_viral_euk_class_metadata(m4)
         elif m3 == "phage":
-            m5, c5 = predict_step("M5_phage_structural_vs_non", emb)
+            m5, c5 = step("M5_phage_structural_vs_non")
             path.append(m5)
             confidences["M5"] = c5
             if m5 == "structural":
-                m6, c6 = predict_step("M6_structural_10_clases", emb)
+                m6, c6 = step("M6_structural_10_clases")
                 path.append(m6)
                 confidences["M6"] = c6
                 cluster_branch = "structural"

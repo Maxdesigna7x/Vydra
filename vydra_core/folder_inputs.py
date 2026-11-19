@@ -415,3 +415,33 @@ def postprocess(raw_jsonl: Path, output_root: Path, manifest: list[dict[str, Any
     for suffix in ('.metadata.json', '.original_sequences.jsonl'):
         raw_jsonl.with_suffix(raw_jsonl.suffix + suffix).unlink(missing_ok=True)
     return {"rows": source_count, "csv_columns": len(columns), "overall": summary}
+
+
+def prepare_resumable_inputs(input_root, output_root, input_files=None, resume=False):
+    """Reuse verified preparation without overwriting provenance on a retry."""
+    from checkpoints import atomic_json
+    input_root, output_root = Path(input_root).resolve(), Path(output_root).resolve()
+    state_path = output_root / 'preparation_checkpoint.json'
+    if not resume:
+        result = prepare_inputs(input_root, output_root, input_files)
+        combined, manifest_path, manifest, preparation = result
+        generated = [combined, manifest_path, output_root / 'original_sequences.jsonl', output_root / 'secuencias_excluidas.csv']
+        atomic_json(state_path, dict(input_root=str(input_root), preparation=preparation,
+                                    generated={p.name: sha256_file(p) for p in generated}))
+        return result
+    state = json.loads(state_path.read_text())
+    files = sorted(input_files) if input_files is not None else sorted(p for p in input_root.rglob('*') if p.is_file() and p.suffix.lower() in INPUT_EXTENSIONS)
+    hashes = {p.relative_to(input_root).as_posix(): sha256_file(p) for p in files}
+    if state['input_root'] != str(input_root) or hashes != state['preparation']['source_file_sha256']:
+        raise ValueError('Input files changed since this run. Use a new output folder.')
+    for name, expected in state['generated'].items():
+        if sha256_file(output_root / name) != expected:
+            raise ValueError('Prepared input was modified: ' + name)
+    manifest_path = output_root / 'manifest_secuencias.csv'
+    with manifest_path.open(encoding='utf-8', newline='') as stream:
+        manifest = list(csv.DictReader(stream))
+    for row in manifest:
+        for key in ('original_length_aa', 'model_input_length_aa'):
+            row[key] = int(row[key])
+        row['terminal_stop_removed'] = row['terminal_stop_removed'] == 'True'
+    return output_root / 'input_proteinas_ordenadas.faa', manifest_path, manifest, state['preparation']

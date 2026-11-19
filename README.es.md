@@ -12,6 +12,8 @@ Vydra analiza **secuencias de aminoácidos** en archivos FASTA de proteínas. Di
 
 [Instalación](#instalar-una-vez) · [Usar la interfaz](#analizar-tus-proteínas) · [Leer los resultados](#entender-los-resultados) · [Exportar proteínas](#filtrar-y-exportar) · [Resolver problemas](#resolver-problemas)
 
+**Elige un modelo de embeddings:** ProstT5 (predeterminado), ESM‑2 8M, 35M o 150M. Selecciona el modelo en la GUI o usa `vydra predict --model esm2-8m`. Consulta [tamaños, velocidad GPU e instalación de perfiles](docs/MODEL_PROFILES.md), incluido el clasificador FAISS opcional.
+
 ## Qué obtienes
 
 | Resultado | Qué te informa |

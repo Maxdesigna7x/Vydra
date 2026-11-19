@@ -6,8 +6,9 @@ import os
 import time
 import traceback
 from datetime import datetime, timezone
-from folder_inputs import prepare_inputs, postprocess, write_json, resolve_model_path
+from folder_inputs import prepare_resumable_inputs, postprocess, write_json, resolve_model_path
 from vydra_cli import build_parser, command_predict
+from model_profiles import PROFILES, profile_root
 from report_payloads import update_report_timing
 
 
@@ -25,32 +26,68 @@ def run(path):
         source = Path(state['input'])
         update(status='running', stage='Preparing input', processed=None)
         output.mkdir(parents=True, exist_ok=True)
-        combined, _, manifest, preparation = prepare_inputs(
+        combined, _, manifest, preparation = prepare_resumable_inputs(
             source if source.is_dir() else source.parent, output,
-            input_files=None if source.is_dir() else [source])
+            input_files=None if source.is_dir() else [source], resume=state.get("resume", False))
         update(total=preparation['input_sequences'], excluded=preparation['excluded_sequences'])
         args_list = ['predict', '--fasta', str(combined), '--format', 'jsonl',
                      '--output', str(output / 'predicciones_motor_temporal.jsonl'),
                      '--device', state['device'], '--no-report', '--language', 'en']
+        if state.get('resume') and (output / 'predicciones_motor_temporal.jsonl.checkpoint' / 'identity.json').is_file():
+            args_list.append('--resume')
+        profile = state.get('model') or 'prostt5'
+        classifier = state.get('classifier') or 'mlp'
+        args_list.extend(['--model', profile, '--classifier', classifier])
         if state['offline']:
             args_list.append('--offline')
         if state.get('batch_size'):
             args_list.extend(['--batch-size', str(state['batch_size'])])
+        from checkpoints import estimate_storage, check_space, atomic_json
+        estimate = estimate_storage(len(manifest), combined.stat().st_size, dimension=PROFILES[profile]['dimension'], report=state['report'])
+        update(storage_estimate=estimate)
+        atomic_json(output / 'estimacion_espacio.json', estimate)
+        if not state.get('resume'):
+            check_space(output, estimate['estimated_total_bytes'])
         update(stage='Locating protein model')
-        model_path = resolve_model_path(None, state['offline'], 'en')
-        os.environ['VYDRA_PROSTT5_PATH'] = str(model_path)
+        if profile == 'prostt5':
+            model_path = resolve_model_path(None, state['offline'], 'en')
+            os.environ['VYDRA_PROSTT5_PATH'] = str(model_path)
+        else:
+            model_path = profile_root() / profile / 'encoder'
         args = build_parser('en').parse_args(args_list)
         # The resolver has already downloaded or validated the local snapshot.
         args.offline = True
 
         def progress(done, total):
-            if done == 1 or done == total or done % 25 == 0:
-                update(stage='Classifying proteins', processed=done, total=total)
+            saved_path = output / 'predicciones_motor_temporal.jsonl.checkpoint' / 'progress.json'
+            saved_at = json.loads(saved_path.read_text()).get('saved_at') if saved_path.is_file() else None
+            update(stage='Classifying proteins', processed=done, total=total,
+                   last_progress_at=time.time(), checkpoint_saved_at=saved_at,
+                   batch_size_active=0, work_started_at=time.time())
 
+        def chunk_progress(details):
+            counts = (details['processed'], details['chunks_done'])
+            previous = (state.get('processed'), state.get('chunks_done'))
+            values = dict(stage='Generating embeddings', processed=details['processed'],
+                          total=details['total'], chunks_done=details['chunks_done'],
+                          chunks_total=details['chunks_total'],
+                          checkpoint_saved_at=details['checkpoint_saved_at'],
+                          batch_size_active=details['batch_size'])
+            if details['computing'] and not state.get('batch_size_active'):
+                values['work_started_at'] = time.time()
+            if counts != previous or not state.get('last_progress_at'):
+                values['last_progress_at'] = time.time()
+            update(**values)
+
+        args._storage_report = state["report"]
         args._progress_callback = progress
+        args._chunk_progress_callback = chunk_progress
+        args._storage_callback = lambda value: update(storage_estimate=value)
         update(stage='Loading models and generating embeddings', processed=None)
         command_predict(args)
         update(stage='Writing results', processed=state['total'])
+        engine_metadata_path = output / 'predicciones_motor_temporal.jsonl.metadata.json'
+        engine_metadata = json.loads(engine_metadata_path.read_text()) if engine_metadata_path.is_file() else {}
         results = postprocess(output / 'predicciones_motor_temporal.jsonl', output, manifest)
         inference_seconds = round(time.monotonic() - started, 6)
         metadata = {
@@ -58,8 +95,10 @@ def run(path):
             'status': 'complete', 'output_language': 'en', 'input_root': str(source if source.is_dir() else source.parent),
             'output_root': str(output), 'result': results, 'preparation': preparation,
             'device_requested': state['device'], 'offline': state['offline'], 'gui_run_id': state['id'],
-            'model_path': str(model_path),
+            'model_path': str(model_path), 'model_profile': profile, 'classifier': classifier,
             'inference_seconds': inference_seconds,
+            'profile_artifacts': engine_metadata.get('profile_artifacts'),
+            'classifier_artifacts': engine_metadata.get('classifier_artifacts'),
             'original_sequences_path': str(output / 'original_sequences.jsonl'),
         }
         write_json(output / 'metadata_inferencia.json', metadata)

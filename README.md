@@ -12,6 +12,8 @@ Vydra analyzes **amino-acid sequences** in protein FASTA files. It distinguishes
 
 [Install](#install-once) · [Run the interface](#analyze-your-proteins) · [Read the results](#understand-the-results) · [Export proteins](#filter-and-export) · [Troubleshooting](#troubleshooting)
 
+**Choose an embedding model:** ProstT5 (default), ESM‑2 8M, 35M or 150M. Select a profile in the GUI or use `vydra predict --model esm2-8m`. See [model sizes, GPU throughput and installation](docs/MODEL_PROFILES.md) for each profile and for the optional FAISS classifier.
+
 ## What you receive
 
 | Result | What it tells you |
@@ -187,7 +189,7 @@ With `--output`, the CLI generates a report by default; `--no-report` disables i
 <details>
 <summary><strong>Technical overview and validation</strong></summary>
 
-ProstT5 produces a 1,024-dimensional embedding shared by six MLP heads. A protein visits only the decisions on its predicted route.
+The selected encoder produces one embedding for the six model-specific heads (1,024 dimensions for ProstT5 or 320, 480 or 640 for ESM‑2). A protein visits only the decisions on its predicted route.
 
 | Head | Decision |
 |---|---|
@@ -198,7 +200,7 @@ ProstT5 produces a 1,024-dimensional embedding shared by six MLP heads. A protei
 | M5 | Structural / non-structural phage |
 | M6 | Ten structural categories |
 
-Phage assignments use exact FAISS inner-product search on normalized reference embeddings within the predicted class. Five retrieved prototypes provide descriptive evidence; the first preserves the existing nearest-cluster assignment. Proteins longer than 2,048 amino acids use overlapping windows whose embeddings are averaged.
+Phage assignments use exact FAISS inner-product search on normalized reference embeddings within the predicted class. Five retrieved prototypes provide descriptive evidence; the first preserves the existing nearest-cluster assignment. Long proteins use overlapping windows, with a window of 2,048 residues for ProstT5 and 1,022 for ESM‑2.
 
 CPU/GPU execution checks and RAM measurements are documented separately from biological performance. Internal head evaluations do not establish end-to-end accuracy on arbitrary external samples. Reference coverage, annotation quality, short fragments, and earlier classification errors affect interpretation. Additional taxonomic or functional transfer rules require independent evaluation.
 

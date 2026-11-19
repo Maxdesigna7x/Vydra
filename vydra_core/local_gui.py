@@ -16,9 +16,11 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlsplit, unquote
 from folder_inputs import INPUT_EXTENSIONS, write_json
+from model_profiles import available_profiles
 
 BASE = Path(__file__).resolve().parent
 ACTIVE = {'starting', 'running', 'cancelling'}
+STALL_TIMEOUT_SECONDS = 30 * 60
 
 
 class RunManager:
@@ -39,7 +41,7 @@ class RunManager:
                             raise ValueError('Invalid PID')
                         os.kill(pid, 0)
                     except (OSError, ValueError, KeyError):
-                        state.update(status='interrupted', stage='Interrupted', error='The previous process exited before completing. Start a new run in a new output folder.')
+                        state.update(status='interrupted', stage='Interrupted', error='The previous process exited before completing. Resume this run to reuse saved checkpoints.')
                         write_json(path, state)
             except (OSError, ValueError, KeyError):
                 continue
@@ -71,11 +73,20 @@ class RunManager:
         output = Path(output_text).expanduser().resolve()
         if output == source or (source.is_dir() and source in output.parents):
             raise ValueError('Choose an output folder outside the input folder.')
-        if output.exists() and (not output.is_dir() or any(output.iterdir())):
+        if output.exists() and (not output.is_dir() or (any(output.iterdir()) and not values.get("resume"))):
             raise ValueError('The output folder must be new or empty. Existing results are never overwritten.')
+        if values.get('resume') and not (output / 'preparation_checkpoint.json').is_file():
+            raise ValueError('No prepared checkpoint in this output folder.')
         device = values.get('device', 'auto')
         if device not in ('auto', 'cuda', 'cpu'):
             raise ValueError('Unknown device.')
+        profile = values.get('model') or 'prostt5'
+        classifier = values.get('classifier') or 'mlp'
+        available = {item['id']: item for item in available_profiles()}
+        if profile not in available or not available[profile]['installed']:
+            raise ValueError('Install the selected model profile before starting.')
+        if classifier not in ('mlp', 'faiss') or (classifier == 'faiss' and not available[profile]['faiss']):
+            raise ValueError('The selected classifier requires an installed FAISS training bank.')
         batch = values.get('batch_size')
         if batch not in (None, ''):
             try:
@@ -91,8 +102,8 @@ class RunManager:
                 raise ValueError('Another run is active. Wait for it to finish or cancel it.')
             ident = uuid.uuid4().hex
             state = dict(id=ident, status='starting', stage='Starting', mode=mode, input=str(source), output=str(output),
-                         device=device, offline=bool(values.get('offline')), report=bool(values.get('report', True)),
-                         batch_size=batch, created_at=datetime.now(timezone.utc).isoformat(),
+                         device=device, model=profile, classifier=classifier, offline=bool(values.get('offline')), report=bool(values.get('report', True)),
+                         batch_size=batch, resume=bool(values.get('resume')), created_at=datetime.now(timezone.utc).isoformat(),
                          started_timestamp=time.time(), total=None, processed=None)
             path = self.directory / (ident + '.json')
             write_json(path, state)
@@ -112,13 +123,55 @@ class RunManager:
             threading.Thread(target=self._monitor, args=(ident, proc), daemon=True).start()
             return state
 
+    def resume(self, ident):
+        with self.lock:
+            state = next((r for r in self.runs() if r['id'] == ident), None)
+            if not state or state['status'] not in ('cancelled', 'failed', 'interrupted'):
+                raise ValueError('Only an interrupted, cancelled or failed run can be resumed.')
+            values = {key: state.get(key) for key in ('mode', 'input', 'output', 'device', 'offline', 'report', 'batch_size', 'model', 'classifier')}
+            values['resume'] = True
+            return self.start(values)
+
+    @staticmethod
+    def stalled(state, now=None):
+        working = (state.get('stage') == 'Classifying proteins' or
+                   (state.get('stage') == 'Generating embeddings' and state.get('batch_size_active', 0) > 0))
+        since = state.get('work_started_at')
+        return bool(state.get('status') == 'running' and working and since and
+                    (time.time() if now is None else now) - since >= STALL_TIMEOUT_SECONDS)
+
     def _monitor(self, ident, proc):
-        code = proc.wait()
+        timeout_error = None
+        path = self.directory / (ident + '.json')
+        while True:
+            try:
+                code = proc.wait(timeout=5)
+                break
+            except subprocess.TimeoutExpired:
+                try:
+                    current = json.loads(path.read_text())
+                except (OSError, ValueError):
+                    continue
+                if self.stalled(current):
+                    timeout_error = ('Stopped after 30 minutes without completing a model batch or protein classification. '
+                                     'Saved checkpoints were retained. Review the log and Resume run to retry the unfinished work.')
+                    try:
+                        if os.name == 'nt':
+                            proc.terminate()
+                        else:
+                            os.killpg(proc.pid, signal.SIGTERM)
+                    except ProcessLookupError:
+                        pass
+                    self._kill_later(proc)
+                    code = proc.wait()
+                    break
         with self.lock:
             path = self.directory / (ident + '.json')
             state = json.loads(path.read_text())
             if ident in self.cancelled:
-                state.update(status='cancelled', stage='Cancelled', error='Partial files were retained. Use a new output folder to retry.')
+                state.update(status='cancelled', stage='Cancelled', error='Checkpoints were retained. Resume this run to continue.')
+            elif timeout_error:
+                state.update(status='failed', stage='Stopped: no progress', error=timeout_error)
             elif state['status'] in ACTIVE:
                 state.update(status='failed', stage='Failed', error=f'Inference process exited with code {code}. See the execution log.')
             state['elapsed_seconds'] = round(time.time() - state['started_timestamp'], 1)
@@ -192,7 +245,7 @@ def make_server(manager, port=0):
             request = urlsplit(self.path)
             try:
                 if request.path == '/api/config':
-                    return self.send(200, {'token': token, 'home': str(Path.home()), 'cwd': str(Path.cwd()), 'python': sys.executable})
+                    return self.send(200, {'token': token, 'home': str(Path.home()), 'cwd': str(Path.cwd()), 'python': sys.executable, 'models': available_profiles()})
                 if request.path == '/api/runs':
                     return self.send(200, manager.runs())
                 if request.path == '/api/browse':
@@ -249,6 +302,8 @@ def make_server(manager, port=0):
                     raise ValueError('Expected an object.')
                 if self.path == '/api/runs':
                     return self.send(201, manager.start(values))
+                if self.path.startswith('/api/resume/'):
+                    return self.send(201, manager.resume(self.path.rsplit('/', 1)[-1]))
                 if self.path.startswith('/api/cancel/'):
                     manager.cancel(self.path.rsplit('/', 1)[-1])
                     return self.send(200, {'status': 'cancelling'})

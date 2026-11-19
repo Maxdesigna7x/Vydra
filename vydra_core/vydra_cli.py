@@ -84,10 +84,24 @@ def import_engine(device_name: str, offline: bool):
     return engine
 
 
-def rows_from_records(engine, records, embeddings, progress_callback=None) -> list[dict[str, Any]]:
-    rows: list[dict[str, Any]] = []
+def rows_from_records(engine, records, embeddings, progress_callback=None, checkpoint=None) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = checkpoint.predictions() if checkpoint else []
+    saved = len(rows)
+    first_query = saved
+    if progress_callback:
+        progress_callback(saved, len(records))
+    profile = getattr(engine, "active_profile", None)
+    predictions = None
+    if profile is not None and profile.classifier == "faiss" and saved < len(records):
+        engine.release_prost_t5()
+        predictions = profile.classify(embeddings[saved:])
     for index, (record, embedding) in enumerate(zip(records, embeddings), 1):
-        prediction = engine.run_hierarchy(embedding)
+        if index <= saved:
+            if rows[index - 1]["seq_id"] != record.seq_id:
+                raise ValueError("Checkpoint record order differs")
+            continue
+        prediction = (engine.run_hierarchy(embedding, profile.for_row(predictions, index - 1 - first_query))
+                      if predictions is not None else engine.run_hierarchy(embedding))
         rows.append(
             {
                 "seq_id": record.seq_id,
@@ -96,6 +110,10 @@ def rows_from_records(engine, records, embeddings, progress_callback=None) -> li
                 **prediction,
             }
         )
+        if checkpoint:
+            checkpoint.save_predictions(json_safe(rows[saved:]), saved)
+            saved = len(rows)
+            checkpoint.save_progress(stage="classification", sequences_done=saved, sequences_total=len(records))
         if progress_callback:
             progress_callback(index, len(records))
     return rows
@@ -183,9 +201,77 @@ def emit(rows: list[dict[str, Any]], output_format: str, output: str | None, lan
 
 
 def command_predict(args: argparse.Namespace) -> int:
+    with contextlib.ExitStack() as stack:
+        return _command_predict(args, stack)
+
+
+def _command_predict(args, stack):
+    from checkpoints import Checkpoint, estimate_storage, identity_for, human_bytes, check_space
+    from model_profiles import PROFILES
+    checkpoint = None
+    if getattr(args, "checkpoint_dir", None) and not getattr(args, "checkpoint", True):
+        raise ValueError("--checkpoint-dir cannot be combined with --no-checkpoint")
+    use_checkpoint = bool(args.output and getattr(args, "checkpoint", True)) or bool(getattr(args, "checkpoint_dir", None))
+    if getattr(args, "resume", False) and not use_checkpoint:
+        raise ValueError("--resume requires --output or --checkpoint-dir and checkpoints enabled")
+
+    def setup_checkpoint(records, text=None):
+        if not records:
+            raise ValueError("No records to classify")
+        estimate = estimate_storage(len(records), len(text.encode("utf-8")) if text else 0,
+                                    getattr(engine, "EMB_DIM", 1024), getattr(args, "_storage_report", args.report))
+        if args.embedding or not use_checkpoint:
+            estimate['estimated_total_bytes'] -= estimate['checkpoint_bytes'] + estimate['partial_chunk_allowance_bytes']
+            estimate['embedding_bytes'] = estimate['integrity_bytes'] = estimate['checkpoint_bytes'] = estimate['partial_chunk_allowance_bytes'] = 0
+        eprint(f"Disk estimate: {len(records):,} proteins; embedding checkpoint {human_bytes(estimate['checkpoint_bytes'])}; estimated total {human_bytes(estimate['estimated_total_bytes'])}. Model downloads excluded.")
+        if not use_checkpoint:
+            if args.output:
+                check_space(Path(args.output).parent, estimate["estimated_total_bytes"])
+            return None
+        directory = getattr(args, "checkpoint_dir", None) or Path(str(args.output) + ".checkpoint")
+        eprint("Verifying model and reference fingerprints...")
+        identity = identity_for(engine, records, text, args.embedding)
+        identity['input_path'] = str((args.fasta or args.embedding).resolve()) if (args.fasta or args.embedding) else None
+        if profile_id != "prostt5" or classifier != "mlp":
+            identity.update(model_profile=profile_id, classifier=classifier,
+                            profile_artifacts=engine.active_profile.manifest,
+                            classifier_artifacts=engine.active_profile.train_manifest)
+        identity['configuration'] = {name: getattr(args, name, None) for name in
+            ('batch_size', 'max_batch_size', 'memory_fraction', 'reserve_memory_gb', 'length_bin')}
+        identity['environment'] = {key: value for key, value in os.environ.items() if key.startswith('VYDRA_') and key != 'VYDRA_PROSTT5_PATH'}
+        if args.output and Path(args.output).parent.resolve() != Path(directory).parent.resolve():
+            check_space(Path(args.output).parent, estimate['estimated_results_bytes'] + estimate['report_allowance_bytes'] + estimate['reserve_bytes'])
+        estimate_callback = getattr(args, "_storage_callback", None)
+        cache = stack.enter_context(Checkpoint(directory, identity, estimate, getattr(args, "resume", False), not args.embedding))
+        if estimate_callback:
+            estimate_callback(json.loads((cache.directory / "storage_estimate.json").read_text()))
+        eprint(f"Checkpoint: {cache.directory}" + (" (resuming)" if getattr(args, "resume", False) else ""))
+        return cache
+    if getattr(args, 'estimate_only', False):
+        if args.embedding:
+            raise ValueError('--estimate-only currently accepts protein sequences/FASTA; use the normal run for embedding inputs')
+        text = args.seq if args.seq is not None else (Path(args.fasta).read_text(encoding='utf-8') if args.fasta else sys.stdin.read())
+        count = sum(1 for _ in original_records(text))
+        if not count:
+            raise ValueError('No sequences found')
+        estimate = estimate_storage(count, len(text.encode('utf-8')), dimension=PROFILES[getattr(args, 'model', 'prostt5')]['dimension'], report=args.report)
+        if not getattr(args, 'checkpoint', True):
+            estimate['estimated_total_bytes'] -= estimate['checkpoint_bytes'] + estimate['partial_chunk_allowance_bytes']
+            estimate['embedding_bytes'] = estimate['integrity_bytes'] = estimate['checkpoint_bytes'] = estimate['partial_chunk_allowance_bytes'] = 0
+        if args.output:
+            estimate['available_bytes'] = check_space(Path(args.output).parent, 0)
+            estimate['enough_space'] = estimate['available_bytes'] >= estimate['estimated_total_bytes']
+        print(json.dumps(estimate, indent=2))
+        return 0
     started = time.perf_counter()
     started_at = datetime.now(timezone.utc).isoformat()
     engine = import_engine(args.device, args.offline)
+    profile_id = getattr(args, "model", "prostt5")
+    classifier = getattr(args, "classifier", "mlp")
+    if args.embedding and profile_id != "prostt5":
+        raise ValueError("Precomputed embeddings are currently supported only with the legacy ProstT5 profile")
+    if hasattr(engine, "configure_profile"):
+        engine.configure_profile(profile_id, classifier)
     with contextlib.redirect_stdout(sys.stderr):
         engine.require_faiss_gpu()
 
@@ -195,10 +281,9 @@ def command_predict(args: argparse.Namespace) -> int:
             # objects. Pass a string so pathlib.Path.name does not strip the
             # parent directory from a normal CLI path.
             records, embeddings = engine.load_embedding_file(str(args.embedding.resolve()))
+        checkpoint = setup_checkpoint(records)
     else:
         from folder_inputs import resolve_model_path
-        model_path = resolve_model_path(None, args.offline, args.language)
-        engine.MODEL_NAME = str(model_path)
         if args.seq is not None:
             text = args.seq
         elif args.fasta is not None:
@@ -208,20 +293,34 @@ def command_predict(args: argparse.Namespace) -> int:
         records = engine.parse_fasta_text(text)
         if not records:
             raise ValueError("No se encontro ninguna secuencia valida")
+        if args.output:
+            preflight = estimate_storage(len(records), len(text.encode('utf-8')), PROFILES[profile_id]['dimension'], report=args.report)
+            # Resumed checkpoints already occupy space and are checked below.
+            if not getattr(args, 'resume', False):
+                check_space(Path(args.output).parent, preflight['estimated_total_bytes'] - (0 if use_checkpoint else preflight['checkpoint_bytes'] + preflight['partial_chunk_allowance_bytes']))
+        if profile_id == "prostt5":
+            model_path = resolve_model_path(None, args.offline, args.language)
+        else:
+            model_path = engine.active_profile.directory / "encoder"
+        engine.MODEL_NAME = str(model_path)
+        checkpoint = setup_checkpoint(records, text)
         eprint(f"Generating embeddings for {len(records)} sequence(s)..." if args.language == 'en' else f"Generando embeddings de {len(records)} secuencia(s)...")
         with contextlib.redirect_stdout(sys.stderr):
             embeddings = engine.embed_records(
                 records,
+                **({"progress_callback": args._embedding_progress_callback} if getattr(args, "_embedding_progress_callback", None) else {}),
+                **({"chunk_progress_callback": args._chunk_progress_callback} if getattr(args, "_chunk_progress_callback", None) else {}),
                 batch_size=args.batch_size,
                 max_batch_size=args.max_batch_size,
                 memory_fraction=args.memory_fraction,
                 reserve_memory_gb=args.reserve_memory_gb,
                 length_bin=args.length_bin,
+                **({"checkpoint": checkpoint} if checkpoint else {}),
             )
 
-    eprint(f"Classifying {len(records)} record(s): MLP on {engine.device}, FAISS on {engine.device}..." if args.language == 'en' else f"Clasificando {len(records)} registro(s): MLP en {engine.device}, FAISS en {engine.device}...")
+    eprint(f"Classifying {len(records)} record(s): {classifier.upper()} on {engine.device}..." if args.language == 'en' else f"Clasificando {len(records)} registro(s): {classifier.upper()} en {engine.device}...")
     with contextlib.redirect_stdout(sys.stderr):
-        rows = rows_from_records(engine, records, embeddings, getattr(args, "_progress_callback", None))
+        rows = rows_from_records(engine, records, embeddings, getattr(args, "_progress_callback", None), checkpoint)
     source = args.fasta or args.embedding
     originals = list(original_records(text)) if not args.embedding else []
     if originals and len(originals) != len(rows):
@@ -244,8 +343,15 @@ def command_predict(args: argparse.Namespace) -> int:
     inference_seconds = round(time.perf_counter() - started, 6)
     for row in rows:
         row['run_inference_seconds'] = inference_seconds
+        row.update(model_profile=profile_id, classifier=classifier)
+    runtime_profile = getattr(engine, 'active_profile', None)
     timing = {'started_at': started_at, 'inference_seconds': inference_seconds,
-              'scope': 'whole run; model/input loading, embeddings and classification; report time separate'}
+              'model_profile': profile_id, 'classifier': classifier,
+              'profile_artifacts': runtime_profile.manifest if runtime_profile else None,
+              'classifier_artifacts': runtime_profile.train_manifest if runtime_profile and classifier == "faiss" else None,
+              'resumed': bool(getattr(args, 'resume', False)),
+              'checkpoint_dir': str(checkpoint.directory) if checkpoint else None,
+              'scope': 'current attempt; model/input loading, embeddings and classification; report time separate'}
     report_dir = None
     metadata_path = None
     if args.output:
@@ -464,6 +570,11 @@ def build_parser(language='en') -> argparse.ArgumentParser:
                          help="generar informe junto al archivo --output (por defecto; --no-report lo desactiva)")
     predict.add_argument('--sequence-export', choices=('gzip', 'csv', 'none'), default='gzip',
                          help='Exportación adicional del informe: gzip (default), CSV o ninguna')
+    from model_profiles import PROFILES
+    predict.add_argument("--model", choices=tuple(PROFILES), default="prostt5",
+                         help="embedding model profile (default: ProstT5)")
+    predict.add_argument("--classifier", choices=("mlp", "faiss"), default="mlp",
+                         help="hierarchical classification method (default: MLP)")
     predict.add_argument("--device", choices=("auto", "cpu", "cuda"), default="auto", help="dispositivo para ProstT5, MLP y FAISS; auto usa GPU compatible o CPU")
     predict.add_argument("--offline", action="store_true", help="prohibir descargas y usar solo archivos locales")
     predict.add_argument("--batch-size", type=int, help="batch fijo inicial; por defecto se calcula automaticamente")
@@ -471,6 +582,11 @@ def build_parser(language='en') -> argparse.ArgumentParser:
     predict.add_argument("--memory-fraction", type=float, help="fraccion maxima de memoria total utilizable (GPU: 0.85, CPU: 0.75)")
     predict.add_argument("--reserve-memory-gb", type=float, help="reserva de memoria en GiB; si se omite, el motor la calcula")
     predict.add_argument("--length-bin", type=int, help="ancho en aa de los buckets de longitud (por defecto: 128)")
+    predict.add_argument("--estimate-only", action="store_true", help="Print disk-space estimate as JSON without loading models or running inference")
+    predict.add_argument("--checkpoint", action=argparse.BooleanOptionalAction, default=True,
+                         help="Save chunks per completed batch and predictions after each protein when --output is used; --no-checkpoint disables it")
+    predict.add_argument("--checkpoint-dir", type=Path, help="Checkpoint directory (default: OUTPUT.checkpoint)")
+    predict.add_argument("--resume", action="store_true", help="Verify and reuse an existing checkpoint; repeat the original command with this option")
     predict.set_defaults(func=command_predict)
 
     gui = subparsers.add_parser("gui", help="open the local graphical interface")

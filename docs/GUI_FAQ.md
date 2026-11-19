@@ -67,3 +67,7 @@ They count predicted proteins, not organisms, viral particles, or genomes. Inter
 ### Does Vydra learn from my input?
 
 Inference uses prepared weights and references. Analyzing a FASTA does not retrain the models or automatically add proteins to the reference banks.
+
+## Model profiles
+
+The embedding model selector lists local profiles, encoder weight size and approximate GPU speed. Select a classifier after choosing the profile. A disabled entry needs its package installed. [Profile setup and benchmark scope](MODEL_PROFILES.md).

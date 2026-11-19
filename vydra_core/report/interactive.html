@@ -324,7 +324,7 @@ try{const saved=localStorage.getItem('vydra-report-theme');if(saved==='light'||s
     };
     const run=JSON.parse(q('run').textContent);
     const seconds=value=>value!==null&&value!==undefined&&value!==''&&Number.isFinite(Number(value))?Number(value).toLocaleString('en-US',{maximumFractionDigits:2})+' s':'Unavailable';
-    q('timing').textContent=(run.fixture?'Illustrative fixture · ':'')+'Whole run · inference: '+seconds(run.inference_seconds??run.elapsed_seconds)+' · total processing: '+seconds(run.total_processing_seconds)+' (includes report generation when enabled)';
+    q('timing').textContent=(run.fixture?'Illustrative fixture · ':'')+(run.model_profile?run.model_profile+' · '+String(run.classifier||'mlp').toUpperCase()+' · ':'')+'Whole run · inference: '+seconds(run.inference_seconds??run.elapsed_seconds)+' · total processing: '+seconds(run.total_processing_seconds)+' (includes report generation when enabled)';
     function refreshFiles(){const prev=q('file').value,rows=data.filter(r=>q('folder').value==='all'||r.folder===q('folder').value);options(q('file'),[['all','All files'],...[...new Set(rows.map(r=>r.file))].sort().map(f=>[f,f])],prev)}
     ['folder','file','group','rank','basis'].forEach(k=>q(k).onchange=()=>{if(k==='folder')refreshFiles();page=0;selected='all';render();save()});
     q('selection').onchange=()=>select(q('selection').value);

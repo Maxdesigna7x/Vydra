@@ -138,3 +138,7 @@ La GUI usa el mismo motor y conserva predicciones completas CSV/JSONL, manifiest
 - Familias, géneros y hospederos son contexto de las referencias. El informe no certifica especie para la proteína nueva.
 - Los porcentajes cuentan proteínas, no organismos, genomas ni abundancia de virus. En la cascada se calculan respecto al padre; los rankings explicitan si el denominador es el grupo completo o solo los registros con etiqueta.
 - La resolución exclusiva usa el mejor nivel disponible; los rankings independientes de género y familia pueden incluir la misma proteína.
+
+## Model profiles
+
+Las salidas y la metadata identifican el perfil en **model_profile** y el clasificador en **classifier**. Los scores de FAISS son cosenos al vecino de train; los de MLP son softmax. [Profile setup and benchmark scope](../docs/MODEL_PROFILES.md).
