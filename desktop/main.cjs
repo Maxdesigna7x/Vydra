@@ -31,6 +31,7 @@ let config;
 
 function configFile() { return path.join(app.getPath('userData'), 'settings.json'); }
 function resourceFolder() { return path.join(app.isPackaged ? process.resourcesPath : __dirname, 'resources'); }
+function windowIcon() { return path.join(resourceFolder(), 'vydra.png'); }
 function defaultFolder() {
   if (process.platform === 'win32') return path.join(process.env.LOCALAPPDATA || app.getPath('userData'), 'Vydra', 'Data');
   return path.join(process.env.XDG_DATA_HOME || path.join(app.getPath('home'), '.local', 'share'), 'Vydra');
@@ -44,6 +45,7 @@ function setup() {
   if (setupWindow && !setupWindow.isDestroyed()) return setupWindow.show();
   setupWindow = new BrowserWindow({
     width: 760, height: 720, minWidth: 580, minHeight: 560, title: 'Configurar Vydra',
+    icon: windowIcon(),
     webPreferences: { preload: path.join(__dirname, 'preload.cjs'), sandbox: true, contextIsolation: true },
   });
   setupWindow.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
@@ -94,6 +96,7 @@ async function startEngine(paths) {
   const loopback = new URL(url).origin;
   engineWindow = new BrowserWindow({
     title: 'Vydra', width: 1220, height: 870, minWidth: 820, minHeight: 600,
+    icon: windowIcon(),
     webPreferences: { sandbox: true, contextIsolation: true },
   });
   const allowed = target => new URL(target).origin === loopback;
@@ -198,6 +201,8 @@ async function start() {
   }
   setup();
 }
+
+if (process.platform === 'linux') app.commandLine.appendSwitch('class', 'Vydra');
 
 if (handleSquirrelEvent()) {
   // Squirrel finishes shortcut management before the normal app starts.

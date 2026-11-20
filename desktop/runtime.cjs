@@ -4,12 +4,14 @@ const { access, mkdir, readFile, rename, statfs, writeFile, cp } = require('node
 const path = require('node:path');
 
 const version = require('./package.json').version;
+// Keep the managed dependencies and setup journal across compatible app updates.
+const runtimeVersion = '0.1.0';
 const windows = process.platform === 'win32';
 const gib = 1024 ** 3;
 const minimum = { cpu: 12 * gib, cuda: (windows ? 22 : 34) * gib };
 
 function layout(root, mode, resources) {
-  const environment = path.join(root, 'env', `${version}-${mode}`);
+  const environment = path.join(root, 'env', `${runtimeVersion}-${mode}`);
   const cache = path.join(root, 'cache');
   const temp = path.join(root, 'tmp');
   const core = path.join(root, 'app', version, 'vydra_core');
@@ -20,7 +22,7 @@ function layout(root, mode, resources) {
     python: windows ? path.join(environment, 'python.exe') : path.join(environment, 'bin', 'python'),
     engine: path.join(resources, 'vydra_core'),
     state: path.join(root, 'runs'),
-    marker: path.join(environment, '.vydra-ready'),
+    marker: path.join(core, `.vydra-${mode}-ready`),
     env: {
       ...process.env,
       MAMBA_ROOT_PREFIX: path.join(cache, 'mamba'),
@@ -136,12 +138,12 @@ async function prepare(root, mode, resources, log, { dependenciesOnly = false, s
   }
   const available = await freeSpace(root);
   if (available < gib) throw new Error('La unidad necesita al menos 1 GiB libre para continuar.');
-  const journal = path.join(root, 'app', version, `setup-${mode}.json`);
+  const journal = path.join(root, 'app', runtimeVersion, `setup-${mode}.json`);
   const previous = await readFile(journal, 'utf8').then(JSON.parse).catch(() => ({}));
   if (!dependenciesOnly && !previous.phase && available < minimum[mode]) {
     throw new Error(`Espacio insuficiente. Se estiman ${minimum[mode] / gib} GiB para preparar este modo.`);
   }
-  for (const folder of [paths.temp, paths.cache, paths.state, path.dirname(paths.core)]) {
+  for (const folder of [paths.temp, paths.cache, paths.state, path.dirname(paths.core), path.dirname(journal)]) {
     await mkdir(folder, { recursive: true });
   }
   const logfile = path.join(root, 'setup.log');

@@ -62,6 +62,8 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           sudo apt-get install -y ./out/make/deb/x64/*.deb
+          grep -Fx 'Icon=vydra-desktop' /usr/share/applications/vydra-desktop.desktop
+          cmp assets/vydra.png /usr/share/pixmaps/vydra-desktop.png
           xvfb-run -a node smoke-window.cjs /usr/bin/vydra-desktop
       - name: Install on Windows and open the setup window
         if: runner.os == 'Windows'
@@ -72,6 +74,7 @@ jobs:
           if ($installer.ExitCode -ne 0) { throw "Installer exited with code $($installer.ExitCode)" }
           $app = Get-ChildItem "$env:LOCALAPPDATA/vydra_desktop/app-*/vydra-desktop.exe" | Select-Object -First 1
           if (!$app) { throw 'The installer did not install vydra-desktop.exe' }
+          ./check-windows-icons.ps1 $setup.FullName $app.FullName
           node smoke-window.cjs $app.FullName
       - uses: actions/upload-artifact@v4
         with:

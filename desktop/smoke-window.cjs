@@ -30,7 +30,7 @@ async function smoke() {
   if (!executable) throw new Error('Pass the installed Vydra executable.');
   const resources = path.join(path.dirname(await realpath(executable)), 'resources', 'resources');
   const tools = process.platform === 'win32' ? 'micromamba.exe' : 'micromamba';
-  await Promise.all([tools, 'requirements.txt', 'desktop_bootstrap.py', 'micromamba-LICENSE.txt',
+  await Promise.all([tools, 'requirements.txt', 'desktop_bootstrap.py', 'micromamba-LICENSE.txt', 'vydra.png',
     path.join('vydra_core', 'gui', 'index.html')].map(file => access(path.join(resources, file))));
   const isolated = await mkdtemp(path.join(tmpdir(), 'vydra-window-'));
   const args = ['--setup', '--disable-gpu', '--remote-debugging-port=0', `--user-data-dir=${isolated}`];

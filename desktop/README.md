@@ -56,7 +56,8 @@ preparación se puede ejecutar ProstT5 sin conexión.
 - La ventana de configuración vive en `desktop/setup.html`, `setup.css` y
   `setup.js`. La preparación del entorno vive en `desktop/runtime.cjs` y
   `desktop/desktop_bootstrap.py`. La pantalla de análisis reutiliza
-  `vydra_core/gui/`.
+  `vydra_core/gui/`. Los iconos de `desktop/assets/` se derivan de
+  `docs/images/vydra-icon.webp`, el logo del README.
 - Sube los cambios a una rama con prefijo `desktop/`. Las modificaciones de
   Desktop o del núcleo disparan la compilación de Linux y Windows. En
   **Actions → Vydra Desktop** se pueden descargar ambos instaladores desde
@@ -75,7 +76,7 @@ preparación se puede ejecutar ProstT5 sin conexión.
 
 Pulsa **Pausar preparación** si necesitas detener la descarga. Vuelve a
 elegir la misma carpeta y el mismo modo. Consulta `setup.log` en la
-carpeta de datos y el estado de la etapa en `app/<versión>/setup-<modo>.json`.
+carpeta de datos y el estado de la etapa en `app/<versión-del-entorno>/setup-<modo>.json`.
 
 - Si se interrumpió el entorno, el asistente vuelve a ejecutar su instalación
   y conserva las cachés de paquetes. Las siguientes etapas reutilizan un entorno
