@@ -1,7 +1,7 @@
 <!doctype html><html lang="en" data-theme="dark"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Vydra · Local inference</title><link rel="stylesheet" href="/gui.css"><link rel="stylesheet" href="/desktop-runs.css"><script defer src="/desktop-runs.js"></script><script defer src="/gui.js"></script></head>
 <body><main>
 <header><div><h1>Vydra</h1><p class="muted">Local protein inference</p></div><div class="header-actions"><button id="desktop-new" type="button" class="button primary">Nueva tarea</button><button id="faq-open" class="button quiet" type="button">FAQ</button><button id="theme" class="button quiet" type="button">Switch to light</button></div></header>
-<section id="desktop-queue" aria-label="Corridas"><p id="desktop-empty" class="muted">No hay corridas. Crea una tarea para empezar.</p><ul id="desktop-run-list" aria-label="Lista de corridas"></ul><p id="desktop-connection-error" class="error" role="alert"></p></section>
+<section id="desktop-queue" aria-labelledby="desktop-queue-heading"><h2 id="desktop-queue-heading">Corridas</h2><p id="desktop-empty" class="muted">No hay corridas. Crea una tarea para empezar.</p><ul id="desktop-run-list" aria-label="Lista de corridas"></ul><p id="desktop-connection-error" class="error" role="alert"></p></section>
 <form id="run-form">
 <div class="options-grid"><label>Embedding model<select id="model"><option value="prostt5">ProstT5 · 5.64 GB · 1×</option></select></label><label>M4 classifier · eukaryotic viruses<input value="MLP + FAISS" readonly></label></div>
 <a href="https://github.com/Maxdesigna7x/Vydra/blob/desktop/v1/docs/MODEL_PROFILES.md" target="_blank" rel="noopener noreferrer">Install or compare models</a>

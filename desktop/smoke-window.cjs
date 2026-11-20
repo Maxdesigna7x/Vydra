@@ -51,13 +51,15 @@ async function smoke() {
         const page = pages.find(target => target.url.endsWith('/setup.html'));
         if (page) {
           const checks = await evaluate(page.webSocketDebuggerUrl, `({
-            title: document.querySelector('h1')?.textContent,
+            title: document.querySelector('#setup-heading')?.textContent,
+            brand: document.querySelector('.brand-mark img')?.naturalWidth,
+            stages: document.querySelectorAll('[data-stage]').length,
             folder: document.querySelector('#folder')?.value,
             devices: Array.from(document.querySelectorAll('[name=mode]')).map(element => element.value),
             error: document.querySelector('#status')?.textContent
           })`);
           if (checks?.error) throw new Error(checks.error);
-          if (checks?.folder && checks.title === 'Configurar Vydra' && checks.devices.join(',') === 'cuda,cpu') {
+          if (checks?.folder && checks.title === 'Elige tu equipo y destino' && checks.brand > 0 && checks.stages === 6 && checks.devices.join(',') === 'cuda,cpu') {
             console.log('Packaged setup window opened with a default folder and both device choices.');
             return;
           }

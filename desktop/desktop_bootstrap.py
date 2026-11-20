@@ -1,10 +1,14 @@
 """Prepare Vydra Desktop and supervise its existing local interface."""
 
+import base64
+import hashlib
+import json
 import os
 import shutil
 import sys
 import threading
 import time
+from contextlib import contextmanager
 from pathlib import Path
 from http.client import IncompleteRead
 from urllib.error import HTTPError
@@ -17,12 +21,21 @@ BANK_SIZES = {
 }
 
 
-def fetch_verified(url, target, size, digest):
+def setup_event(stage, phase, item, **metrics):
+    print("VYDRA_SETUP " + json.dumps(dict(stage=stage, phase=phase, item=item, **metrics)), flush=True)
+
+
+def fetch_verified(url, target, size, digest, report=None):
     from vydra_cli import sha256_file
 
-    if target.is_file() and target.stat().st_size == size and sha256_file(target) == digest:
-        print(f"Verificado: {target.name}.", flush=True)
-        return
+    if report is None:
+        def report(_phase, _received):
+            pass
+    if target.is_file() and target.stat().st_size == size:
+        report("working", size)
+        if sha256_file(target) == digest:
+            print(f"Verificado: {target.name}.", flush=True)
+            return
     partial = target.with_name(target.name + ".part")
     if target.is_file():
         if partial.exists():
@@ -48,6 +61,8 @@ def fetch_verified(url, target, size, digest):
                         offset = 0
                     with partial.open("ab" if append else "wb") as output:
                         print(f"Descargando {target.name} desde {offset:,} de {size:,} bytes.", flush=True)
+                        report("transfer", offset)
+                        next_report = time.monotonic() + .8
                         next_notice = time.monotonic() + 10
                         while offset < size:
                             chunk = response.read(min(1024 * 1024, size - offset))
@@ -55,11 +70,16 @@ def fetch_verified(url, target, size, digest):
                                 break
                             output.write(chunk)
                             offset += len(chunk)
-                            if time.monotonic() >= next_notice:
+                            now = time.monotonic()
+                            if now >= next_report or offset == size:
+                                report("transfer", offset)
+                                next_report = now + .8
+                            if now >= next_notice:
                                 print(f"{target.name} · {offset / size:.0%}", flush=True)
-                                next_notice = time.monotonic() + 10
+                                next_notice = now + 10
             if partial.stat().st_size != size:
                 raise OSError("Descarga incompleta.")
+            report("working", size)
             if sha256_file(partial) != digest:
                 partial.unlink()
                 raise ValueError(f"Falló la verificación SHA-256 de {target.name}.")
@@ -71,6 +91,7 @@ def fetch_verified(url, target, size, digest):
         except (OSError, ValueError, IncompleteRead):
             if attempt == 3:
                 raise
+        report("retry", partial.stat().st_size if partial.exists() else 0)
         time.sleep(5 * (2 ** attempt))
 
 
@@ -80,14 +101,33 @@ M4_PARTS = (
 )
 
 
+def download_stage(stage, items):
+    total = sum(size for _, _, size, _ in items)
+    completed = 0
+    for url, target, size, digest in items:
+        def update(phase, received):
+            if phase == "working":
+                item = f"Verificando {target.name}"
+            elif phase == "retry":
+                item = f"Reintentando {target.name}"
+            else:
+                item = target.name
+            setup_event(stage, phase, item, received=completed + received, total=total)
+
+        fetch_verified(url, target, size, digest, update)
+        completed += size
+
+
 def prepare_m4_bank():
     from model_profiles import profile_root, verify_manifest
     from profile_install import RELEASE, install_archive
 
+    setup_event("m4", "working", "Buscando el banco M4 en esta carpeta")
     root = profile_root()
     destination = root / "prostt5"
     if destination.exists():
         verify_manifest(destination, "m4_manifest.json", "prostt5")
+        setup_event("m4", "done", "Banco M4 reutilizado")
         return
     cache = root.parent / "cache" / "profile-downloads"
     cache.mkdir(parents=True, exist_ok=True)
@@ -102,11 +142,13 @@ def prepare_m4_bank():
     if shutil.disk_usage(root).free < limit + missing_bytes:
         raise OSError(f"Se necesitan {limit + missing_bytes:,} bytes libres para el banco M4 en {root}.")
     print("Preparando banco FAISS de M4 para ProstT5…", flush=True)
-    for part, (size, digest) in zip(parts, M4_PARTS):
-        fetch_verified(f"{RELEASE}/{part.name}", part, size, digest)
+    download_stage("m4", [(f"{RELEASE}/{part.name}", part, size, digest)
+                          for part, (size, digest) in zip(parts, M4_PARTS)])
+    setup_event("m4", "working", "Descomprimiendo y comprobando el banco M4")
     install_archive("prostt5", root, parts, limit)
     for part in parts:
         part.unlink()
+    setup_event("m4", "done", "Banco M4 preparado")
 
 
 def verify_dependencies(mode, check_gpu):
@@ -136,41 +178,96 @@ def verify_dependencies(mode, check_gpu):
     print(f"Prueba de dependencias correcta. PyTorch: {backend}. FAISS: {index_backend}.", flush=True)
 
 
+PROSTT5_FILES = {
+    "pytorch_model.bin": (5637876077, "b1a9ffcef73280cc57f090ad6446b4116b574b6c75d83ccc32778282f7f00855"),
+    "spiece.model": (237990, "74da7b4afcde53faa570114b530c726135bdfcdb813dec3abfb27f9d44db7324"),
+}
+
+
 def verify_prostt5(model_dir):
     from vydra_cli import sha256_file
 
-    expected = {
-        "pytorch_model.bin": (5637876077, "b1a9ffcef73280cc57f090ad6446b4116b574b6c75d83ccc32778282f7f00855"),
-        "spiece.model": (237990, "74da7b4afcde53faa570114b530c726135bdfcdb813dec3abfb27f9d44db7324"),
-    }
-    for name, (size, digest) in expected.items():
+    for name, (size, digest) in PROSTT5_FILES.items():
         item = model_dir / name
         if not item.is_file() or item.stat().st_size != size or sha256_file(item) != digest:
             raise ValueError(f"El modelo no coincide con la revisión esperada: {item}")
+
+
+def prostt5_bytes(directory, files):
+    # Hugging Face writes the pinned snapshot to its local-dir cache before
+    # atomically moving each finished file into the destination.
+    cache = directory / ".cache" / "huggingface" / "download"
+    received = 0
+    for name, (size, digest) in files.items():
+        final = directory / name
+        fingerprint = base64.urlsafe_b64encode(hashlib.sha1(name.encode()).digest()).decode()
+        partial = cache / f"{fingerprint}.{digest}.incomplete"
+        for candidate in (final, partial):
+            try:
+                received += min(candidate.stat().st_size, size)
+                break
+            except FileNotFoundError:
+                continue
+    return received
+
+
+@contextmanager
+def model_transfer(directory):
+    total = sum(size for size, _ in PROSTT5_FILES.values())
+    stop = threading.Event()
+
+    def watch():
+        previous = -1
+        while not stop.is_set():
+            received = prostt5_bytes(directory, PROSTT5_FILES)
+            if received != previous:
+                setup_event("model", "transfer", "Pesos y tokenizer de ProstT5",
+                            total=total, received=received)
+                previous = received
+            stop.wait(.8)
+
+    thread = threading.Thread(target=watch, daemon=True)
+    thread.start()
+    try:
+        yield
+    finally:
+        stop.set()
+        thread.join()
 
 
 def prepare(mode):
     from folder_inputs import resolve_model_path
     from vydra_cli import BANKS_DIR, DOWNLOADABLE_ARTIFACTS, RELEASE_BASE_URL, main
 
+    setup_event("libraries", "working", "Comprobando bibliotecas y dispositivo")
     verify_dependencies(mode, check_gpu=True)
+    setup_event("libraries", "done", "Bibliotecas disponibles")
+    setup_event("references", "working", "Buscando los bancos en la carpeta de datos")
     BANKS_DIR.mkdir(parents=True, exist_ok=True)
-    for filename, digest in DOWNLOADABLE_ARTIFACTS.items():
-        fetch_verified(f"{RELEASE_BASE_URL}/{filename}", BANKS_DIR / filename, BANK_SIZES[filename], digest)
+    download_stage("references", [(f"{RELEASE_BASE_URL}/{name}", BANKS_DIR / name, BANK_SIZES[name], digest)
+                                  for name, digest in DOWNLOADABLE_ARTIFACTS.items()])
+    setup_event("references", "done", "Bancos de referencia disponibles")
+
+    setup_event("model", "working", "Buscando la revisión local de ProstT5")
     model_dir = Path(os.environ["VYDRA_PROSTT5_PATH"])
     if not (model_dir / ".vydra-model-ready").is_file() or not (model_dir / "pytorch_model.bin").is_file():
-        print("Preparando ProstT5. Se reutilizarán los archivos completos y los parciales de la descarga.", flush=True)
         try:
             resolve_model_path(model_dir, offline=True)
+            setup_event("model", "working", "Verificando los pesos locales")
             verify_prostt5(model_dir)
         except (FileNotFoundError, ValueError):
-            if main(["download-model", "--directory", str(model_dir)]):
-                raise RuntimeError("Falló la preparación de ProstT5.")
+            with model_transfer(model_dir):
+                if main(["download-model", "--directory", str(model_dir)]):
+                    raise RuntimeError("Falló la preparación de ProstT5.")
+            setup_event("model", "working", "Verificando los pesos y el tokenizer")
             resolve_model_path(model_dir, offline=True)
             verify_prostt5(model_dir)
         (model_dir / ".vydra-model-ready").touch()
     resolve_model_path(model_dir, offline=True)
+    setup_event("model", "done", "ProstT5 disponible")
+
     prepare_m4_bank()
+    setup_event("verify", "working", "Comprobando modelos y archivos")
     return main(["doctor"])
 
 

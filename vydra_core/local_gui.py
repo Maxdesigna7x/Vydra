@@ -441,7 +441,8 @@ def make_server(manager, port=0):
                     return self.send(200, target.read_bytes(), mime)
                 static = {'/': ('index.html', 'text/html; charset=utf-8'), '/gui.js': ('gui.js', 'text/javascript; charset=utf-8'), '/gui.css': ('gui.css', 'text/css; charset=utf-8'),
                           '/desktop-runs.js': ('desktop-runs.js', 'text/javascript; charset=utf-8'),
-                          '/desktop-runs.css': ('desktop-runs.css', 'text/css; charset=utf-8')}
+                          '/desktop-runs.css': ('desktop-runs.css', 'text/css; charset=utf-8'),
+                          '/vydra.png': ('vydra.png', 'image/png')}
                 if request.path in static:
                     name, mime = static[request.path]
                     return self.send(200, (BASE / 'gui' / name).read_bytes(), mime)

@@ -8,7 +8,7 @@ module.exports = {
     icon,
     executableName: 'vydra-desktop',
     extraResource: [path.join(__dirname, 'resources')],
-    ignore: [/^\/resources(?:\/|$)/, /^\/test_/],
+    ignore: [/^\/resources(?:\/|$)/, /^\/test[-_]/],
   },
   makers: [
     {

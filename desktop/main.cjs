@@ -114,7 +114,8 @@ function checkForUpdatesInBackground() {
 function setup() {
   if (setupWindow && !setupWindow.isDestroyed()) return setupWindow.show();
   setupWindow = new BrowserWindow({
-    width: 760, height: 720, minWidth: 580, minHeight: 560, title: 'Configurar Vydra',
+    width: 1260, height: 850, minWidth: 580, minHeight: 560, title: 'Configurar Vydra',
+    backgroundColor: '#101113',
     icon: windowIcon(),
     webPreferences: { preload: path.join(__dirname, 'preload.cjs'), sandbox: true, contextIsolation: true },
   });
@@ -212,6 +213,7 @@ async function startEngine(paths) {
   });
   engineWindow = new BrowserWindow({
     title: 'Vydra', width: 1220, height: 870, minWidth: 820, minHeight: 600,
+    backgroundColor: '#101113',
     icon: windowIcon(),
     webPreferences: {
       preload: path.join(__dirname, 'navigation-preload.cjs'), sandbox: true, contextIsolation: true,
@@ -261,7 +263,12 @@ function registerSetupHandlers() {
       config = { root: path.normalize(root), mode };
       await mkdir(path.dirname(configFile()), { recursive: true });
       await writeAtomic(configFile(), JSON.stringify(config));
-      const paths = await prepare(config.root, config.mode, resourceFolder(), progress, { signal: installation.signal });
+      const paths = await prepare(config.root, config.mode, resourceFolder(), progress, {
+        signal: installation.signal,
+        onProgress: event => {
+          if (setupWindow && !setupWindow.isDestroyed()) setupWindow.webContents.send('setup:transfer', event);
+        },
+      });
       installation.signal.throwIfAborted();
       await startEngine(paths);
     } finally {

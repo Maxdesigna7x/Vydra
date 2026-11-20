@@ -103,6 +103,17 @@ versión más nueva, **Descargar** abre el instalador oficial en el navegador.
 También puedes usar **Vydra → Buscar actualizaciones…**. Sin conexión,
 puedes seguir usando tu entorno local y volver a buscar más tarde.
 
+## Progreso de la preparación
+
+El asistente muestra el entorno base, las bibliotecas de Python, los bancos
+de referencia, ProstT5, el banco M4 y la comprobación final. Durante una
+transferencia, la velocidad y el tiempo restante se calculan con el movimiento
+reciente de bytes. Los porcentajes abarcan todo el banco o grupo de archivos
+cuando se conoce su tamaño. Para pip se identifica el archivo actual, ya que
+pip determina las dependencias y sus tamaños durante la instalación.
+Durante la resolución de paquetes, la instalación, la verificación o la
+descompresión, se muestra la actividad en curso sin estimar velocidad de red.
+
 ## Reanudar una instalación
 
 Pulsa **Pausar preparación** si necesitas detener la descarga. Vuelve a

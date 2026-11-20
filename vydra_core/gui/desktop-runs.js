@@ -176,6 +176,13 @@ window.createVydraDesktopRuns = ({ selectRun, showReport }) => {
   function mount(config) {
     for (const entry of config.models) modelNames.set(entry.id, entry.name);
     document.documentElement.classList.add('desktop-runs');
+    const brand = document.querySelector('main > header > div:first-child');
+    brand.classList.add('desktop-brand');
+    const icon = document.createElement('img');
+    icon.src = '/vydra.png';
+    icon.alt = '';
+    icon.addEventListener('error', () => icon.remove(), { once: true });
+    brand.prepend(icon);
     task.append($('run-form'));
     details.append($('status-section'));
     $('desktop-new').onclick = () => {

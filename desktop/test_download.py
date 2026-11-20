@@ -1,4 +1,5 @@
 import hashlib
+import base64
 import sys
 import tempfile
 import threading
@@ -9,7 +10,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "vydra_core"))
-from desktop_bootstrap import fetch_verified
+from desktop_bootstrap import fetch_verified, prostt5_bytes
 
 
 @contextmanager
@@ -48,8 +49,11 @@ class SetupDownloads(unittest.TestCase):
             partial = target.with_suffix(".pt.part")
             partial.write_bytes(payload[:73])
             digest = hashlib.sha256(payload).hexdigest()
+            progress = []
+            fetch_verified(url, target, len(payload), digest, lambda *event: progress.append(event))
             fetch_verified(url, target, len(payload), digest)
-            fetch_verified(url, target, len(payload), digest)
+            self.assertEqual(progress[0], ("transfer", 73))
+            self.assertEqual(progress[-1], ("working", len(payload)))
             self.assertEqual(calls, ["bytes=73-"])
             self.assertEqual(target.read_bytes(), payload)
             self.assertFalse(partial.exists())
@@ -69,3 +73,16 @@ class SetupDownloads(unittest.TestCase):
                 fetch_verified(url, target, 3, hashlib.sha256(b"abc").hexdigest())
             self.assertFalse(target.exists())
             self.assertFalse(target.with_suffix(".pt.part").exists())
+
+    def test_model_meter_uses_the_matching_snapshot_partial(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            cache = root / ".cache" / "huggingface" / "download"
+            cache.mkdir(parents=True)
+            name = "pytorch_model.bin"
+            key = base64.urlsafe_b64encode(hashlib.sha1(name.encode()).digest()).decode()
+            (cache / f"{key}.wrong.incomplete").write_bytes(b"old payload")
+            (cache / f"{key}.current.incomplete").write_bytes(b"part")
+            self.assertEqual(prostt5_bytes(root, {name: (10, "current")}), 4)
+            (root / name).write_bytes(b"0123456789")
+            self.assertEqual(prostt5_bytes(root, {name: (10, "current")}), 10)

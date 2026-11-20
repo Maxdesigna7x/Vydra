@@ -1,4 +1,6 @@
 const { spawn } = require('node:child_process');
+const { createInterface } = require('node:readline');
+const { progressReporter, packageArchives, watchArchives, pipProgress } = require('./setup-progress.cjs');
 const { appendFileSync } = require('node:fs');
 const { access, mkdir, readFile, rename, statfs, writeFile, cp } = require('node:fs/promises');
 const path = require('node:path');
@@ -88,7 +90,7 @@ async function ready(paths) {
   }
 }
 
-function run(command, args, options, log, signal) {
+function run(command, args, options, log, signal, onLine, errorLog = log) {
   signal?.throwIfAborted();
   const child = spawn(command, args, {
     ...options, windowsHide: true, detached: !windows, stdio: ['ignore', 'pipe', 'pipe'],
@@ -104,7 +106,11 @@ function run(command, args, options, log, signal) {
     catch (error) { if (error.code !== 'ESRCH') child.kill(); }
   }
   signal?.addEventListener('abort', stop, { once: true });
-  for (const pipe of [child.stdout, child.stderr]) pipe.on('data', bytes => log(bytes.toString()));
+  for (const pipe of [child.stdout, child.stderr]) {
+    pipe.setEncoding('utf8');
+    pipe.on('data', pipe === child.stdout ? log : errorLog);
+    if (onLine) createInterface({ input: pipe, crlfDelay: Infinity }).on('line', onLine);
+  }
   return new Promise((resolve, reject) => {
     child.once('error', reject);
     child.once('close', code => {
@@ -131,9 +137,15 @@ function pythonProcess(paths, args) {
   return { command: paths.python, args, env };
 }
 
-async function prepare(root, mode, resources, log, { dependenciesOnly = false, signal } = {}) {
+async function prepare(root, mode, resources, log, { dependenciesOnly = false, signal, onProgress } = {}) {
   const paths = layout(root, mode, resources);
-  if (!dependenciesOnly && await ready(paths)) return paths;
+  const send = progressReporter(onProgress || (() => {}));
+  const mark = (stage, phase, item) => send({ stage, phase, item });
+  if (!dependenciesOnly && await ready(paths)) {
+    for (const stage of ['environment', 'libraries', 'references', 'model', 'm4', 'verify']) mark(stage, 'done', 'Ya preparado');
+    return paths;
+  }
+  mark('environment', 'working', 'Comprobando espacio y dispositivo');
   if (!windows && mode === 'cuda' && !dependenciesOnly) {
     await run('nvidia-smi', ['--query-gpu=name,driver_version', '--format=csv,noheader'], {}, log, signal);
   }
@@ -153,9 +165,13 @@ async function prepare(root, mode, resources, log, { dependenciesOnly = false, s
     catch (error) { console.error('Could not write setup.log', error); }
     log(message);
   };
-  const python = args => {
+  const python = (args, onLine) => {
     const launch = pythonProcess(paths, args);
-    return run(launch.command, launch.args, { env: launch.env }, progress, signal);
+    return run(launch.command, launch.args, { env: launch.env }, progress, signal, onLine);
+  };
+  const pip = async args => {
+    const report = pipProgress(event => send({ stage: 'libraries', ...event }));
+    await python(['-m', 'pip', 'install', '--retries', '6', '--timeout', '120', '--progress-bar', 'raw', ...args], report);
   };
   const hasPython = await access(paths.python).then(() => true).catch(() => false);
   if (!hasPython || !previous.phase || previous.phase === 'installing') {
@@ -164,27 +180,56 @@ async function prepare(root, mode, resources, log, { dependenciesOnly = false, s
     const solveEnv = mode === 'cuda' && !windows && dependenciesOnly
       ? { ...paths.env, CONDA_OVERRIDE_CUDA: '12.9' } : paths.env;
     const exists = await access(path.join(paths.environment, 'conda-meta', 'history')).then(() => true).catch(() => false);
-    await run(paths.tools, ['--no-rc', exists ? 'install' : 'create', '-y', '--always-copy', '-p', paths.environment,
-      '-c', 'conda-forge', '--override-channels', ...packages(mode)], { env: solveEnv }, progress, signal);
+    const args = ['--no-rc', exists ? 'install' : 'create', '-y', '--always-copy', '-p', paths.environment,
+      '-c', 'conda-forge', '--override-channels', ...packages(mode)];
+    let stopWatching = () => {};
+    if (onProgress) {
+      mark('environment', 'working', 'Resolviendo el entorno y consultando el catálogo de paquetes');
+      let plan = '';
+      try {
+        await run(paths.tools, [...args, '--dry-run', '--json'], { env: solveEnv }, chunk => { plan += chunk; }, signal, undefined, progress);
+        const archives = packageArchives(JSON.parse(plan), paths.env.MAMBA_ROOT_PREFIX);
+        if (!archives.length) mark('environment', 'working', 'Preparando paquetes del entorno');
+        stopWatching = await watchArchives(archives, event => send({ stage: 'environment', ...event }));
+      } catch (error) {
+        signal?.throwIfAborted();
+        progress(`Vista de descarga del entorno no disponible: ${error.message}\n`);
+      }
+    }
+    try {
+      await run(paths.tools, args, { env: solveEnv }, progress, signal);
+    } finally {
+      stopWatching();
+    }
+    mark('environment', 'done', 'Entorno preparado');
+    mark('libraries', 'working', 'Resolviendo bibliotecas de Python');
     if (windows) {
       const index = mode === 'cuda' ? 'cu126' : 'cpu';
-      await python(['-m', 'pip', 'install', '--retries', '6', '--timeout', '120',
-        '--index-url', `https://download.pytorch.org/whl/${index}`, 'torch==2.10.0']);
+      await pip(['--index-url', `https://download.pytorch.org/whl/${index}`, 'torch==2.10.0']);
     }
-    await python(['-m', 'pip', 'install', '--retries', '6', '--timeout', '120',
-      '-r', path.join(resources, 'requirements.txt')]);
+    await pip(['-r', path.join(resources, 'requirements.txt')]);
     await writeAtomic(journal, JSON.stringify({ phase: 'dependencies' }));
+  } else {
+    mark('environment', 'done', 'Entorno reutilizado');
   }
   if (!dependenciesOnly && !await access(path.join(paths.env.VYDRA_PROFILE_ROOT, 'prostt5', 'm4_manifest.json')).then(() => true, () => false)) {
-    await python(['-m', 'pip', 'install', '--retries', '6', '--timeout', '120', 'zstandard==0.25.0']);
+    mark('libraries', 'working', 'Preparando la biblioteca de descompresión');
+    await pip(['zstandard==0.25.0']);
   }
   await cp(paths.engine, paths.core, { recursive: true });
+  await cp(path.join(resources, 'vydra.png'), path.join(paths.core, 'gui', 'vydra.png'));
   const bootstrap = path.join(paths.core, 'desktop_bootstrap.py');
   await cp(path.join(resources, 'desktop_bootstrap.py'), bootstrap);
-  await python([bootstrap, dependenciesOnly ? 'imports' : 'prepare', mode]);
+  await python([bootstrap, dependenciesOnly ? 'imports' : 'prepare', mode], line => {
+    const prefix = 'VYDRA_SETUP ';
+    if (!line.startsWith(prefix)) return;
+    try { send(JSON.parse(line.slice(prefix.length))); }
+    catch (error) { console.warn('Invalid setup progress:', error.message); }
+  });
   if (!dependenciesOnly) {
     await writeAtomic(paths.marker, version);
     await writeAtomic(journal, JSON.stringify({ phase: 'ready' }));
+    mark('verify', 'done', 'Vydra está listo');
   }
   return paths;
 }

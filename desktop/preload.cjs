@@ -11,5 +11,6 @@ contextBridge.exposeInMainWorld('vydraSetup', {
     ipcRenderer.send('updates:ready');
   },
   downloadUpdate: () => ipcRenderer.send('updates:download'),
+  transfer: callback => ipcRenderer.on('setup:transfer', (_event, event) => callback(event)),
   progress: callback => ipcRenderer.on('setup:progress', (_event, message) => callback(message)),
 });
