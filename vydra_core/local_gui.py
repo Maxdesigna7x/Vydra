@@ -24,16 +24,19 @@ STALL_TIMEOUT_SECONDS = 30 * 60
 
 
 class RunManager:
-    def __init__(self, directory, worker=None):
+    def __init__(self, directory, worker=None, *, queue=False):
         self.directory = Path(directory).expanduser().resolve()
         self.directory.mkdir(parents=True, exist_ok=True)
         self.worker = Path(worker) if worker else BASE / 'gui_worker.py'
         self.lock = threading.RLock()
         self.processes = {}
+        self.monitors = {}
         self.cancelled = set()
+        self.queue = queue
+        self.closing = False
         for path in self.directory.glob('*.json'):
             try:
-                state = json.loads(path.read_text())
+                state = json.loads(path.read_text(encoding='utf-8'))
                 if state.get('status') in ACTIVE:
                     try:
                         pid = int((self.directory / (state['id'] + '.pid')).read_text())
@@ -71,7 +74,7 @@ class RunManager:
         with self.lock:
             for path in self.directory.glob('*.json'):
                 try:
-                    state = json.loads(path.read_text())
+                    state = json.loads(path.read_text(encoding='utf-8'))
                     if state['id'] in self.cancelled and state['status'] in ACTIVE:
                         state['status'] = 'cancelling'
                         state['stage'] = 'Cancelling'
@@ -93,10 +96,6 @@ class RunManager:
         output = Path(output_text).expanduser().resolve()
         if output == source or (source.is_dir() and source in output.parents):
             raise ValueError('Choose an output folder outside the input folder.')
-        if output.exists() and (not output.is_dir() or (any(output.iterdir()) and not values.get("resume"))):
-            raise ValueError('The output folder must be new or empty. Existing results are never overwritten.')
-        if values.get('resume') and not (output / 'preparation_checkpoint.json').is_file():
-            raise ValueError('No prepared checkpoint in this output folder.')
         device = values.get('device', 'auto')
         if device not in ('auto', 'cuda', 'cpu'):
             raise ValueError('Unknown device.')
@@ -117,31 +116,86 @@ class RunManager:
                 raise ValueError('Batch size must be a positive integer.')
         else:
             batch = None
+        resume = bool(values.get('resume'))
         with self.lock:
-            if any(row['status'] in ACTIVE for row in self.runs()):
+            if self.closing:
+                raise ValueError('Vydra is closing.')
+            rows = self.runs()
+            pending = [row for row in rows if row['status'] in ACTIVE or row['status'] == 'queued']
+            if not self.queue and (pending or self.processes):
                 raise ValueError('Another run is active. Wait for it to finish or cancel it.')
+            self._check_destination(output, resume)
+            for row in pending:
+                reserved = Path(row['output'])
+                if output == reserved or output in reserved.parents or reserved in output.parents:
+                    raise ValueError('Choose a results folder outside the folders reserved by active or queued tasks.')
             ident = uuid.uuid4().hex
-            state = dict(id=ident, status='starting', stage='Starting', mode=mode, input=str(source), output=str(output),
-                         device=device, model=profile, classifier=classifier, offline=bool(values.get('offline')), report=bool(values.get('report', True)),
-                         batch_size=batch, resume=bool(values.get('resume')), created_at=datetime.now(timezone.utc).isoformat(),
-                         started_timestamp=time.time(), total=None, processed=None)
-            path = self.directory / (ident + '.json')
-            write_json(path, state)
-            log = (self.directory / (ident + '.log')).open('wb')
-            try:
+            state = dict(id=ident, status='queued', stage='Queued', mode=mode, input=str(source), output=str(output),
+                         device=device, model=profile, classifier=classifier, offline=bool(values.get('offline')),
+                         report=bool(values.get('report', True)), batch_size=batch, resume=resume,
+                         created_at=datetime.now(timezone.utc).isoformat(), total=None, processed=None)
+            if not self.queue:
+                self._launch(state)
+                return state
+            write_json(self.directory / (ident + '.json'), state)
+            launched = self.dispatch()
+            if launched and launched['id'] == ident:
+                return launched
+            return state
+
+    @staticmethod
+    def _check_destination(output, resume):
+        if output.exists() and (not output.is_dir() or (any(output.iterdir()) and not resume)):
+            raise ValueError('The output folder must be new or empty. Existing results are never overwritten.')
+        if resume and not (output / 'preparation_checkpoint.json').is_file():
+            raise ValueError('No prepared checkpoint in this output folder.')
+
+    def _launch(self, state):
+        ident = state['id']
+        path = self.directory / (ident + '.json')
+        state.update(status='starting', stage='Starting', started_timestamp=time.time())
+        write_json(path, state)
+        try:
+            with (self.directory / (ident + '.log')).open('wb') as log:
                 proc = subprocess.Popen([sys.executable, '-u', str(self.worker), str(path)], stdout=log,
                                         stderr=subprocess.STDOUT, start_new_session=os.name != 'nt', cwd=BASE)
-            except OSError as exc:
-                state.update(status='failed', stage='Failed', error=str(exc))
-                write_json(path, state)
-                raise
-            finally:
-                log.close()
-            self.processes[ident] = proc
+        except OSError as exc:
+            state.update(status='failed', stage='Failed', error=str(exc))
+            write_json(path, state)
+            raise
+        self.processes[ident] = proc
+        try:
             # The process owns the run file after launch; keep PID in a separate file.
             (self.directory / (ident + '.pid')).write_text(str(proc.pid))
-            threading.Thread(target=self._monitor, args=(ident, proc), daemon=True).start()
-            return state
+        finally:
+            monitor = threading.Thread(target=self._monitor, args=(ident, proc), daemon=True)
+            self.monitors[ident] = monitor
+            monitor.start()
+
+    def dispatch(self):
+        with self.lock:
+            if not self.queue or self.closing or self.processes:
+                return None
+            rows = self.runs()
+            if any(row['status'] in ACTIVE for row in rows):
+                return None
+            for state in reversed(rows):
+                if state['status'] != 'queued':
+                    continue
+                try:
+                    if not Path(state['input']).exists():
+                        raise ValueError('The queued input is no longer available.')
+                    self._check_destination(Path(state['output']), state['resume'])
+                    self._launch(state)
+                except (OSError, ValueError) as exc:
+                    if state['id'] in self.processes:
+                        return state
+                    state.update(status='failed', stage='Failed', error=str(exc),
+                                 finished_at=datetime.now(timezone.utc).isoformat())
+                    write_json(self.directory / (state['id'] + '.json'), state)
+                    continue
+                return state
+        return None
 
     def resume(self, ident):
         with self.lock:
@@ -169,7 +223,7 @@ class RunManager:
                 break
             except subprocess.TimeoutExpired:
                 try:
-                    current = json.loads(path.read_text())
+                    current = json.loads(path.read_text(encoding='utf-8'))
                 except (OSError, ValueError):
                     continue
                 if self.stalled(current):
@@ -186,21 +240,33 @@ class RunManager:
                     code = proc.wait()
                     break
         with self.lock:
-            path = self.directory / (ident + '.json')
-            state = json.loads(path.read_text())
-            if ident in self.cancelled:
-                state.update(status='cancelled', stage='Cancelled', error='Checkpoints were retained. Resume this run to continue.')
-            elif timeout_error:
-                state.update(status='failed', stage='Stopped: no progress', error=timeout_error)
-            elif state['status'] in ACTIVE:
-                state.update(status='failed', stage='Failed', error=f'Inference process exited with code {code}. See the execution log.')
-            state['elapsed_seconds'] = round(time.time() - state['started_timestamp'], 1)
-            state['finished_at'] = datetime.now(timezone.utc).isoformat()
-            write_json(path, state)
-            self.processes.pop(ident, None)
+            try:
+                state = json.loads(path.read_text(encoding='utf-8'))
+                if ident in self.cancelled:
+                    state.update(status='cancelled', stage='Cancelled', error='Checkpoints were retained. Resume this run to continue.')
+                elif timeout_error:
+                    state.update(status='failed', stage='Stopped: no progress', error=timeout_error)
+                elif state['status'] in ACTIVE:
+                    state.update(status='failed', stage='Failed', error=f'Inference process exited with code {code}. See the execution log.')
+                state['elapsed_seconds'] = round(time.time() - state['started_timestamp'], 1)
+                state['finished_at'] = datetime.now(timezone.utc).isoformat()
+                write_json(path, state)
+            finally:
+                self.processes.pop(ident, None)
+                self.monitors.pop(ident, None)
+                self.cancelled.discard(ident)
+                self.dispatch()
 
     def cancel(self, ident):
         with self.lock:
+            if self.queue:
+                queued = next((row for row in self.runs() if row['id'] == ident and row['status'] == 'queued'), None)
+                if queued:
+                    queued.update(status='cancelled', stage='Cancelled',
+                                  finished_at=datetime.now(timezone.utc).isoformat())
+                    write_json(self.directory / (ident + '.json'), queued)
+                    self.dispatch()
+                    return 'cancelled'
             proc = self.processes.get(ident)
             if not proc or proc.poll() is not None:
                 raise ValueError('This run is no longer active in this server session.')
@@ -210,6 +276,7 @@ class RunManager:
             else:
                 os.killpg(proc.pid, signal.SIGTERM)
             threading.Thread(target=self._kill_later, args=(proc,), daemon=True).start()
+            return 'cancelling'
 
     @staticmethod
     def _kill_later(proc):
@@ -225,16 +292,22 @@ class RunManager:
                     pass
 
     def close(self):
-        for ident in list(self.processes):
+        with self.lock:
+            self.closing = True
+            processes = dict(self.processes)
+            monitors = tuple(self.monitors.values())
+        for ident in processes:
             try:
                 self.cancel(ident)
             except (ValueError, ProcessLookupError):
                 pass
-        for proc in list(self.processes.values()):
+        for proc in processes.values():
             try:
                 proc.wait(timeout=10)
             except subprocess.TimeoutExpired:
                 pass
+        for monitor in monitors:
+            monitor.join(timeout=2)
 
 
 def make_server(manager, port=0):
@@ -271,6 +344,7 @@ def make_server(manager, port=0):
                         config['desktop'] = {'mode': desktop_mode, 'windows': os.name == 'nt'}
                     return self.send(200, config)
                 if request.path == '/api/runs':
+                    manager.dispatch()
                     return self.send(200, manager.runs())
                 if request.path == '/api/browse':
                     raw = parse_qs(request.query).get('path', [str(Path.home())])[0]
@@ -306,7 +380,9 @@ def make_server(manager, port=0):
                         return self.send(404, {'error': 'Report file is missing.'})
                     mime = mimetypes.guess_type(target.name)[0] or 'application/octet-stream'
                     return self.send(200, target.read_bytes(), mime)
-                static = {'/': ('index.html', 'text/html; charset=utf-8'), '/gui.js': ('gui.js', 'text/javascript; charset=utf-8'), '/gui.css': ('gui.css', 'text/css; charset=utf-8')}
+                static = {'/': ('index.html', 'text/html; charset=utf-8'), '/gui.js': ('gui.js', 'text/javascript; charset=utf-8'), '/gui.css': ('gui.css', 'text/css; charset=utf-8'),
+                          '/desktop-runs.js': ('desktop-runs.js', 'text/javascript; charset=utf-8'),
+                          '/desktop-runs.css': ('desktop-runs.css', 'text/css; charset=utf-8')}
                 if request.path in static:
                     name, mime = static[request.path]
                     return self.send(200, (BASE / 'gui' / name).read_bytes(), mime)
@@ -329,8 +405,7 @@ def make_server(manager, port=0):
                 if self.path.startswith('/api/resume/'):
                     return self.send(201, manager.resume(self.path.rsplit('/', 1)[-1]))
                 if self.path.startswith('/api/cancel/'):
-                    manager.cancel(self.path.rsplit('/', 1)[-1])
-                    return self.send(200, {'status': 'cancelling'})
+                    return self.send(200, {'status': manager.cancel(self.path.rsplit('/', 1)[-1])})
                 if self.path == '/api/check':
                     result = subprocess.run([sys.executable, str(BASE / 'vydra_cli.py'), 'doctor'], capture_output=True, text=True, timeout=120, cwd=BASE)
                     return self.send(200, {'ok': result.returncode == 0, 'log': result.stdout + result.stderr})

@@ -1,5 +1,6 @@
 """Prepare Vydra Desktop and supervise its existing local interface."""
 
+from contextlib import contextmanager
 import os
 import shutil
 import sys
@@ -138,22 +139,43 @@ def prepare(mode):
     return main(["doctor"])
 
 
+@contextmanager
+def desktop_session(state_dir):
+    """Only one desktop scheduler may own a run directory at a time."""
+    state_dir.mkdir(parents=True, exist_ok=True)
+    with (state_dir / '.desktop-queue.lock').open('a+b') as handle:
+        try:
+            if os.name == 'nt':
+                import msvcrt
+                handle.seek(0)
+                msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
+            else:
+                import fcntl
+                fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except OSError as exc:
+            raise RuntimeError('La cola de esta carpeta de datos ya está abierta en otra ventana.') from exc
+        yield
+
+
 def serve(state_dir):
     from local_gui import RunManager, make_server
 
-    manager = RunManager(Path(state_dir))
-    with make_server(manager, 0) as server:
-        # Electron owns the write end. EOF also covers crashes and forced exits.
-        def watch_parent():
-            sys.stdin.buffer.read()
-            server.shutdown()
+    with desktop_session(Path(state_dir)):
+        manager = RunManager(Path(state_dir), queue=True)
+        with make_server(manager, 0) as server:
+            manager.dispatch()
 
-        threading.Thread(target=watch_parent, daemon=True).start()
-        print(f"VYDRA_READY http://127.0.0.1:{server.server_port}/", flush=True)
-        try:
-            server.serve_forever()
-        finally:
-            manager.close()
+            # Electron owns the write end. EOF also covers crashes and forced exits.
+            def watch_parent():
+                sys.stdin.buffer.read()
+                server.shutdown()
+
+            threading.Thread(target=watch_parent, daemon=True).start()
+            print(f"VYDRA_READY http://127.0.0.1:{server.server_port}/", flush=True)
+            try:
+                server.serve_forever()
+            finally:
+                manager.close()
 
 
 if __name__ == "__main__":

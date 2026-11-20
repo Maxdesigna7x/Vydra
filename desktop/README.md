@@ -3,7 +3,14 @@
 Vydra Desktop abre la interfaz local de Vydra en una ventana de Electron. El
 asistente prepara un entorno privado y los archivos de ProstT5. Las entradas y
 los resultados se eligen en cada análisis. Usa **Atrás** para volver del
-archivo de texto al informe o **Inicio** para regresar a la pantalla de análisis.
+archivo de texto al informe o **Inicio** para regresar a la lista de corridas.
+
+**Nueva tarea** abre las opciones de modelo, método M4, entrada, salida y
+dispositivo. Desktop ejecuta una corrida a la vez y atiende las tareas
+pendientes en el orden en que se añadieron. Las tareas en cola se guardan al
+cerrar Vydra y continúan al abrir la misma carpeta de datos. La tarea activa
+se detiene al cerrar. Si dejó un checkpoint, puedes reanudarla desde sus
+detalles. El botón **Informe** abre el resultado de una corrida completada.
 
 | Modo | Debian/Ubuntu x64 | Windows x64 |
 | --- | --- | --- |

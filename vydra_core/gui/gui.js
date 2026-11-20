@@ -1,5 +1,6 @@
 (()=>{
 const $=id=>document.getElementById(id);
+let desktopRuns=null;
 let config=null,runs=[],activeId=null,browseTarget=null,parentPath=null,logShown=false,polling=false,submitting=false;
 try{document.documentElement.dataset.theme=localStorage.getItem('vydra-gui-theme')||'dark'}catch{}
 function theme(){ $('theme').textContent=document.documentElement.dataset.theme==='dark'?'Switch to light':'Switch to dark' }
@@ -8,16 +9,23 @@ async function api(path,body){const response=await fetch(path,body===undefined?{
 function inputMode(){const folder=$('mode').value==='folder';$('source-label').textContent=folder?'Input folder':'Input FASTA file';$('input-hint').textContent=folder?'FASTA files are discovered recursively. Original file names and folders are retained.':'Select a protein FASTA file. Original IDs and headers are retained.'}
 $('mode').onchange=inputMode;
 const active=r=>['starting','running','cancelling'].includes(r.status);
+function showReport(run){window.location.assign('/reports/'+encodeURIComponent(run.id)+'/')}
+function selectRun(id){activeId=id;logShown=false;$('execution-log').hidden=true;render()}
 function render(){
- const busy=runs.some(active);$('start').disabled=!config||busy||submitting;
+ const busy=runs.some(active);$('start').disabled=!config||(!desktopRuns&&busy)||submitting;
+ if(desktopRuns)$('start').textContent=busy||runs.some(r=>r.status==='queued')?'Añadir a la cola':'Iniciar tarea';
  const run=runs.find(r=>r.id===activeId)||runs.find(active)||runs[0];if(run)activeId=run.id;
+ if(desktopRuns)desktopRuns.render(runs);
+ else {
  $('recent').replaceChildren();if(!runs.length){const p=document.createElement('p');p.className='muted';p.textContent='No runs yet.';$('recent').append(p)}
  runs.forEach(r=>{const button=document.createElement('button');button.type='button';const title=document.createElement('span');title.className='recent-title';const date=document.createElement('span');date.textContent=new Date(r.created_at).toLocaleString('en');const status=document.createElement('span');status.textContent=r.status[0].toUpperCase()+r.status.slice(1);title.append(date,status);const path=document.createElement('small');path.textContent=r.input;button.append(title,path);button.title=['complete','completed'].includes(r.status)&&r.report_path?'Open inference results':'Inspect run status';button.onclick=()=>{if(['complete','completed'].includes(r.status)&&r.report_path){window.location.assign('/reports/'+encodeURIComponent(r.id)+'/');return}activeId=r.id;logShown=false;$('show-log').textContent='View execution log';$('execution-log').hidden=true;render();$('status-section').scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'instant':'smooth'})};$('recent').append(button)});
+ }
  if(!run)return;
+ if(desktopRuns)desktopRuns.showDetails(run);
  $('status-badge').textContent=run.status[0].toUpperCase()+run.status.slice(1);$('status-text').textContent=run.stage;
- $('resume').hidden=!['cancelled','failed','interrupted'].includes(run.status);$('resume').disabled=busy||submitting;
+ $('resume').hidden=!['cancelled','failed','interrupted'].includes(run.status)||(desktopRuns&&!run.started_timestamp);$('resume').disabled=(!desktopRuns&&busy)||submitting;
  const storage=run.storage_estimate; $('storage-estimate').textContent=storage?`Disk space: ${storage.sequences.toLocaleString('en')} proteins · embedding checkpoint ${(storage.checkpoint_bytes/1024**3).toFixed(2)} GiB · estimated total ${(storage.estimated_total_bytes/1024**3).toFixed(2)} GiB (model downloads excluded)`:'';
- $('cancel').hidden=!active(run);$('cancel').disabled=run.status==='cancelling';$('show-log').disabled=false;
+ $('cancel').hidden=!active(run)&&run.status!=='queued';$('cancel').disabled=run.status==='cancelling';$('show-log').disabled=!!desktopRuns&&!run.started_timestamp;
  $('run-error').textContent=run.error||'';$('saved-output').textContent='Results folder: '+run.output;
  $('processed').textContent=Number.isInteger(run.processed)?`Processed proteins: ${run.processed.toLocaleString('en')} / ${run.total?.toLocaleString('en')||'—'} · remaining: ${Math.max(0,(run.total||0)-run.processed).toLocaleString('en')}`:run.total?`Input proteins: ${run.total.toLocaleString('en')}`:'';
  const embedding=run.stage==='Generating embeddings', hasChunks=Number.isInteger(run.chunks_total);
@@ -29,9 +37,11 @@ function render(){
  $('elapsed').textContent='Elapsed: '+Math.floor(elapsed/60)+'m '+Math.floor(elapsed%60)+'s';
  $('progress').hidden=!(['Classifying proteins','Generating embeddings'].includes(run.stage)&&run.total>0);if(!$('progress').hidden){$('progress').max=embedding&&hasChunks?run.chunks_total:run.total;$('progress').value=embedding&&hasChunks?(run.chunks_done||0):(run.processed||0)}
 }
-async function poll(){if(polling)return;polling=true;try{runs=await api('/api/runs');render();if(logShown&&activeId){const data=await api('/api/log/'+activeId);$('execution-log').textContent=data.log||'No log output yet.'}}catch(e){$('form-error').textContent='Connection lost. Keep the Vydra server terminal open. '+e.message}finally{polling=false}}
+async function poll(){if(polling)return;polling=true;try{runs=await api('/api/runs');if(desktopRuns)$('desktop-connection-error').textContent='';render();if(logShown&&activeId){const data=await api('/api/log/'+activeId);$('execution-log').textContent=data.log||'No log output yet.'}}catch(e){if(desktopRuns)$('desktop-connection-error').textContent='Se perdió la conexión con Vydra. '+e.message;else $('form-error').textContent='Connection lost. Keep the Vydra server terminal open. '+e.message}finally{polling=false}}
 $('batch').addEventListener('invalid',()=>{if(!$('advanced').open)$('advanced').showModal()});
-$('run-form').onsubmit=async event=>{event.preventDefault();if(submitting)return;submitting=true;render();$('form-error').textContent='';try{const run=await api('/api/runs',{mode:$('mode').value,input:$('source').value,output:$('output').value,device:$('device').value,model:$('model').value,classifier:$('classifier').value,offline:!$('offline').checked,report:$('report').checked,batch_size:$('batch').value||null});activeId=run.id;logShown=false;$('show-log').textContent='View execution log';$('execution-log').hidden=true;await poll()}catch(e){$('form-error').textContent=e.message}finally{submitting=false;render()}};
+$('run-form').onsubmit=async event=>{event.preventDefault();if(submitting)return;submitting=true;render();$('form-error').textContent='';try{const run=await api('/api/runs',{mode:$('mode').value,input:$('source').value,output:$('output').value,device:$('device').value,model:$('model').value,classifier:$('classifier').value,offline:!$('offline').checked,report:$('report').checked,batch_size:$('batch').value||null});activeId=run.id;logShown=false;$('show-log').textContent='View execution log';$('execution-log').hidden=true;
+ if(desktopRuns){runs=[run,...runs];$('source').value='';$('output').value='';desktopRuns.closeTask()}
+ await poll()}catch(e){$('form-error').textContent=e.message}finally{submitting=false;render()}};
 $('resume').onclick=async()=>{if(submitting)return;submitting=true;render();try{const run=await api('/api/resume/'+activeId,{});activeId=run.id;await poll()}catch(e){$('run-error').textContent=e.message}finally{submitting=false;render()}};
 $('cancel').onclick=async()=>{try{await api('/api/cancel/'+activeId,{});await poll()}catch(e){$('run-error').textContent=e.message}};
 $('show-log').onclick=async()=>{logShown=true;$('execution-log').hidden=false;$('log-dialog').showModal();try{const data=await api('/api/log/'+activeId);$('execution-log').textContent=data.log||'No log output yet.'}catch(e){$('execution-log').textContent=e.message}};
@@ -68,6 +78,10 @@ $('device').onchange = updateClassifier;
     return option;
   }));
   if (config.desktop) {
+    desktopRuns=window.createVydraDesktopRuns({selectRun,showReport});
+    desktopRuns.mount(config);
+    $('start').dataset.help='Inicia la tarea o añádela al final de la cola.';
+    $('start').setAttribute('aria-description', $('start').dataset.help);
     const device = $('device');
     const gpu = device.querySelector('option[value="cuda"]');
     gpu.textContent = config.desktop.windows ? 'NVIDIA (models) · CPU (FAISS)' : 'NVIDIA (models and FAISS)';

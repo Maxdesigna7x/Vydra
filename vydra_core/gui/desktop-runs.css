@@ -1,0 +1,28 @@
+#desktop-new, #desktop-queue { display: none; }
+.desktop-runs main { max-width: 1100px; grid-template-rows: auto minmax(0, 1fr); gap: 18px; }
+.desktop-runs main > header { flex-wrap: nowrap; padding-bottom: 14px; border-bottom: 1px solid var(--border); }
+.desktop-runs main > header .header-actions { align-items: center; }
+.desktop-runs main > header p, .desktop-runs .workspace, .desktop-runs main > footer { display: none; }
+.desktop-runs #desktop-new { display: inline-flex; white-space: nowrap; }
+.desktop-runs #desktop-queue { display: block; padding: 0; min-height: 0; overflow: auto; }
+#desktop-run-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
+#desktop-empty { margin: 12px 0; }
+#desktop-connection-error:empty { display: none; }
+.desktop-run { height: 62px; min-width: 0; display: flex; align-items: center; gap: 6px; padding: 0 8px 0 0;
+  border: 1px solid var(--border); border-radius: 9px; background: var(--surface); }
+.desktop-run:hover, .desktop-run:focus-within { border-color: var(--input-border); }
+.desktop-run-summary { flex: 1; min-width: 0; height: 100%; background: transparent; cursor: pointer; color: inherit;
+  border: 0; border-radius: inherit; text-align: left; font: inherit; display: grid; align-content: center;
+  padding: 0 12px; grid-template-columns: minmax(0, 1fr) minmax(0, auto); column-gap: 14px; }
+.desktop-run-summary strong, .desktop-run-status, .desktop-run-meta, .desktop-run-time { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.desktop-run-summary strong { font-weight: 600; }
+.desktop-run-status { max-width: min(42vw, 360px); text-align: right; font-size: 12px; }
+.desktop-run-meta, .desktop-run-time { color: var(--muted); font-size: 12px; }
+.desktop-run-time { text-align: right; }
+.desktop-run[data-status="running"] .desktop-run-status, .desktop-run[data-status="starting"] .desktop-run-status { color: var(--accent); }
+.desktop-run[data-status="failed"] .desktop-run-status { color: var(--error); }
+.desktop-open-report { flex: none; font-size: 12px; }
+.desktop-dialog { width: min(720px, calc(100% - 40px)); }
+.desktop-dialog #desktop-run-title, .desktop-dialog p { overflow-wrap: anywhere; }
+.desktop-dialog #desktop-run-parameters { font-weight: 600; }
+.desktop-dialog #status-section { margin: 14px 0 0; }
