@@ -1,6 +1,6 @@
 # Vydra como servidor MCP local
 
-En Desktop, abre **Vydra → Copiar configuración MCP…** y elige las
+En Desktop, abre **Vydra → Copy MCP configuration…** y elige las
 carpetas que contienen tus entradas y donde guardarás las salidas. Agrega
 el servidor `vydra` a la configuración del cliente MCP usando el JSON
 copiado. Si el cliente ya tiene otros servidores, incorpora la entrada

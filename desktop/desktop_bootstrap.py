@@ -34,7 +34,7 @@ def fetch_verified(url, target, size, digest, report=None):
     if target.is_file() and target.stat().st_size == size:
         report("working", size)
         if sha256_file(target) == digest:
-            print(f"Verificado: {target.name}.", flush=True)
+            print(f"Verified: {target.name}.", flush=True)
             return
     partial = target.with_name(target.name + ".part")
     if target.is_file():
@@ -50,17 +50,17 @@ def fetch_verified(url, target, size, digest, report=None):
         try:
             if offset < size:
                 if shutil.disk_usage(target.parent).free <= size - offset:
-                    raise OSError(f"Espacio insuficiente para {target.name}.")
+                    raise OSError(f"Insufficient disk space for {target.name}.")
                 headers = {"Range": f"bytes={offset}-"} if offset else {}
                 with urlopen(Request(url, headers=headers), timeout=120) as response:
                     append = response.status == 206
                     if append:
                         if response.headers.get("Content-Range") != f"bytes {offset}-{size - 1}/{size}":
-                            raise ValueError("El servidor devolvió un tramo de descarga incorrecto.")
+                            raise ValueError("The server returned an incorrect download range.")
                     else:
                         offset = 0
                     with partial.open("ab" if append else "wb") as output:
-                        print(f"Descargando {target.name} desde {offset:,} de {size:,} bytes.", flush=True)
+                        print(f"Downloading {target.name} from {offset:,} of {size:,} bytes.", flush=True)
                         report("transfer", offset)
                         next_report = time.monotonic() + .8
                         next_notice = time.monotonic() + 10
@@ -78,11 +78,11 @@ def fetch_verified(url, target, size, digest, report=None):
                                 print(f"{target.name} · {offset / size:.0%}", flush=True)
                                 next_notice = now + 10
             if partial.stat().st_size != size:
-                raise OSError("Descarga incompleta.")
+                raise OSError("Incomplete download.")
             report("working", size)
             if sha256_file(partial) != digest:
                 partial.unlink()
-                raise ValueError(f"Falló la verificación SHA-256 de {target.name}.")
+                raise ValueError(f"SHA-256 verification failed for {target.name}.")
             partial.replace(target)
             return
         except HTTPError as error:
@@ -107,9 +107,9 @@ def download_stage(stage, items):
     for url, target, size, digest in items:
         def update(phase, received):
             if phase == "working":
-                item = f"Verificando {target.name}"
+                item = f"Verifying {target.name}"
             elif phase == "retry":
-                item = f"Reintentando {target.name}"
+                item = f"Retrying {target.name}"
             else:
                 item = target.name
             setup_event(stage, phase, item, received=completed + received, total=total)
@@ -122,12 +122,12 @@ def prepare_m4_bank():
     from model_profiles import profile_root, verify_manifest
     from profile_install import RELEASE, install_archive
 
-    setup_event("m4", "working", "Buscando el banco M4 en esta carpeta")
+    setup_event("m4", "working", "Looking for the M4 bank in this folder")
     root = profile_root()
     destination = root / "prostt5"
     if destination.exists():
         verify_manifest(destination, "m4_manifest.json", "prostt5")
-        setup_event("m4", "done", "Banco M4 reutilizado")
+        setup_event("m4", "done", "Reusing the M4 bank")
         return
     cache = root.parent / "cache" / "profile-downloads"
     cache.mkdir(parents=True, exist_ok=True)
@@ -140,15 +140,15 @@ def prepare_m4_bank():
                          if p.is_file()), 0)
         missing_bytes += size - existing if existing <= size else size
     if shutil.disk_usage(root).free < limit + missing_bytes:
-        raise OSError(f"Se necesitan {limit + missing_bytes:,} bytes libres para el banco M4 en {root}.")
-    print("Preparando banco FAISS de M4 para ProstT5…", flush=True)
+        raise OSError(f"The M4 bank requires {limit + missing_bytes:,} free bytes in {root}.")
+    print("Preparing the ProstT5 M4 FAISS bank…", flush=True)
     download_stage("m4", [(f"{RELEASE}/{part.name}", part, size, digest)
                           for part, (size, digest) in zip(parts, M4_PARTS)])
-    setup_event("m4", "working", "Descomprimiendo y comprobando el banco M4")
+    setup_event("m4", "working", "Extracting and verifying the M4 bank")
     install_archive("prostt5", root, parts, limit)
     for part in parts:
         part.unlink()
-    setup_event("m4", "done", "Banco M4 preparado")
+    setup_event("m4", "done", "M4 bank ready")
 
 
 def verify_dependencies(mode, check_gpu):
@@ -162,20 +162,20 @@ def verify_dependencies(mode, check_gpu):
 
     print(f"PyTorch {torch.__version__} · FAISS {faiss.__version__} · pandas {pandas.__version__}", flush=True)
     if mode == "cuda" and not torch.version.cuda:
-        raise RuntimeError("El paquete de PyTorch carece de CUDA.")
+        raise RuntimeError("This PyTorch package lacks CUDA support.")
     if mode == "cuda" and sys.platform == "linux" and not hasattr(faiss, "StandardGpuResources"):
-        raise RuntimeError("El paquete de FAISS carece de GPU.")
+        raise RuntimeError("This FAISS package lacks GPU support.")
     backend = select_device(mode) if check_gpu else torch.device("cpu")
     index_backend = faiss_device(backend)
     vectors = np.eye(2, dtype=np.float32)
     index = build_index(vectors, index_backend.index, device=index_backend)
     scores, indices = search_index(index, vectors)
     if not np.array_equal(indices[:, 0], [0, 1]) or not np.allclose(scores[:, 0], [1, 1]):
-        raise RuntimeError("Falló la prueba de FAISS.")
+        raise RuntimeError("The FAISS check failed.")
     if backend.type == "cuda":
         if torch.tensor([2.0], device=backend).square().item() != 4:
-            raise RuntimeError("Falló la prueba de cálculo CUDA.")
-    print(f"Prueba de dependencias correcta. PyTorch: {backend}. FAISS: {index_backend}.", flush=True)
+            raise RuntimeError("The CUDA computation check failed.")
+    print(f"Dependency checks passed. PyTorch: {backend}. FAISS: {index_backend}.", flush=True)
 
 
 PROSTT5_FILES = {
@@ -190,7 +190,7 @@ def verify_prostt5(model_dir):
     for name, (size, digest) in PROSTT5_FILES.items():
         item = model_dir / name
         if not item.is_file() or item.stat().st_size != size or sha256_file(item) != digest:
-            raise ValueError(f"El modelo no coincide con la revisión esperada: {item}")
+            raise ValueError(f"The model does not match the pinned revision: {item}")
 
 
 def prostt5_bytes(directory, files):
@@ -221,7 +221,7 @@ def model_transfer(directory):
         while not stop.is_set():
             received = prostt5_bytes(directory, PROSTT5_FILES)
             if received != previous:
-                setup_event("model", "transfer", "Pesos y tokenizer de ProstT5",
+                setup_event("model", "transfer", "ProstT5 weights and tokenizer",
                             total=total, received=received)
                 previous = received
             stop.wait(.8)
@@ -239,35 +239,35 @@ def prepare(mode):
     from folder_inputs import resolve_model_path
     from vydra_cli import BANKS_DIR, DOWNLOADABLE_ARTIFACTS, RELEASE_BASE_URL, main
 
-    setup_event("libraries", "working", "Comprobando bibliotecas y dispositivo")
+    setup_event("libraries", "working", "Checking libraries and device")
     verify_dependencies(mode, check_gpu=True)
-    setup_event("libraries", "done", "Bibliotecas disponibles")
-    setup_event("references", "working", "Buscando los bancos en la carpeta de datos")
+    setup_event("libraries", "done", "Libraries ready")
+    setup_event("references", "working", "Looking for reference banks in the data folder")
     BANKS_DIR.mkdir(parents=True, exist_ok=True)
     download_stage("references", [(f"{RELEASE_BASE_URL}/{name}", BANKS_DIR / name, BANK_SIZES[name], digest)
                                   for name, digest in DOWNLOADABLE_ARTIFACTS.items()])
-    setup_event("references", "done", "Bancos de referencia disponibles")
+    setup_event("references", "done", "Reference banks ready")
 
-    setup_event("model", "working", "Buscando la revisión local de ProstT5")
+    setup_event("model", "working", "Looking for the pinned ProstT5 model")
     model_dir = Path(os.environ["VYDRA_PROSTT5_PATH"])
     if not (model_dir / ".vydra-model-ready").is_file() or not (model_dir / "pytorch_model.bin").is_file():
         try:
             resolve_model_path(model_dir, offline=True)
-            setup_event("model", "working", "Verificando los pesos locales")
+            setup_event("model", "working", "Verifying local model weights")
             verify_prostt5(model_dir)
         except (FileNotFoundError, ValueError):
             with model_transfer(model_dir):
                 if main(["download-model", "--directory", str(model_dir)]):
-                    raise RuntimeError("Falló la preparación de ProstT5.")
-            setup_event("model", "working", "Verificando los pesos y el tokenizer")
+                    raise RuntimeError("ProstT5 setup failed.")
+            setup_event("model", "working", "Verifying model weights and tokenizer")
             resolve_model_path(model_dir, offline=True)
             verify_prostt5(model_dir)
         (model_dir / ".vydra-model-ready").touch()
     resolve_model_path(model_dir, offline=True)
-    setup_event("model", "done", "ProstT5 disponible")
+    setup_event("model", "done", "ProstT5 ready")
 
     prepare_m4_bank()
-    setup_event("verify", "working", "Comprobando modelos y archivos")
+    setup_event("verify", "working", "Checking models and files")
     return main(["doctor"])
 
 

@@ -4,15 +4,9 @@ window.createVydraDesktopRuns = ({ selectRun, showReport }) => {
   const $ = id => document.getElementById(id);
   const modelNames = new Map();
   const statuses = {
-    queued: 'En cola', starting: 'Iniciando', running: 'En curso', cancelling: 'Cancelando',
-    complete: 'Completada', completed: 'Completada', failed: 'Fallida', cancelled: 'Cancelada',
-    interrupted: 'Interrumpida',
-  };
-  const stages = {
-    'Preparing input': 'Preparando entrada', 'Locating protein model': 'Buscando modelo',
-    'Loading models and generating embeddings': 'Cargando modelo',
-    'Generating embeddings': 'Generando embeddings', 'Classifying proteins': 'Clasificando proteínas',
-    'Writing results': 'Guardando resultados', 'Generating report': 'Generando informe',
+    queued: 'Queued', starting: 'Starting', running: 'Running', cancelling: 'Cancelling',
+    complete: 'Completed', completed: 'Completed', failed: 'Failed', cancelled: 'Cancelled',
+    interrupted: 'Interrupted',
   };
   const active = run => ['starting', 'running', 'cancelling'].includes(run.status);
   const completed = run => ['complete', 'completed'].includes(run.status);
@@ -21,14 +15,14 @@ window.createVydraDesktopRuns = ({ selectRun, showReport }) => {
   const method = run => run.classifier === 'both' ? 'MLP + FAISS' : (run.classifier || 'mlp').toUpperCase();
   function comparison(run) {
     const counts = run.result?.overall;
-    return counts?.m4_compared ? ` · ${counts.m4_agree}/${counts.m4_compared} coinciden` : '';
+    return counts?.m4_compared ? ` · ${counts.m4_agree}/${counts.m4_compared} match` : '';
   }
-  const date = run => run.created_at ? new Date(run.created_at).toLocaleString(undefined, {
+  const date = run => run.created_at ? new Date(run.created_at).toLocaleString('en-US', {
     month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
   }) : '';
-  const device = run => ({auto: 'Automático', cuda: 'NVIDIA', cpu: 'CPU'})[run.device] || '—';
-  const integers = new Intl.NumberFormat();
-  const rates = new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 });
+  const device = run => ({auto: 'Automatic', cuda: 'NVIDIA', cpu: 'CPU'})[run.device] || '—';
+  const integers = new Intl.NumberFormat('en-US');
+  const rates = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
   const duration = seconds => {
     const total = Math.max(0, Math.floor(seconds));
     const hours = Math.floor(total / 3600);
@@ -44,11 +38,10 @@ window.createVydraDesktopRuns = ({ selectRun, showReport }) => {
   let lastRender;
 
   function describe(run, position) {
-    if (position) return `En cola · ${position}`;
+    if (position) return `Queued · ${position}`;
     const status = statuses[run.status] || run.status;
     if (run.status !== 'running') return status;
-    const stage = stages[run.stage] || run.stage;
-    return [status, stage].filter(Boolean).join(' · ');
+    return [status, run.stage].filter(Boolean).join(' · ');
   }
 
   function liveProgress(run, now) {
@@ -65,15 +58,15 @@ window.createVydraDesktopRuns = ({ selectRun, showReport }) => {
     const elapsed = Number.isFinite(run.started_timestamp) ? Math.max(0, now - run.started_timestamp)
       : run.elapsed_seconds || 0;
     const eta = remaining === null
-      ? (embedding || classification ? 'ETA de etapa: —' : '')
-      : `ETA de etapa: ${remaining > 0 ? '~' : ''}${duration(Math.ceil(remaining))}`;
+      ? (embedding || classification ? 'Stage ETA: —' : '')
+      : `Stage ETA: ${remaining > 0 ? '~' : ''}${duration(Math.ceil(remaining))}`;
     const metrics = [
-      sequences ? `Sec. ${count(run.processed, run.total)}` : '',
+      sequences ? `Sequences ${count(run.processed, run.total)}` : '',
       chunks ? `Chunks ${count(run.chunks_done, run.chunks_total)}` : '',
-      embedding ? `Lote ${integers.format(run.batch_size_active || 0)}` : '',
+      embedding ? `Batch ${integers.format(run.batch_size_active || 0)}` : '',
       embedding ? `${rate === null ? '—' : rate < 0.01 ? '<0.01' : rates.format(rate)} chunks/s` : '',
     ].filter(Boolean).join(' · ');
-    return { total, done, time: [`Lleva ${duration(elapsed)}`, eta].filter(Boolean).join(' · '), metrics };
+    return { total, done, time: [`Elapsed ${duration(elapsed)}`, eta].filter(Boolean).join(' · '), metrics };
   }
 
   function updateLiveCard(item, row) {
@@ -122,7 +115,7 @@ window.createVydraDesktopRuns = ({ selectRun, showReport }) => {
     if (live) {
       const progress = document.createElement('progress');
       progress.className = 'desktop-run-progress';
-      progress.setAttribute('aria-label', 'Progreso de la etapa');
+      progress.setAttribute('aria-label', 'Stage progress');
       item.append(progress);
       updateLiveCard(item, row);
     }
@@ -131,7 +124,7 @@ window.createVydraDesktopRuns = ({ selectRun, showReport }) => {
       const report = document.createElement('button');
       report.type = 'button';
       report.className = 'button quiet desktop-open-report';
-      report.textContent = 'Informe';
+      report.textContent = 'Report';
       report.dataset.action = 'report';
       report.dataset.run = run.id;
       report.onclick = () => showReport(run);
@@ -148,7 +141,7 @@ window.createVydraDesktopRuns = ({ selectRun, showReport }) => {
     const now = Date.now() / 1000;
     const rows = ordered.map(run => ({
       run, title: name(run.input), state: describe(run, positions.get(run.id)), created: date(run), live: liveProgress(run, now),
-      summary: `${model(run)} · M4: ${method(run)}${comparison(run)} · ${device(run)} · Salida: ${name(run.output)}`,
+      summary: `${model(run)} · M4: ${method(run)}${comparison(run)} · ${device(run)} · Output: ${name(run.output)}`,
     }));
     const signature = JSON.stringify(rows.map(({run, title, state, summary, created, live}) =>
       [run.id, run.input, run.output, run.status, run.report_path, title, live ? null : state, summary, created]));
@@ -170,7 +163,7 @@ window.createVydraDesktopRuns = ({ selectRun, showReport }) => {
     $('desktop-run-title').textContent = name(run.input);
     $('desktop-run-parameters').textContent = `${model(run)} · M4: ${method(run)}${comparison(run)} · ${device(run)}`;
     $('desktop-run-input').textContent = run.input || '—';
-    $('desktop-run-date').textContent = run.created_at ? new Date(run.created_at).toLocaleString() : '';
+    $('desktop-run-date').textContent = run.created_at ? new Date(run.created_at).toLocaleString('en-US') : '';
   }
 
   function mount(config) {

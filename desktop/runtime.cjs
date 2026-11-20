@@ -117,7 +117,7 @@ function run(command, args, options, log, signal, onLine, errorLog = log) {
       signal?.removeEventListener('abort', stop);
       if (signal?.aborted) reject(signal.reason);
       else if (code === 0) resolve();
-      else reject(new Error(`El proceso terminó con código ${code}. Consulta el registro de instalación.`));
+      else reject(new Error(`The process exited with code ${code}. See the installation log.`));
     });
   });
 }
@@ -142,19 +142,19 @@ async function prepare(root, mode, resources, log, { dependenciesOnly = false, s
   const send = progressReporter(onProgress || (() => {}));
   const mark = (stage, phase, item) => send({ stage, phase, item });
   if (!dependenciesOnly && await ready(paths)) {
-    for (const stage of ['environment', 'libraries', 'references', 'model', 'm4', 'verify']) mark(stage, 'done', 'Ya preparado');
+    for (const stage of ['environment', 'libraries', 'references', 'model', 'm4', 'verify']) mark(stage, 'done', 'Already prepared');
     return paths;
   }
-  mark('environment', 'working', 'Comprobando espacio y dispositivo');
+  mark('environment', 'working', 'Checking disk space and device');
   if (!windows && mode === 'cuda' && !dependenciesOnly) {
     await run('nvidia-smi', ['--query-gpu=name,driver_version', '--format=csv,noheader'], {}, log, signal);
   }
   const available = await freeSpace(root);
-  if (available < gib) throw new Error('La unidad necesita al menos 1 GiB libre para continuar.');
+  if (available < gib) throw new Error('At least 1 GiB of free disk space is required to continue.');
   const journal = path.join(root, 'app', runtimeVersion, `setup-${mode}.json`);
   const previous = await readFile(journal, 'utf8').then(JSON.parse).catch(() => ({}));
   if (!dependenciesOnly && !previous.phase && available < minimum[mode]) {
-    throw new Error(`Espacio insuficiente. Se estiman ${minimum[mode] / gib} GiB para preparar este modo.`);
+    throw new Error(`Insufficient disk space. This mode may require ${minimum[mode] / gib} GiB for a fresh installation.`);
   }
   for (const folder of [paths.temp, paths.cache, paths.state, path.dirname(paths.core), path.dirname(journal)]) {
     await mkdir(folder, { recursive: true });
@@ -176,7 +176,7 @@ async function prepare(root, mode, resources, log, { dependenciesOnly = false, s
   const hasPython = await access(paths.python).then(() => true).catch(() => false);
   if (!hasPython || !previous.phase || previous.phase === 'installing') {
     await writeAtomic(journal, JSON.stringify({ phase: 'installing' }));
-    progress('Preparando el entorno de Vydra…\n');
+    progress('Preparing the Vydra environment…\n');
     const solveEnv = mode === 'cuda' && !windows && dependenciesOnly
       ? { ...paths.env, CONDA_OVERRIDE_CUDA: '12.9' } : paths.env;
     const exists = await access(path.join(paths.environment, 'conda-meta', 'history')).then(() => true).catch(() => false);
@@ -184,16 +184,16 @@ async function prepare(root, mode, resources, log, { dependenciesOnly = false, s
       '-c', 'conda-forge', '--override-channels', ...packages(mode)];
     let stopWatching = () => {};
     if (onProgress) {
-      mark('environment', 'working', 'Resolviendo el entorno y consultando el catálogo de paquetes');
+      mark('environment', 'working', 'Resolving the environment and reading package metadata');
       let plan = '';
       try {
         await run(paths.tools, [...args, '--dry-run', '--json'], { env: solveEnv }, chunk => { plan += chunk; }, signal, undefined, progress);
         const archives = packageArchives(JSON.parse(plan), paths.env.MAMBA_ROOT_PREFIX);
-        if (!archives.length) mark('environment', 'working', 'Preparando paquetes del entorno');
+        if (!archives.length) mark('environment', 'working', 'Preparing environment packages');
         stopWatching = await watchArchives(archives, event => send({ stage: 'environment', ...event }));
       } catch (error) {
         signal?.throwIfAborted();
-        progress(`Vista de descarga del entorno no disponible: ${error.message}\n`);
+        progress(`Environment download progress is unavailable: ${error.message}\n`);
       }
     }
     try {
@@ -201,8 +201,8 @@ async function prepare(root, mode, resources, log, { dependenciesOnly = false, s
     } finally {
       stopWatching();
     }
-    mark('environment', 'done', 'Entorno preparado');
-    mark('libraries', 'working', 'Resolviendo bibliotecas de Python');
+    mark('environment', 'done', 'Environment ready');
+    mark('libraries', 'working', 'Resolving Python libraries');
     if (windows) {
       const index = mode === 'cuda' ? 'cu126' : 'cpu';
       await pip(['--index-url', `https://download.pytorch.org/whl/${index}`, 'torch==2.10.0']);
@@ -210,10 +210,10 @@ async function prepare(root, mode, resources, log, { dependenciesOnly = false, s
     await pip(['-r', path.join(resources, 'requirements.txt')]);
     await writeAtomic(journal, JSON.stringify({ phase: 'dependencies' }));
   } else {
-    mark('environment', 'done', 'Entorno reutilizado');
+    mark('environment', 'done', 'Reusing the existing environment');
   }
   if (!dependenciesOnly && !await access(path.join(paths.env.VYDRA_PROFILE_ROOT, 'prostt5', 'm4_manifest.json')).then(() => true, () => false)) {
-    mark('libraries', 'working', 'Preparando la biblioteca de descompresión');
+    mark('libraries', 'working', 'Preparing the decompression library');
     await pip(['zstandard==0.25.0']);
   }
   await cp(paths.engine, paths.core, { recursive: true });
@@ -229,7 +229,7 @@ async function prepare(root, mode, resources, log, { dependenciesOnly = false, s
   if (!dependenciesOnly) {
     await writeAtomic(paths.marker, version);
     await writeAtomic(journal, JSON.stringify({ phase: 'ready' }));
-    mark('verify', 'done', 'Vydra está listo');
+    mark('verify', 'done', 'Vydra is ready');
   }
   return paths;
 }

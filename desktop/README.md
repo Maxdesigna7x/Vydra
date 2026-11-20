@@ -2,15 +2,15 @@
 
 Vydra Desktop abre la interfaz local de Vydra en una ventana de Electron. El
 asistente prepara un entorno privado y los archivos de ProstT5. Las entradas y
-los resultados se eligen en cada análisis. Usa **Atrás** para volver del
-archivo de texto al informe o **Inicio** para regresar a la lista de corridas.
+los resultados se eligen en cada análisis. Usa **Back** para volver del
+archivo de texto al informe o **Home** para regresar a la lista de corridas.
 
-**Nueva tarea** abre las opciones de modelo, entrada, salida y
+**New task** abre las opciones de modelo, entrada, salida y
 dispositivo. Desktop ejecuta una corrida a la vez y atiende las tareas
 pendientes en el orden en que se añadieron. Las tareas en cola se guardan al
 cerrar Vydra y continúan al abrir la misma carpeta de datos. La tarea activa
 se detiene al cerrar. Si dejó un checkpoint, puedes reanudarla desde sus
-detalles. El botón **Informe** abre el resultado de una corrida completada.
+detalles. El botón **Report** abre el resultado de una corrida completada.
 La tarjeta activa muestra el tiempo transcurrido, secuencias y chunks
 procesados, y durante los embeddings también el lote activo y los chunks
 por segundo. La barra y el tiempo restante corresponden a la etapa actual.
@@ -34,7 +34,7 @@ completada muestra cuántas predicciones coinciden. En el informe, usa
 y descargar esa selección. Las dos clases y puntuaciones se guardan en los
 resultados por secuencia.
 
-Para conectar un cliente de IA, usa **Vydra → Copiar configuración MCP…**.
+Para conectar un cliente de IA, usa **Vydra → Copy MCP configuration…**.
 Selecciona las carpetas de datos que el cliente podrá usar. Las tareas que
 envíe aparecerán en la misma cola. Consulta la [guía MCP](../docs/MCP.md).
 
@@ -99,8 +99,8 @@ envíe aparecerán en la misma cola. Consulta la [guía MCP](../docs/MCP.md).
 Vydra Desktop busca versiones publicadas en GitHub Releases al abrirse y
 cada seis horas mientras está abierto. Incluye las versiones de prueba
 publicadas que tengan un instalador para el sistema actual. Si encuentra una
-versión más nueva, **Descargar** abre el instalador oficial en el navegador.
-También puedes usar **Vydra → Buscar actualizaciones…**. Sin conexión,
+versión más nueva, **Download** abre el instalador oficial en el navegador.
+También puedes usar **Vydra → Check for updates…**. Sin conexión,
 puedes seguir usando tu entorno local y volver a buscar más tarde.
 
 ## Progreso de la preparación
@@ -116,7 +116,7 @@ descompresión, se muestra la actividad en curso sin estimar velocidad de red.
 
 ## Reanudar una instalación
 
-Pulsa **Pausar preparación** si necesitas detener la descarga. Vuelve a
+Pulsa **Pause setup** si necesitas detener la descarga. Vuelve a
 elegir la misma carpeta y el mismo modo. Consulta `setup.log` en la
 carpeta de datos y el estado de la etapa en `app/<versión-del-entorno>/setup-<modo>.json`.
 

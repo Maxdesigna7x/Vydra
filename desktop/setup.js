@@ -4,9 +4,9 @@ const form = document.querySelector('form');
 const folder = $('folder');
 const mode = () => new FormData(form).get('mode');
 const stages = new Map([...document.querySelectorAll('[data-stage]')].map(stage => [stage.dataset.stage, stage]));
-const number = new Intl.NumberFormat('es', { maximumFractionDigits: 1 });
-const phaseNames = { transfer: 'Descargando', working: 'En proceso', retry: 'Reintentando', done: 'Completada', stopped: 'Detenida' };
-const speed = new Intl.NumberFormat('es', { maximumFractionDigits: 2 });
+const number = new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
+const phaseNames = { transfer: 'Downloading', working: 'In progress', retry: 'Retrying', done: 'Complete', stopped: 'Stopped' };
+const speed = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
 let settings;
 let timer;
 let spaceRequest = 0;
@@ -24,10 +24,10 @@ async function showSpace() {
     const required = settings.minimum[mode()] / gib;
     const free = await api.space(target) / gib;
     if (requested === spaceRequest) {
-      $('space').textContent = `${number.format(free)} GiB libres · Hasta ${required} GiB para una instalación nueva`;
+      $('space').textContent = `${number.format(free)} GiB free · Up to ${required} GiB for a fresh installation`;
     }
   } catch {
-    if (requested === spaceRequest) $('space').textContent = 'No se pudo comprobar el espacio de esta carpeta.';
+    if (requested === spaceRequest) $('space').textContent = 'Could not check available disk space.';
   }
 }
 
@@ -50,7 +50,7 @@ function renderTransfer() {
   $('percent').textContent = value === null ? '—' : `${Math.floor(value)} %`;
   const label = phaseNames[phase] || '';
   if ($('phase-label').textContent !== label) $('phase-label').textContent = label;
-  $('active-item').textContent = item + (stale ? ' · Esperando datos' : scope === 'file' && phase === 'transfer' ? ' · Archivo actual' : '');
+  $('active-item').textContent = item + (stale ? ' · Waiting for data' : scope === 'file' && phase === 'transfer' ? ' · Current file' : '');
   const mb = bytes => `${number.format(bytes / 1e6)} MB`;
   $('bytes').textContent = known ? `${mb(received)} / ${mb(total)}` : Number.isFinite(received) ? mb(received) : '—';
   $('rate').textContent = !stale && phase === 'transfer' && rate > 0 ? `${speed.format(rate / 1e6)} MB/s` : '—';
@@ -63,7 +63,7 @@ function showProgress(event) {
   for (const entry of stages.values()) entry.removeAttribute('aria-current');
   if (event.phase === 'done') {
     stage.dataset.state = 'done';
-    stage.setAttribute('aria-label', `${stage.textContent}, completada`);
+    stage.setAttribute('aria-label', `${stage.textContent}, complete`);
   } else {
     stage.removeAttribute('data-state');
     stage.removeAttribute('aria-label');
@@ -84,7 +84,7 @@ api.updates(update => {
   $('update-notice').hidden = !update;
   if (!update) return;
   $('update-message').textContent = update.prerelease
-    ? `Versión de prueba v${update.version} disponible` : `Vydra v${update.version} está disponible`;
+    ? `Preview version v${update.version} is available` : `Vydra v${update.version} is available`;
 });
 
 api.progress(message => {
@@ -120,7 +120,7 @@ form.oninput = () => {
 };
 $('pause').onclick = async () => {
   $('pause').disabled = true;
-  $('status').textContent = 'Pausando preparación…';
+  $('status').textContent = 'Pausing setup…';
   await api.pause();
 };
 $('back').onclick = () => {
@@ -139,17 +139,17 @@ async function install() {
   $('pause').hidden = $('pause').disabled = false;
   $('status').textContent = '';
   $('destination').textContent = selection.folder;
-  $('device-summary').textContent = selection.mode === 'cuda' ? 'Dispositivo · GPU NVIDIA' : 'Dispositivo · CPU';
+  $('device-summary').textContent = selection.mode === 'cuda' ? 'Device · NVIDIA GPU' : 'Device · CPU';
   for (const stage of stages.values()) {
     stage.removeAttribute('data-state');
     stage.removeAttribute('aria-label');
   }
   latest = undefined;
-  showProgress({ stage: 'environment', phase: 'working', item: 'Comprobando espacio y dispositivo' });
+  showProgress({ stage: 'environment', phase: 'working', item: 'Checking disk space and device' });
   $('preparation-heading').focus();
   try {
     await api.install(selection.folder, selection.mode);
-    $('status').textContent = 'Vydra está listo.';
+    $('status').textContent = 'Vydra is ready.';
   } catch (error) {
     $('status').textContent = error.message.replace(/^Error invoking remote method .*?: (Error: )?/u, '');
     $('retry').hidden = $('back').hidden = false;

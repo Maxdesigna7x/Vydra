@@ -57,7 +57,7 @@ async function watchArchives(archives, emit) {
       if (received !== previous) {
         previous = received;
         emit({ phase: received === total ? 'working' : 'transfer',
-          item: received === total ? 'Instalando paquetes del entorno' : 'Paquetes de conda-forge', total, received });
+          item: received === total ? 'Installing environment packages' : 'conda-forge packages', total, received });
       }
     } finally {
       sampling = false;
@@ -71,7 +71,7 @@ async function watchArchives(archives, emit) {
 }
 
 function pipProgress(emit) {
-  let item = 'Paquete de Python';
+  let item = 'Python package';
   return line => {
     const meter = /^Progress (\d+) of (\d+)$/u.exec(line.trim());
     if (meter) {
@@ -85,7 +85,7 @@ function pipProgress(emit) {
       item = downloading[1].replace(/\.whl\.metadata$/u, '');
       emit({ phase: 'working', item });
     } else if (/^Installing collected packages:/u.test(line.trim())) {
-      emit({ phase: 'working', item: 'Instalando bibliotecas de Python' });
+      emit({ phase: 'working', item: 'Installing Python libraries' });
     }
   };
 }

@@ -57,7 +57,7 @@ function sendUpdateNotice(window) {
 async function downloadUpdate(update = availableUpdate) {
   if (!update) return;
   try { await shell.openExternal(update.url); }
-  catch (error) { dialog.showErrorBox('Actualización de Vydra', error.message); }
+  catch (error) { dialog.showErrorBox('Vydra update', error.message); }
 }
 
 function connectUpdateNotice(window, allowedPage) {
@@ -92,16 +92,16 @@ async function showUpdateDialog() {
   try {
     const update = await refreshUpdate();
     const options = update ? {
-      message: `Vydra v${update.version} está disponible`,
-      detail: update.prerelease ? 'Esta es una versión de prueba.' : '',
-      buttons: ['Descargar', 'Más tarde'], defaultId: 0, cancelId: 1,
-    } : { message: `Vydra v${app.getVersion()} está al día.`, buttons: ['Aceptar'] };
+      message: `Vydra v${update.version} is available`,
+      detail: update.prerelease ? 'This is a preview version.' : '',
+      buttons: ['Download', 'Later'], defaultId: 0, cancelId: 1,
+    } : { message: `Vydra v${app.getVersion()} is up to date.`, buttons: ['OK'] };
     const parent = engineWindow || setupWindow;
     const { response } = await (parent ? dialog.showMessageBox(parent, options) : dialog.showMessageBox(options));
     if (update && response === 0) await downloadUpdate(update);
   } catch (error) {
     console.warn('Update check failed:', error.message);
-    if (!quitting) dialog.showErrorBox('Actualización de Vydra', 'No se pudieron consultar las actualizaciones. Inténtalo más tarde.');
+    if (!quitting) dialog.showErrorBox('Vydra update', 'Could not check for updates. Try again later.');
   } finally {
     showingUpdateDialog = false;
   }
@@ -114,7 +114,7 @@ function checkForUpdatesInBackground() {
 function setup() {
   if (setupWindow && !setupWindow.isDestroyed()) return setupWindow.show();
   setupWindow = new BrowserWindow({
-    width: 1260, height: 850, minWidth: 580, minHeight: 560, title: 'Configurar Vydra',
+    width: 1260, height: 850, minWidth: 580, minHeight: 560, title: 'Set up Vydra',
     backgroundColor: '#101113',
     icon: windowIcon(),
     webPreferences: { preload: path.join(__dirname, 'preload.cjs'), sandbox: true, contextIsolation: true },
@@ -124,7 +124,7 @@ function setup() {
   setupWindow.on('close', event => {
     if (installation) {
       event.preventDefault();
-      progress('La preparación sigue en curso. Si se interrumpe, Vydra recuperará las etapas completadas.\n');
+      progress('Setup is still running. Vydra will reuse completed stages if it is interrupted.\n');
     }
   });
   setupWindow.on('closed', () => { setupWindow = null; });
@@ -192,15 +192,15 @@ async function startEngine(paths) {
   const url = await new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
       child.stdin.end();
-      reject(new Error('El motor local no respondió en 60 segundos.'));
+      reject(new Error('The local engine did not respond within 60 seconds.'));
     }, 60_000);
     child.once('error', error => { clearTimeout(timer); reject(error); });
     child.once('close', code => {
       clearTimeout(timer);
       if (engine === child) engine = null;
-      if (!opened) reject(new Error(`El motor se cerró durante el inicio (código ${code}).`));
+      if (!opened) reject(new Error(`The engine exited during startup (code ${code}).`));
       else if (!quitting && engineWindow && !engineWindow.isDestroyed()) {
-        dialog.showErrorBox('Vydra', 'La sesión local terminó. Puedes volver a abrir Vydra.');
+        dialog.showErrorBox('Vydra', 'The local session ended. You can reopen Vydra.');
         setup();
         engineWindow.close();
       }
@@ -246,17 +246,19 @@ function registerSetupHandlers() {
     return callback(...args);
   });
   handle('setup:settings', () => ({ current: config, defaultFolder: defaultFolder(), minimum,
-    cudaLabel: process.platform === 'win32' ? 'Modelos en NVIDIA · FAISS en CPU' : 'Modelos y FAISS en NVIDIA' }));
+    cudaLabel: process.platform === 'win32' ? 'Models on NVIDIA · FAISS on CPU' : 'Models and FAISS on NVIDIA' }));
   handle('setup:choose', async () => {
-    const result = await dialog.showOpenDialog(setupWindow, { properties: ['openDirectory', 'createDirectory'] });
+    const result = await dialog.showOpenDialog(setupWindow, {
+      title: 'Choose the installation folder', buttonLabel: 'Select folder', properties: ['openDirectory', 'createDirectory'],
+    });
     return result.filePaths[0];
   });
   handle('setup:space', folder => freeSpace(path.resolve(folder)));
-  handle('setup:pause', () => installation?.abort(new Error('Preparación pausada. Vuelve a usar la misma carpeta y el mismo modo para continuar.')));
+  handle('setup:pause', () => installation?.abort(new Error('Setup paused. Use the same folder and device mode to resume.')));
   handle('setup:install', async (root, mode) => {
-    if (installation || engine) throw new Error('Ya hay una sesión de Vydra activa.');
+    if (installation || engine) throw new Error('A Vydra session is already active.');
     if (typeof root !== 'string' || !path.isAbsolute(root) || !Object.hasOwn(minimum, mode)) {
-      throw new Error('Selecciona una carpeta absoluta y un modo de instalación.');
+      throw new Error('Choose an absolute folder path and a device mode.');
     }
     installation = new AbortController();
     try {
@@ -279,12 +281,12 @@ function registerSetupHandlers() {
 
 async function copyMcpConfig() {
   if (!config || !engineWindow || !engine) {
-    dialog.showErrorBox('Vydra MCP', 'Abre Vydra y completa la configuración antes de conectar un cliente MCP.');
+    dialog.showErrorBox('Vydra MCP', 'Open Vydra and complete setup before connecting an MCP client.');
     return;
   }
   const choice = await dialog.showOpenDialog(engineWindow, {
-    title: 'Elige las carpetas a las que podrá acceder el cliente MCP',
-    buttonLabel: 'Copiar configuración',
+    title: 'Choose the folders your MCP client can access',
+    buttonLabel: 'Copy configuration',
     properties: ['openDirectory', 'multiSelections'],
   });
   if (choice.canceled || !choice.filePaths.length) return;
@@ -299,8 +301,8 @@ async function copyMcpConfig() {
     },
   }, null, 2));
   await dialog.showMessageBox(engineWindow, {
-    message: 'Configuración MCP copiada',
-    detail: 'Agrega el servidor Vydra a la configuración de tu cliente MCP y mantén abierta la app mientras se ejecuten las tareas.',
+    message: 'MCP configuration copied',
+    detail: 'Add Vydra to your MCP client configuration. Keep Vydra open while tasks are running.',
   });
 }
 
@@ -309,15 +311,15 @@ async function start() {
   registerSetupHandlers();
   Menu.setApplicationMenu(Menu.buildFromTemplate([
     { label: 'Vydra', submenu: [
-      { label: 'Buscar actualizaciones…', click: showUpdateDialog },
-      { label: 'Copiar configuración MCP…', click: copyMcpConfig },
-      { label: 'Ver carpeta de datos', click: () => { if (config) shell.openPath(config.root); } },
-      { label: 'Configurar almacenamiento y dispositivo', click: async () => {
+      { label: 'Check for updates…', click: showUpdateDialog },
+      { label: 'Copy MCP configuration…', click: copyMcpConfig },
+      { label: 'Open data folder', click: () => { if (config) shell.openPath(config.root); } },
+      { label: 'Configure storage and device', click: async () => {
         if (!engineWindow || !engine) { setup(); return; }
         const { response } = await dialog.showMessageBox(engineWindow, {
-          message: 'Vydra cerrará la sesión de análisis para abrir la configuración.',
-          detail: 'Si hay un análisis activo, se conservarán sus puntos de reanudación.',
-          buttons: ['Abrir configuración', 'Cancelar'], defaultId: 1, cancelId: 1,
+          message: 'Vydra will close the analysis session to open setup.',
+          detail: 'Any active analysis will keep its saved checkpoints.',
+          buttons: ['Open setup', 'Cancel'], defaultId: 1, cancelId: 1,
         });
         if (response !== 0 || !engine || !engineWindow) return;
         reconfigure = true;
@@ -327,9 +329,9 @@ async function start() {
         setupWindow.hide();
         engineWindow.close();
       } },
-      { role: 'quit', label: 'Salir' },
+      { role: 'quit', label: 'Quit' },
     ] },
-    { label: 'Edición', submenu: [{ role: 'cut' }, { role: 'copy' }, { role: 'paste' }, { role: 'selectAll' }] },
+    { label: 'Edit', submenu: [{ role: 'cut', label: 'Cut' }, { role: 'copy', label: 'Copy' }, { role: 'paste', label: 'Paste' }, { role: 'selectAll', label: 'Select All' }] },
   ]));
   checkForUpdatesInBackground();
   setInterval(checkForUpdatesInBackground, 6 * 60 * 60 * 1000).unref();
@@ -345,6 +347,7 @@ async function start() {
   setup();
 }
 
+app.commandLine.appendSwitch('lang', 'en-US');
 if (process.platform === 'linux') app.commandLine.appendSwitch('class', 'Vydra');
 
 if (handleSquirrelEvent()) {

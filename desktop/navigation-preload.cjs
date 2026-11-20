@@ -18,11 +18,11 @@ window.addEventListener('DOMContentLoaded', () => {
       svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.75;
         stroke-linecap: round; stroke-linejoin: round; }
     </style>
-    <nav aria-label="Navegación de Vydra">
-      <button id="back" type="button" aria-label="Atrás" title="Atrás" disabled>
+    <nav aria-label="Vydra navigation">
+      <button id="back" type="button" aria-label="Back" title="Back" disabled>
         <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m12 5-7 7 7 7M5 12h14"/></svg>
       </button>
-      <button id="home" type="button" aria-label="Inicio" title="Inicio" disabled>
+      <button id="home" type="button" aria-label="Home" title="Home" disabled>
         <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7M5 9v11h5v-6h4v6h5V9"/></svg>
       </button>
     </nav>
@@ -60,8 +60,8 @@ window.addEventListener('DOMContentLoaded', () => {
   ipcRenderer.on('updates:available', (_event, update) => {
     notice.hidden = !update;
     if (!update) return;
-    download.textContent = `Descargar v${update.version}`;
-    download.title = update.prerelease ? 'Descargar versión de prueba desde GitHub' : 'Descargar actualización desde GitHub';
+    download.textContent = `Download v${update.version}`;
+    download.title = update.prerelease ? 'Download preview from GitHub' : 'Download update from GitHub';
   });
   ipcRenderer.send('updates:ready');
 });

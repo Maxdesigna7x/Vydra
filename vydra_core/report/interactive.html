@@ -62,7 +62,7 @@ try{const saved=localStorage.getItem('vydra-report-theme');if(saved==='light'||s
     <section>
       <h3>Predicted structural functions</h3>
       <div class="text-small" data-el="function-total"></div>
-      <div class="vp-bars" data-el="functions" role="group" aria-label="Funciones estructurales de fagos"></div>
+      <div class="vp-bars" data-el="functions" role="group" aria-label="Phage structural functions"></div>
     </section>
   </div>
 </div><div class="text-small">Percentages are relative to each parent. Select a segment or node to inspect its proteins.</div></section><hr>
@@ -73,8 +73,8 @@ try{const saved=localStorage.getItem('vydra-report-theme');if(saved==='light'||s
       <label class="form-label">Phage evidence<select class="form-select" data-el="basis"><option value="neighbors">Five nearest prototypes</option><option value="cluster">Assigned cluster context</option></select></label><label class="form-label">Rank<select class="form-select" data-el="rank"><option value="family">Family</option><option value="genus">Genus</option></select></label>
     </div>
     <div class="vp-columns vp-space">
-      <div><h3>Reference labels · Top 5</h3><div class="text-small" data-el="coverage"></div><div class="vp-bars" data-el="references" role="group" aria-label="Etiquetas taxonómicas de las referencias"></div></div>
-      <div><h3>Available context level</h3><div class="text-small" data-el="evidence"></div><div class="vp-bars" data-el="levels" role="group" aria-label="Niveles de contexto disponibles"></div></div>
+      <div><h3>Reference labels · Top 5</h3><div class="text-small" data-el="coverage"></div><div class="vp-bars" data-el="references" role="group" aria-label="Reference taxonomic labels"></div></div>
+      <div><h3>Available context level</h3><div class="text-small" data-el="evidence"></div><div class="vp-bars" data-el="levels" role="group" aria-label="Available context levels"></div></div>
     </div>
     <div class="reference-table-section"><h3>Full reference distribution</h3><div data-el="reference-table-summary" class="text-small"></div><div class="table-responsive"><table class="table reference-table"><thead><tr><th>Position</th><th>Reference label</th><th>Proteins</th><th>% of labeled proteins</th><th>% of group</th><th>Cumulative % of labeled proteins</th></tr></thead><tbody data-el="reference-table"></tbody></table></div></div>
   </section>

@@ -94,7 +94,7 @@ def parse_fasta(path: Path):
                 header = raw.lstrip()[1:].rstrip('\r\n')
                 pieces = []
             elif header is None:
-                raise ValueError(f"Secuencia antes del primer encabezado FASTA en {path}")
+                raise ValueError(f"Sequence found before the first FASTA header in {path}")
             else:
                 pieces.append("".join(line.split()))
     if header is not None:
@@ -118,7 +118,7 @@ def write_json(path: Path, payload: dict[str, Any]) -> None:
 def prepare_inputs(input_root: Path, output_root: Path, input_files=None) -> tuple[Path, Path, list[dict[str, Any]], dict[str, Any]]:
     files = sorted(input_files) if input_files is not None else sorted(p for p in input_root.rglob("*") if p.is_file() and p.suffix.lower() in INPUT_EXTENSIONS)
     if not files:
-        raise FileNotFoundError(f"No se encontraron archivos FASTA bajo {input_root}")
+        raise FileNotFoundError(f"No FASTA files found in {input_root}")
 
     all_records: list[tuple[int, int, str, str, dict[str, Any]]] = []
     manifest: list[dict[str, Any]] = []
@@ -206,7 +206,7 @@ def prepare_inputs(input_root: Path, output_root: Path, input_files=None) -> tup
     excluded_handle.close()
     snapshot.close()
     if not manifest:
-        raise ValueError(f"No se encontraron proteínas identificables; consulta {excluded_path}")
+        raise ValueError(f"No identifiable proteins found. See {excluded_path}")
 
     all_records.sort(key=lambda item: (item[0], item[1], item[2]))
     combined_path = output_root / "input_proteinas_ordenadas.faa"
@@ -349,11 +349,11 @@ def postprocess(raw_jsonl: Path, output_root: Path, manifest: list[dict[str, Any
     with raw_jsonl.open("r", encoding="utf-8") as source, enriched_jsonl.open("w", encoding="utf-8") as destination_jsonl:
         first = source.readline()
         if not first:
-            raise ValueError("Vydra no produjo predicciones")
+            raise ValueError("Vydra returned no predictions")
         first_object = json_safe(json.loads(first))
         first_meta = manifest_by_id.pop(first_object.get("seq_id"), None)
         if first_meta is None:
-            raise ValueError(f"ID no encontrado en el manifiesto: {first_object.get('seq_id')}")
+            raise ValueError(f"ID missing from the manifest: {first_object.get('seq_id')}")
         first_object.update(first_meta)
         columns = list(csv_fields)
         destination_csv = full_csv.open("w", encoding="utf-8", newline="")
@@ -379,14 +379,14 @@ def postprocess(raw_jsonl: Path, output_root: Path, manifest: list[dict[str, Any
                 obj = json_safe(json.loads(line))
                 meta = manifest_by_id.pop(obj.get("seq_id"), None)
                 if meta is None:
-                    raise ValueError(f"ID duplicado o no encontrado en el manifiesto: {obj.get('seq_id')}")
+                    raise ValueError(f"Duplicate ID or ID missing from the manifest: {obj.get('seq_id')}")
                 obj.update(meta)
                 write_row(obj)
         finally:
             destination_csv.close()
 
     if source_count != len(manifest):
-        raise ValueError(f"Vydra produjo {source_count} filas para {len(manifest)} entradas")
+        raise ValueError(f"Vydra returned {source_count} rows for {len(manifest)} inputs")
 
     summary_fields = [
         "source_relative_path", "source_folder", "source_file", "sequences", "cellular", "viral",

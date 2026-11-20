@@ -59,7 +59,7 @@ async function smoke() {
             error: document.querySelector('#status')?.textContent
           })`);
           if (checks?.error) throw new Error(checks.error);
-          if (checks?.folder && checks.title === 'Elige tu equipo y destino' && checks.brand > 0 && checks.stages === 6 && checks.devices.join(',') === 'cuda,cpu') {
+          if (checks?.folder && checks.title === 'Choose your device and location' && checks.brand > 0 && checks.stages === 6 && checks.devices.join(',') === 'cuda,cpu') {
             console.log('Packaged setup window opened with a default folder and both device choices.');
             return;
           }
