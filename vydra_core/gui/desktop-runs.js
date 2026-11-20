@@ -23,6 +23,17 @@ window.createVydraDesktopRuns = ({ selectRun, showReport }) => {
     month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
   }) : '';
   const device = run => ({auto: 'Automático', cuda: 'NVIDIA', cpu: 'CPU'})[run.device] || '—';
+  const integers = new Intl.NumberFormat();
+  const rates = new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 });
+  const duration = seconds => {
+    const total = Math.max(0, Math.floor(seconds));
+    const hours = Math.floor(total / 3600);
+    const minutes = Math.floor(total / 60) % 60;
+    if (hours) return `${hours}h ${minutes}m`;
+    if (minutes) return `${minutes}m ${String(total % 60).padStart(2, '0')}s`;
+    return `${total}s`;
+  };
+  const count = (done, total) => `${integers.format(Math.max(0, done || 0))}/${integers.format(total)}`;
   const details = $('desktop-run-details');
   const list = $('desktop-run-list');
   const task = $('desktop-new-task');
@@ -33,14 +44,50 @@ window.createVydraDesktopRuns = ({ selectRun, showReport }) => {
     const status = statuses[run.status] || run.status;
     if (run.status !== 'running') return status;
     const stage = stages[run.stage] || run.stage;
-    const chunks = run.stage === 'Generating embeddings' && Number.isInteger(run.chunks_total);
-    const progress = chunks ? `${run.chunks_done || 0}/${run.chunks_total}`
-      : Number.isInteger(run.processed) && run.total ? `${run.processed}/${run.total}` : '';
-    return [status, stage, progress].filter(Boolean).join(' · ');
+    return [status, stage].filter(Boolean).join(' · ');
+  }
+
+  function liveProgress(run, now) {
+    if (!active(run)) return null;
+    const embedding = run.stage === 'Generating embeddings';
+    const classification = run.stage === 'Classifying proteins';
+    const sequences = Number.isInteger(run.total) && run.total > 0;
+    const chunks = Number.isInteger(run.chunks_total) && run.chunks_total > 0;
+    const total = embedding && chunks ? run.chunks_total : classification && sequences ? run.total : null;
+    const done = total === null ? null : Math.min(total, Math.max(0, (embedding ? run.chunks_done : run.processed) || 0));
+    const fresh = !run.last_progress_at || now - run.last_progress_at < 300;
+    const rate = fresh && Number.isFinite(run.phase_rate) && run.phase_rate > 0 ? run.phase_rate : null;
+    const remaining = rate && total !== null ? (total - done) / rate : null;
+    const elapsed = Number.isFinite(run.started_timestamp) ? Math.max(0, now - run.started_timestamp)
+      : run.elapsed_seconds || 0;
+    const eta = remaining === null
+      ? (embedding || classification ? 'ETA de etapa: —' : '')
+      : `ETA de etapa: ${remaining > 0 ? '~' : ''}${duration(Math.ceil(remaining))}`;
+    const metrics = [
+      sequences ? `Sec. ${count(run.processed, run.total)}` : '',
+      chunks ? `Chunks ${count(run.chunks_done, run.chunks_total)}` : '',
+      embedding ? `Lote ${integers.format(run.batch_size_active || 0)}` : '',
+      embedding ? `${rate === null ? '—' : rate < 0.01 ? '<0.01' : rates.format(rate)} chunks/s` : '',
+    ].filter(Boolean).join(' · ');
+    return { total, done, time: [`Lleva ${duration(elapsed)}`, eta].filter(Boolean).join(' · '), metrics };
+  }
+
+  function updateLiveCard(item, row) {
+    const { run, state, summary, live } = row;
+    const open = item.querySelector('.desktop-run-summary');
+    open.title = [run.input, run.output, summary, state, live.time, live.metrics].filter(Boolean).join('\n');
+    item.querySelector('.desktop-run-status').textContent = `${state} · ${live.time}`;
+    item.querySelector('.desktop-run-metrics').textContent = live.metrics;
+    const progress = item.querySelector('progress');
+    if (live.total === null) progress.removeAttribute('value');
+    else {
+      progress.max = live.total;
+      progress.value = live.done;
+    }
   }
 
   function card(row) {
-    const { run, title, state, summary, created } = row;
+    const { run, title, state, summary, created, live } = row;
     const item = document.createElement('li');
     item.className = 'desktop-run';
     item.dataset.status = run.status;
@@ -58,16 +105,23 @@ window.createVydraDesktopRuns = ({ selectRun, showReport }) => {
     const meta = document.createElement('span');
     meta.className = 'desktop-run-meta';
     meta.textContent = summary;
-    const timestamp = document.createElement('time');
-    timestamp.className = 'desktop-run-time';
-    timestamp.dateTime = run.created_at || '';
-    timestamp.textContent = created;
-    open.append(titleText, stateText, meta, timestamp);
+    const extra = document.createElement(live ? 'span' : 'time');
+    extra.className = live ? 'desktop-run-metrics' : 'desktop-run-time';
+    if (!live) extra.dateTime = run.created_at || '';
+    if (!live) extra.textContent = created;
+    open.append(titleText, stateText, meta, extra);
     open.onclick = () => {
       selectRun(run.id);
       details.showModal();
     };
     item.append(open);
+    if (live) {
+      const progress = document.createElement('progress');
+      progress.className = 'desktop-run-progress';
+      progress.setAttribute('aria-label', 'Progreso de la etapa');
+      item.append(progress);
+      updateLiveCard(item, row);
+    }
 
     if (completed(run) && run.report_path) {
       const report = document.createElement('button');
@@ -87,13 +141,17 @@ window.createVydraDesktopRuns = ({ selectRun, showReport }) => {
     const ordered = [...runs.filter(active), ...queued,
       ...runs.filter(run => !active(run) && run.status !== 'queued')];
     const positions = new Map(queued.map((run, index) => [run.id, index + 1]));
+    const now = Date.now() / 1000;
     const rows = ordered.map(run => ({
-      run, title: name(run.input), state: describe(run, positions.get(run.id)), created: date(run),
+      run, title: name(run.input), state: describe(run, positions.get(run.id)), created: date(run), live: liveProgress(run, now),
       summary: `${model(run)} · M4: ${method(run)} · ${device(run)} · Salida: ${name(run.output)}`,
     }));
-    const signature = JSON.stringify(rows.map(({run, title, state, summary, created}) =>
-      [run.id, run.input, run.output, run.status, run.report_path, title, state, summary, created]));
-    if (signature === lastRender) return;
+    const signature = JSON.stringify(rows.map(({run, title, state, summary, created, live}) =>
+      [run.id, run.input, run.output, run.status, run.report_path, title, live ? null : state, summary, created]));
+    if (signature === lastRender) {
+      rows.forEach((row, index) => { if (row.live) updateLiveCard(list.children[index], row); });
+      return;
+    }
     lastRender = signature;
     const focused = list.contains(document.activeElement) ? document.activeElement.dataset : null;
     $('desktop-empty').hidden = rows.length > 0;

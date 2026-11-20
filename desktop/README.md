@@ -11,6 +11,10 @@ pendientes en el orden en que se añadieron. Las tareas en cola se guardan al
 cerrar Vydra y continúan al abrir la misma carpeta de datos. La tarea activa
 se detiene al cerrar. Si dejó un checkpoint, puedes reanudarla desde sus
 detalles. El botón **Informe** abre el resultado de una corrida completada.
+La tarjeta activa muestra el tiempo transcurrido, secuencias y chunks
+procesados, y durante los embeddings también el lote activo y los chunks
+por segundo. La barra y el tiempo restante corresponden a la etapa actual.
+La estimación aparece cuando ya se ha medido trabajo nuevo en esa etapa.
 
 | Modo | Debian/Ubuntu x64 | Windows x64 |
 | --- | --- | --- |

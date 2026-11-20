@@ -8,17 +8,30 @@
 #desktop-run-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 8px; }
 #desktop-empty { margin: 12px 0; }
 #desktop-connection-error:empty { display: none; }
-.desktop-run { height: 62px; min-width: 0; display: flex; align-items: center; gap: 6px; padding: 0 8px 0 0;
+.desktop-run { position: relative; height: 62px; min-width: 0; display: flex; align-items: center; gap: 6px; padding: 0 8px 0 0;
   border: 1px solid var(--border); border-radius: 9px; background: var(--surface); }
 .desktop-run:hover, .desktop-run:focus-within { border-color: var(--input-border); }
 .desktop-run-summary { flex: 1; min-width: 0; height: 100%; background: transparent; cursor: pointer; color: inherit;
   border: 0; border-radius: inherit; text-align: left; font: inherit; display: grid; align-content: center;
   padding: 0 12px; grid-template-columns: minmax(0, 1fr) minmax(0, auto); column-gap: 14px; }
-.desktop-run-summary strong, .desktop-run-status, .desktop-run-meta, .desktop-run-time { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.desktop-run-summary strong, .desktop-run-status, .desktop-run-meta, .desktop-run-time, .desktop-run-metrics { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .desktop-run-summary strong { font-weight: 600; }
 .desktop-run-status { max-width: min(42vw, 360px); text-align: right; font-size: 12px; }
 .desktop-run-meta, .desktop-run-time { color: var(--muted); font-size: 12px; }
-.desktop-run-time { text-align: right; }
+.desktop-run-time, .desktop-run-metrics { text-align: right; }
+.desktop-run-metrics { max-width: min(65vw, 540px); font-size: 12px; color: var(--foreground); font-variant-numeric: tabular-nums; }
+.desktop-run-summary:has(.desktop-run-metrics) .desktop-run-status { max-width: min(65vw, 540px); }
+.desktop-run-progress { appearance: none; pointer-events: none; position: absolute; inset: auto 12px 3px;
+  margin: 0; width: calc(100% - 24px); height: 3px; overflow: hidden; border: 0; border-radius: 8px; }
+.desktop-run-progress::-webkit-progress-bar { background: var(--border); }
+.desktop-run-progress::-webkit-progress-value { background: var(--accent); }
+.desktop-run-progress:indeterminate::-webkit-progress-bar {
+  background: linear-gradient(90deg, transparent, var(--accent), transparent) 0 / 34% 100% no-repeat, var(--border);
+  animation: vydra-working 1.6s ease-in-out infinite alternate; }
+@keyframes vydra-working { to { background-position: 100% 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .desktop-run-progress:indeterminate::-webkit-progress-bar { animation: none; }
+}
 .desktop-run[data-status="running"] .desktop-run-status, .desktop-run[data-status="starting"] .desktop-run-status { color: var(--accent); }
 .desktop-run[data-status="failed"] .desktop-run-status { color: var(--error); }
 .desktop-open-report { flex: none; font-size: 12px; }

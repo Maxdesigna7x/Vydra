@@ -12,6 +12,27 @@ from model_profiles import PROFILES, profile_root
 from report_payloads import update_report_timing
 
 
+class PhaseRate:
+    """Measure new work this session, excluding units loaded from a checkpoint."""
+
+    def __init__(self):
+        self.baseline = None
+        self.last_count = None
+        self.rate = None
+
+    def observe(self, count, now):
+        if self.baseline is None or count < self.last_count:
+            self.baseline = (count, now)
+            self.last_count = count
+            self.rate = None
+            return None
+        initial_count, initial_time = self.baseline
+        if count > self.last_count and now > initial_time:
+            self.rate = (count - initial_count) / (now - initial_time)
+            self.last_count = count
+        return self.rate
+
+
 def run(path):
     state = json.loads(path.read_text())
     started = time.monotonic()
@@ -58,20 +79,28 @@ def run(path):
         # The resolver has already downloaded or validated the local snapshot.
         args.offline = True
 
+        classification_rate = PhaseRate()
+        embedding_rate = PhaseRate()
+
         def progress(done, total):
             saved_path = output / 'predicciones_motor_temporal.jsonl.checkpoint' / 'progress.json'
             saved_at = json.loads(saved_path.read_text()).get('saved_at') if saved_path.is_file() else None
             update(stage='Classifying proteins', processed=done, total=total,
+                   phase_rate=classification_rate.observe(done, time.monotonic()),
                    last_progress_at=time.time(), checkpoint_saved_at=saved_at,
                    batch_size_active=0, work_started_at=time.time())
 
         def chunk_progress(details):
             counts = (details['processed'], details['chunks_done'])
+            # The first embedding callback reports recovered units before the model loads.
+            # Start timing with the first real batch, even when resuming from a checkpoint.
+            if details['computing'] or embedding_rate.baseline is not None:
+                embedding_rate.observe(details['chunks_done'], time.monotonic())
             previous = (state.get('processed'), state.get('chunks_done'))
             values = dict(stage='Generating embeddings', processed=details['processed'],
                           total=details['total'], chunks_done=details['chunks_done'],
                           chunks_total=details['chunks_total'],
-                          checkpoint_saved_at=details['checkpoint_saved_at'],
+                          phase_rate=embedding_rate.rate, checkpoint_saved_at=details['checkpoint_saved_at'],
                           batch_size_active=details['batch_size'])
             if details['computing'] and not state.get('batch_size_active'):
                 values['work_started_at'] = time.time()
@@ -85,7 +114,7 @@ def run(path):
         args._storage_callback = lambda value: update(storage_estimate=value)
         update(stage='Loading models and generating embeddings', processed=None)
         command_predict(args)
-        update(stage='Writing results', processed=state['total'])
+        update(stage='Writing results', processed=state['total'], phase_rate=None, batch_size_active=0)
         engine_metadata_path = output / 'predicciones_motor_temporal.jsonl.metadata.json'
         engine_metadata = json.loads(engine_metadata_path.read_text()) if engine_metadata_path.is_file() else {}
         results = postprocess(output / 'predicciones_motor_temporal.jsonl', output, manifest)
