@@ -60,6 +60,51 @@ function setup() {
   setupWindow.loadFile(path.join(__dirname, 'setup.html'));
 }
 
+function configureEngineNavigation(contents, home) {
+  const history = contents.navigationHistory;
+  const origin = new URL(home).origin;
+  const allowed = target => new URL(target).origin === origin;
+  const isMainFrame = event => event.senderFrame && event.senderFrame.parent === null;
+  const updateToolbar = () => {
+    if (!contents.isDestroyed()) {
+      contents.send('navigation:state', { canGoBack: history.getActiveIndex() > 0, atHome: contents.getURL() === home });
+    }
+  };
+  contents.ipc.on('navigation:ready', event => {
+    if (isMainFrame(event)) updateToolbar();
+  });
+  contents.ipc.on('navigation:back', event => {
+    if (!isMainFrame(event)) return;
+    const index = history.getActiveIndex();
+    if (index > 0) history.goToIndex(index - 1);
+  });
+  contents.ipc.on('navigation:home', event => {
+    if (!isMainFrame(event) || contents.getURL() === home) return;
+    const previous = history.getAllEntries().slice(0, history.getActiveIndex());
+    const index = previous.findLastIndex(entry => entry.url === home);
+    if (index >= 0) history.goToIndex(index);
+    else contents.loadURL(home).catch(console.error);
+  });
+
+  const guardNavigation = event => {
+    if (!allowed(event.url)) event.preventDefault();
+  };
+  contents.on('will-navigate', guardNavigation);
+  contents.on('will-redirect', guardNavigation);
+  contents.on('did-stop-loading', updateToolbar);
+  contents.on('did-navigate-in-page', updateToolbar);
+  contents.setWindowOpenHandler(({ url: target }) => {
+    if (allowed(target)) {
+      setImmediate(() => {
+        if (!contents.isDestroyed()) contents.loadURL(target).catch(console.error);
+      });
+    } else if (new URL(target).protocol === 'https:') {
+      shell.openExternal(target).catch(console.error);
+    }
+    return { action: 'deny' };
+  });
+}
+
 async function startEngine(paths) {
   const runtime = path.join(paths.core, 'desktop_bootstrap.py');
   const launch = pythonProcess(paths, [runtime, 'serve', paths.state]);
@@ -93,27 +138,14 @@ async function startEngine(paths) {
       else progress(`${line}\n`);
     });
   });
-  const loopback = new URL(url).origin;
   engineWindow = new BrowserWindow({
     title: 'Vydra', width: 1220, height: 870, minWidth: 820, minHeight: 600,
     icon: windowIcon(),
-    webPreferences: { sandbox: true, contextIsolation: true },
+    webPreferences: {
+      preload: path.join(__dirname, 'navigation-preload.cjs'), sandbox: true, contextIsolation: true,
+    },
   });
-  const allowed = target => new URL(target).origin === loopback;
-  const guardNavigation = (event, target) => {
-    if (!allowed(target)) event.preventDefault();
-  };
-  function configureContents(contents) {
-    contents.on('will-navigate', guardNavigation);
-    contents.on('will-redirect', guardNavigation);
-    contents.setWindowOpenHandler(({ url: target }) => {
-      if (allowed(target)) return { action: 'allow' };
-      if (new URL(target).protocol === 'https:') shell.openExternal(target).catch(console.error);
-      return { action: 'deny' };
-    });
-    contents.on('did-create-window', popup => configureContents(popup.webContents));
-  }
-  configureContents(engineWindow.webContents);
+  configureEngineNavigation(engineWindow.webContents, url);
   engineWindow.on('closed', () => {
     engineWindow = null;
     if (engine === child) {

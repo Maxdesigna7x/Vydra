@@ -1,7 +1,7 @@
 {
   "name": "vydra-desktop",
   "productName": "Vydra",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Vydra local desktop application",
   "author": "Maxdesigna7x",
   "homepage": "https://github.com/Maxdesigna7x/Vydra",
@@ -11,7 +11,7 @@
     "stage": "node stage.cjs",
     "start": "electron .",
     "make": "electron-forge make",
-    "test": "node --check main.cjs && node --check runtime.cjs && node --check setup.js && python -m unittest discover -s ."
+    "test": "node --check main.cjs && node --check navigation-preload.cjs && node --check runtime.cjs && node --check setup.js && python -m unittest discover -s ."
   },
   "devDependencies": {
     "@electron-forge/cli": "8.0.1",

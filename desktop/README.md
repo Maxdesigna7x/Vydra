@@ -2,7 +2,8 @@
 
 Vydra Desktop abre la interfaz local de Vydra en una ventana de Electron. El
 asistente prepara un entorno privado y los archivos de ProstT5. Las entradas y
-los resultados se eligen en cada análisis.
+los resultados se eligen en cada análisis. Usa **Atrás** para volver del
+archivo de texto al informe o **Inicio** para regresar a la pantalla de análisis.
 
 | Modo | Debian/Ubuntu x64 | Windows x64 |
 | --- | --- | --- |
