@@ -17,3 +17,6 @@ button:disabled { opacity: .55; cursor: wait; }
 #space { margin: .8rem 0 0; }
 #status { margin: .9rem 0; }
 pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 180px; overflow: auto; background: #e6eee9; padding: .7rem; }
+
+#update-notice:not([hidden]) { display: flex; align-items: center; justify-content: space-between;
+  gap: 1rem; margin-bottom: 1rem; }

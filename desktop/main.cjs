@@ -1,8 +1,10 @@
-const { app, BrowserWindow, Menu, dialog, ipcMain, shell } = require('electron');
+const { app, BrowserWindow, Menu, dialog, ipcMain, net, shell } = require('electron');
 const { spawn } = require('node:child_process');
 const { createInterface } = require('node:readline');
 const { mkdir, readFile } = require('node:fs/promises');
 const path = require('node:path');
+const { pathToFileURL } = require('node:url');
+const { checkForUpdate } = require('./updates.cjs');
 const { layout, minimum, ready, prepare, pythonProcess, writeAtomic, freeSpace } = require('./runtime.cjs');
 
 function handleSquirrelEvent() {
@@ -28,6 +30,9 @@ let installation;
 let quitting = false;
 let reconfigure = false;
 let config;
+let availableUpdate;
+let updateRequest;
+let showingUpdateDialog = false;
 
 function configFile() { return path.join(app.getPath('userData'), 'settings.json'); }
 function resourceFolder() { return path.join(app.isPackaged ? process.resourcesPath : __dirname, 'resources'); }
@@ -39,6 +44,71 @@ function defaultFolder() {
 
 function progress(message) {
   if (setupWindow && !setupWindow.isDestroyed()) setupWindow.webContents.send('setup:progress', message);
+}
+
+function sendUpdateNotice(window) {
+  if (!window || window.isDestroyed()) return;
+  const notice = availableUpdate
+    ? { version: availableUpdate.version, prerelease: availableUpdate.prerelease }
+    : null;
+  window.webContents.send('updates:available', notice);
+}
+
+async function downloadUpdate(update = availableUpdate) {
+  if (!update) return;
+  try { await shell.openExternal(update.url); }
+  catch (error) { dialog.showErrorBox('Actualización de Vydra', error.message); }
+}
+
+function connectUpdateNotice(window, allowedPage) {
+  const contents = window.webContents;
+  const allowed = event => event.senderFrame?.url === allowedPage && event.senderFrame.parent === null;
+  contents.ipc.on('updates:ready', event => {
+    if (allowed(event)) sendUpdateNotice(window);
+  });
+  contents.ipc.on('updates:download', event => {
+    if (allowed(event)) void downloadUpdate();
+  });
+}
+
+function refreshUpdate() {
+  if (!updateRequest) {
+    updateRequest = checkForUpdate({
+      version: app.getVersion(), platform: process.platform, arch: process.arch,
+      fetch: (url, options) => net.fetch(url, options),
+    }).then(result => {
+      availableUpdate = result;
+      sendUpdateNotice(engineWindow);
+      sendUpdateNotice(setupWindow);
+      return result;
+    }).finally(() => { updateRequest = null; });
+  }
+  return updateRequest;
+}
+
+async function showUpdateDialog() {
+  if (showingUpdateDialog) return;
+  showingUpdateDialog = true;
+  try {
+    const update = await refreshUpdate();
+    const options = update ? {
+      message: `Vydra v${update.version} está disponible`,
+      detail: update.prerelease ? 'Esta es una versión de prueba.' : '',
+      buttons: ['Descargar', 'Más tarde'], defaultId: 0, cancelId: 1,
+    } : { message: `Vydra v${app.getVersion()} está al día.`, buttons: ['Aceptar'] };
+    const parent = engineWindow || setupWindow;
+    const { response } = await (parent ? dialog.showMessageBox(parent, options) : dialog.showMessageBox(options));
+    if (update && response === 0) await downloadUpdate(update);
+  } catch (error) {
+    console.warn('Update check failed:', error.message);
+    if (!quitting) dialog.showErrorBox('Actualización de Vydra', 'No se pudieron consultar las actualizaciones. Inténtalo más tarde.');
+  } finally {
+    showingUpdateDialog = false;
+  }
+}
+
+function checkForUpdatesInBackground() {
+  refreshUpdate().catch(error => console.warn('Update check failed:', error.message));
 }
 
 function setup() {
@@ -57,7 +127,9 @@ function setup() {
     }
   });
   setupWindow.on('closed', () => { setupWindow = null; });
-  setupWindow.loadFile(path.join(__dirname, 'setup.html'));
+  const setupPath = path.join(__dirname, 'setup.html');
+  connectUpdateNotice(setupWindow, pathToFileURL(setupPath).href);
+  setupWindow.loadFile(setupPath);
 }
 
 function configureEngineNavigation(contents, home) {
@@ -146,6 +218,7 @@ async function startEngine(paths) {
     },
   });
   configureEngineNavigation(engineWindow.webContents, url);
+  connectUpdateNotice(engineWindow, url);
   engineWindow.on('closed', () => {
     engineWindow = null;
     if (engine === child) {
@@ -202,6 +275,7 @@ async function start() {
   registerSetupHandlers();
   Menu.setApplicationMenu(Menu.buildFromTemplate([
     { label: 'Vydra', submenu: [
+      { label: 'Buscar actualizaciones…', click: showUpdateDialog },
       { label: 'Ver carpeta de datos', click: () => { if (config) shell.openPath(config.root); } },
       { label: 'Configurar almacenamiento y dispositivo', click: async () => {
         if (!engineWindow || !engine) { setup(); return; }
@@ -222,6 +296,8 @@ async function start() {
     ] },
     { label: 'Edición', submenu: [{ role: 'cut' }, { role: 'copy' }, { role: 'paste' }, { role: 'selectAll' }] },
   ]));
+  checkForUpdatesInBackground();
+  setInterval(checkForUpdatesInBackground, 6 * 60 * 60 * 1000).unref();
   config = await readFile(configFile(), 'utf8').then(JSON.parse).catch(() => null);
   if (!process.argv.includes('--setup') && config && typeof config.root === 'string' &&
       path.isAbsolute(config.root) && Object.hasOwn(minimum, config.mode)) {

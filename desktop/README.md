@@ -84,6 +84,15 @@ preparación se puede ejecutar ProstT5 sin conexión.
   **Set as a pre-release**. La publicación estable queda reservada a versiones
   que superen la validación completa.
 
+## Actualizaciones
+
+Vydra Desktop busca versiones publicadas en GitHub Releases al abrirse y
+cada seis horas mientras está abierto. Incluye las versiones de prueba
+publicadas que tengan un instalador para el sistema actual. Si encuentra una
+versión más nueva, **Descargar** abre el instalador oficial en el navegador.
+También puedes usar **Vydra → Buscar actualizaciones…**. Sin conexión,
+puedes seguir usando tu entorno local y volver a buscar más tarde.
+
 ## Reanudar una instalación
 
 Pulsa **Pausar preparación** si necesitas detener la descarga. Vuelve a

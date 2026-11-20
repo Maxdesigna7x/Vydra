@@ -43,4 +43,25 @@ window.addEventListener('DOMContentLoaded', () => {
     document.body.prepend(toolbar);
   }
   ipcRenderer.send('navigation:ready');
+
+  const header = document.querySelector('main > header .header-actions');
+  if (window.location.pathname !== '/' || !header) return;
+
+  const notice = document.createElement('span');
+  notice.hidden = true;
+  notice.setAttribute('aria-live', 'polite');
+  const download = document.createElement('button');
+  download.type = 'button';
+  download.className = 'button quiet';
+  download.addEventListener('click', () => ipcRenderer.send('updates:download'));
+  notice.append(download);
+  header.prepend(notice);
+
+  ipcRenderer.on('updates:available', (_event, update) => {
+    notice.hidden = !update;
+    if (!update) return;
+    download.textContent = `Descargar v${update.version}`;
+    download.title = update.prerelease ? 'Descargar versión de prueba desde GitHub' : 'Descargar actualización desde GitHub';
+  });
+  ipcRenderer.send('updates:ready');
 });

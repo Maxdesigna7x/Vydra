@@ -27,6 +27,15 @@ async function showSpace() {
   }
 }
 
+document.getElementById('download-update').onclick = api.downloadUpdate;
+api.updates(update => {
+  document.getElementById('update-notice').hidden = !update;
+  if (!update) return;
+  document.getElementById('update-message').textContent = update.prerelease
+    ? `Versión de prueba v${update.version} disponible`
+    : `Vydra v${update.version} está disponible`;
+});
+
 api.progress(message => {
   document.getElementById('details').hidden = false;
   log.textContent = (log.textContent + message).slice(-20_000);
