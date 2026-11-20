@@ -12,7 +12,7 @@ Vydra analiza **secuencias de aminoácidos** en archivos FASTA de proteínas. Di
 
 [Instalación](#instalar-una-vez) · [Usar la interfaz](#analizar-tus-proteínas) · [Leer los resultados](#entender-los-resultados) · [Exportar proteínas](#filtrar-y-exportar) · [Resolver problemas](#resolver-problemas)
 
-**Elige un modelo de embeddings:** ProstT5 (predeterminado), ESM‑2 8M, 35M o 150M. Selecciona el modelo en la GUI o usa `vydra predict --model esm2-8m`. Consulta [tamaños, velocidad GPU e instalación de perfiles](docs/MODEL_PROFILES.md), incluido el clasificador FAISS opcional de M4.
+**Elige un modelo de embeddings:** ProstT5 (predeterminado), ESM‑2 8M, 35M o 150M. Selecciona el modelo en la GUI o usa `vydra predict --model esm2-8m`. Consulta [tamaños, velocidad GPU e instalación de perfiles](docs/MODEL_PROFILES.md), incluida la comparación MLP y FAISS de M4.
 
 ## Qué obtienes
 
@@ -78,12 +78,16 @@ Con ese entorno activo, descarga los modelos y comprueba la instalación:
 ```bash
 ./vydra download-artifacts
 ./vydra download-model
+python -m pip install zstandard
+python scripts/install_model_profile.py prostt5
 ./vydra doctor
 ```
 
 Los pesos del clasificador y las anotaciones de referencia se incluyen en el repositorio. Los dos bancos grandes se descargan aparte, aproximadamente 1.6 GB en total; el encoder ProstT5 fijado requiere unos 5.3 GB. Las descargas se reutilizan en corridas posteriores. No instales las variantes CPU y GPU de FAISS juntas en un mismo entorno.
 
 ## Analizar tus proteínas
+
+[Conectar un cliente MCP local](docs/MCP.md).
 
 Después de instalar, abre una terminal en la carpeta del repositorio. El lanzador activa Conda automáticamente y abre la interfaz:
 
@@ -120,7 +124,7 @@ El informe separa **predicciones del modelo**, **anotaciones de referencias cerc
 - **Classification overview:** conteos de proteínas predichas en cada etapa. Los porcentajes usan la categoría padre correspondiente; no representan abundancia de organismos o virus.
 - **Phage reference evidence:** cinco prototipos cercanos de la clase predicha, incluidos otros clusters como alternativas. La vista inicial muestra género/familia solo si todos los vecinos con ese campo coinciden. Abre el detalle de una proteína para ver cuántas anotaciones hay y dónde discrepan.
 - **Cluster context:** vista secundaria del cluster asignado completo, que puede ser mayor y más diverso que el vecindario cercano.
-- **Contexto de clase de virus eucariotas:** anotaciones publicadas del grupo, con accesión representativa, descripción, categoría funcional y contexto taxonómico cuando existe. Esta rama no realiza recuperación FAISS.
+- **Contexto de clase de virus eucariotas:** anotaciones publicadas del grupo, con accesión representativa, descripción, categoría funcional y contexto taxonómico cuando existe. El informe permite filtrar las proteínas según coincidan las dos clases predichas en M4.
 - **Tiempos:** inferencia y procesamiento total, incluida la generación del informe cuando está activa; son tiempos de toda la corrida, no de cada proteína.
 
 Hay tres cantidades que se deben interpretar por separado:

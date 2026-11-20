@@ -1,6 +1,5 @@
 """Prepare Vydra Desktop and supervise its existing local interface."""
 
-from contextlib import contextmanager
 import os
 import shutil
 import sys
@@ -75,6 +74,41 @@ def fetch_verified(url, target, size, digest):
         time.sleep(5 * (2 ** attempt))
 
 
+M4_PARTS = (
+    (536870912, "5dbf3a24bd66b9fc785641683f0f99ad9d467987fc6de61cfbdab7c8865a37ec"),
+    (207044955, "ba779cc0a80a3504133695fd5153c78ac4f4a377bbd9f2e3729e9a202d89717f"),
+)
+
+
+def prepare_m4_bank():
+    from model_profiles import profile_root, verify_manifest
+    from profile_install import RELEASE, install_archive
+
+    root = profile_root()
+    destination = root / "prostt5"
+    if destination.exists():
+        verify_manifest(destination, "m4_manifest.json", "prostt5")
+        return
+    cache = root.parent / "cache" / "profile-downloads"
+    cache.mkdir(parents=True, exist_ok=True)
+    root.mkdir(parents=True, exist_ok=True)
+    parts = [cache / f"prostt5.tar.zst.part-{i:02d}" for i in range(len(M4_PARTS))]
+    limit = 1024**3
+    missing_bytes = 0
+    for part, (size, _) in zip(parts, M4_PARTS):
+        existing = next((p.stat().st_size for p in (part, part.with_name(part.name + ".part"))
+                         if p.is_file()), 0)
+        missing_bytes += size - existing if existing <= size else size
+    if shutil.disk_usage(root).free < limit + missing_bytes:
+        raise OSError(f"Se necesitan {limit + missing_bytes:,} bytes libres para el banco M4 en {root}.")
+    print("Preparando banco FAISS de M4 para ProstT5…", flush=True)
+    for part, (size, digest) in zip(parts, M4_PARTS):
+        fetch_verified(f"{RELEASE}/{part.name}", part, size, digest)
+    install_archive("prostt5", root, parts, limit)
+    for part in parts:
+        part.unlink()
+
+
 def verify_dependencies(mode, check_gpu):
     import faiss
     import numpy as np
@@ -136,33 +170,16 @@ def prepare(mode):
             verify_prostt5(model_dir)
         (model_dir / ".vydra-model-ready").touch()
     resolve_model_path(model_dir, offline=True)
+    prepare_m4_bank()
     return main(["doctor"])
 
 
-@contextmanager
-def desktop_session(state_dir):
-    """Only one desktop scheduler may own a run directory at a time."""
-    state_dir.mkdir(parents=True, exist_ok=True)
-    with (state_dir / '.desktop-queue.lock').open('a+b') as handle:
-        try:
-            if os.name == 'nt':
-                import msvcrt
-                handle.seek(0)
-                msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
-            else:
-                import fcntl
-                fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        except OSError as exc:
-            raise RuntimeError('La cola de esta carpeta de datos ya está abierta en otra ventana.') from exc
-        yield
-
-
 def serve(state_dir):
-    from local_gui import RunManager, make_server
+    from local_gui import RunManager, make_server, publish_endpoint, queue_session
 
-    with desktop_session(Path(state_dir)):
+    with queue_session(state_dir):
         manager = RunManager(Path(state_dir), queue=True)
-        with make_server(manager, 0) as server:
+        with make_server(manager, 0) as server, publish_endpoint(manager.directory, server):
             manager.dispatch()
 
             # Electron owns the write end. EOF also covers crashes and forced exits.

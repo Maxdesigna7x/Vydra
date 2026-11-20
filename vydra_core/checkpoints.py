@@ -95,12 +95,22 @@ def identity_for(engine, records, text=None, embedding_path=None):
                 chunk_overlap=getattr(engine, 'CHUNK_OVERLAP', 512))
 
 
-# Explicit compatibility with the runtime immediately preceding chunk journaling.
-# Input, model/reference hashes, device and all configuration still must match.
+# Previous runtime revisions with equivalent single-method output. Inputs,
+# configuration, device and every model/reference fingerprint must still match.
 LEGACY_RUNTIME_HASHES = {
-    'engine.py': 'a09dc4b97bbbb65853692d5f1aea2c9ddfa6e512427c01b0d29e02e4c403a773',
-    'vydra_cli.py': '0bc29fe70e6a3f1ce2256a21d2cc2a41388b14c4cc924a6af5cb0e759395aff8',
-    'checkpoints.py': '2ff3ceb6b756c54c02e1f5b2310ccfba8e01b6c4d34d4f9c84dda3388beaadd5',
+    'engine.py': {
+        'a09dc4b97bbbb65853692d5f1aea2c9ddfa6e512427c01b0d29e02e4c403a773',
+        'b285edc82fa70e98f8cb1633b6ecc86a403eb296b703f6ec207a4540fc4d9742',
+    },
+    'vydra_cli.py': {
+        '0bc29fe70e6a3f1ce2256a21d2cc2a41388b14c4cc924a6af5cb0e759395aff8',
+        'f0fa48a81f05e796fdb814df2c7027be165dd147316b3dae7a16ad5efac16000',
+    },
+    'checkpoints.py': {
+        '2ff3ceb6b756c54c02e1f5b2310ccfba8e01b6c4d34d4f9c84dda3388beaadd5',
+        '7cf1f03a81cfb7bae2d4708206b26727cc6ab99d472f2d8a4dd6f74a6efab42a',
+    },
+    'profile_runtime.py': {'277b7fdb917f6b8ce6b002cdb714b200df63aa07223a01bf574b6f82f018b8a7'},
 }
 
 
@@ -109,11 +119,24 @@ def compatible_identity(saved, current):
         return True
     old, new = dict(saved), dict(current)
     old_assets, new_assets = old.pop('assets', {}), new.pop('assets', {})
-    if old != new or old_assets.keys() != new_assets.keys() or not old_assets:
+    if old != new or not old_assets:
         return False
     runtime = Path(__file__).parent.resolve()
+    # Desktop copies its core into a versioned folder beside the previous one.
+    if old_assets.keys() != new_assets.keys() and runtime.parent.parent.name == 'app':
+        previous_roots = [path.parent for key in old_assets if (path := Path(key)).name == 'engine.py'
+                          and path.parent.name == runtime.name and path.parent.parent.parent == runtime.parent.parent]
+        if len(previous_roots) == 1:
+            previous = previous_roots[0]
+            old_assets = {
+                str(runtime / Path(key).relative_to(previous)) if Path(key).is_relative_to(previous) else key: value
+                for key, value in old_assets.items()
+            }
+    if old_assets.keys() != new_assets.keys():
+        return False
     return all(value == new_assets[path] or (
-        Path(path).parent == runtime and value == LEGACY_RUNTIME_HASHES.get(Path(path).name)
+        current.get('classifier') != 'both' and Path(path).parent == runtime
+        and value in LEGACY_RUNTIME_HASHES.get(Path(path).name, ())
     ) for path, value in old_assets.items())
 
 

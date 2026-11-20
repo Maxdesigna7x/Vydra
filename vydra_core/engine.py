@@ -984,6 +984,7 @@ def run_hierarchy(emb: np.ndarray) -> dict:
     nearest_neighbors = []
     cluster_annotation = empty_annotation()
     viral_euk_metadata = empty_viral_euk_class_metadata()
+    comparison = {}
 
     if m1 == "cellular":
         m2, c2 = step("M2_cellular_3_clases")
@@ -995,6 +996,15 @@ def run_hierarchy(emb: np.ndarray) -> dict:
         confidences["M3"] = c3
         if m3 == "eukariota":
             m4, c4 = step("M4_viral_euk_978_clases")
+            if active_profile is not None and active_profile.classifier == "both":
+                faiss_class, faiss_score = active_profile.predict_m4(normalize_embedding(emb))
+                comparison = {
+                    "mlp_class": m4,
+                    "mlp_softmax": c4,
+                    "faiss_class": faiss_class,
+                    "faiss_cosine": faiss_score,
+                    "agreement": "agree" if m4 == faiss_class else "disagree",
+                }
             path.append(m4)
             confidences["M4"] = c4
             viral_euk_metadata = get_viral_euk_class_metadata(m4)
@@ -1042,6 +1052,7 @@ def run_hierarchy(emb: np.ndarray) -> dict:
         "cluster_annotation": cluster_annotation,
         "cluster_biological_label": biological_label(cluster_annotation),
         "viral_euk_class_metadata": viral_euk_metadata,
+        "m4_comparison": comparison,
     }
 
 

@@ -12,7 +12,7 @@ Vydra analyzes **amino-acid sequences** in protein FASTA files. It distinguishes
 
 [Install](#install-once) · [Run the interface](#analyze-your-proteins) · [Read the results](#understand-the-results) · [Export proteins](#filter-and-export) · [Troubleshooting](#troubleshooting)
 
-**Choose an embedding model:** ProstT5 (default), ESM‑2 8M, 35M or 150M. Select a profile in the GUI or use `vydra predict --model esm2-8m`. See [model sizes, GPU throughput and installation](docs/MODEL_PROFILES.md) for each profile and for the optional M4 FAISS classifier.
+**Choose an embedding model:** ProstT5 (default), ESM‑2 8M, 35M or 150M. Select a profile in the GUI or use `vydra predict --model esm2-8m`. See [model sizes, GPU throughput and installation](docs/MODEL_PROFILES.md) for each profile and the M4 comparison.
 
 ## What you receive
 
@@ -78,12 +78,16 @@ With that environment active, download the models and check the installation:
 ```bash
 ./vydra download-artifacts
 ./vydra download-model
+python -m pip install zstandard
+python scripts/install_model_profile.py prostt5
 ./vydra doctor
 ```
 
 The classifier weights and reference annotations are included in the repository. The two large reference banks are downloaded separately, about 1.6 GB combined; the pinned ProstT5 encoder requires about 5.3 GB. Downloads are reused in later runs. Do not install CPU and GPU FAISS variants together in one environment.
 
 ## Analyze your proteins
+
+[Connect a local MCP client](docs/MCP.md).
 
 After installation, open a terminal in the repository folder and start the interface. The launcher activates Conda for you:
 
@@ -120,7 +124,7 @@ The report separates **model predictions**, **annotations of nearby references**
 - **Classification overview:** counts of predicted proteins at each step. Percentages use the corresponding parent category; they do not measure organism or virus abundance.
 - **Phage reference evidence:** five nearest prototypes from the predicted class, including other clusters as alternatives. The initial reference view shows a genus/family label only when all retrieved neighbors with that field agree. Open a protein's detail to see how many annotations are available and where they disagree.
 - **Cluster context:** a secondary view of the whole assigned cluster, which may be larger and more diverse than the local neighborhood.
-- **Eukaryotic-virus class context:** published group annotations, including representative accession, protein description, function category, and taxonomic context when available. This branch does not use FAISS retrieval.
+- **Eukaryotic-virus class context:** published group annotations, including representative accession, protein description, function category, and taxonomic context when available. The report can filter proteins by agreement between the two M4 classes.
 - **Timing:** inference time and total processing time, including report generation when enabled; these are whole-run times, not per-protein timings.
 
 Three quantities must be read separately:

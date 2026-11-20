@@ -271,6 +271,9 @@ def new_stats() -> dict[str, Any]:
         "cellular_eukaryota": 0,
         "viral_phage": 0,
         "viral_eukaryota": 0,
+        "m4_compared": 0,
+        "m4_agree": 0,
+        "m4_disagree": 0,
         "phage_structural": 0,
         "phage_non_structural": 0,
         "cluster_assigned": 0,
@@ -282,6 +285,10 @@ def new_stats() -> dict[str, Any]:
 
 
 def add_result(stats: dict[str, Any], row: dict[str, Any]) -> None:
+    agreement = row.get("m4_comparison", {}).get("agreement")
+    if agreement in ("agree", "disagree"):
+        stats["m4_compared"] += 1
+        stats[f"m4_{agreement}"] += 1
     stats["sequences"] += 1
     stats["chunked"] += int(bool(row.get("chunked")))
     length = int(row.get("original_length_aa", row.get("length", 0)))
@@ -384,6 +391,7 @@ def postprocess(raw_jsonl: Path, output_root: Path, manifest: list[dict[str, Any
     summary_fields = [
         "source_relative_path", "source_folder", "source_file", "sequences", "cellular", "viral",
         "cellular_bacteria", "cellular_archaea", "cellular_eukaryota", "viral_phage", "viral_eukaryota",
+        "m4_compared", "m4_agree", "m4_disagree",
         "phage_structural", "phage_non_structural", "cluster_assigned", "chunked",
         "mean_original_length_aa", "max_original_length_aa", "mean_confidence_M1",
     ]

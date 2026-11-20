@@ -1,4 +1,4 @@
-const { app, BrowserWindow, Menu, dialog, ipcMain, net, shell } = require('electron');
+const { app, BrowserWindow, Menu, clipboard, dialog, ipcMain, net, shell } = require('electron');
 const { spawn } = require('node:child_process');
 const { createInterface } = require('node:readline');
 const { mkdir, readFile } = require('node:fs/promises');
@@ -270,12 +270,40 @@ function registerSetupHandlers() {
   });
 }
 
+async function copyMcpConfig() {
+  if (!config || !engineWindow || !engine) {
+    dialog.showErrorBox('Vydra MCP', 'Abre Vydra y completa la configuración antes de conectar un cliente MCP.');
+    return;
+  }
+  const choice = await dialog.showOpenDialog(engineWindow, {
+    title: 'Elige las carpetas a las que podrá acceder el cliente MCP',
+    buttonLabel: 'Copiar configuración',
+    properties: ['openDirectory', 'multiSelections'],
+  });
+  if (choice.canceled || !choice.filePaths.length) return;
+  const paths = layout(config.root, config.mode, resourceFolder());
+  clipboard.writeText(JSON.stringify({
+    mcpServers: {
+      vydra: {
+        command: paths.python,
+        args: [path.join(paths.core, 'mcp_server.py'), '--desktop-data-dir', config.root,
+          ...choice.filePaths.flatMap(folder => ['--root', folder])],
+      },
+    },
+  }, null, 2));
+  await dialog.showMessageBox(engineWindow, {
+    message: 'Configuración MCP copiada',
+    detail: 'Agrega el servidor Vydra a la configuración de tu cliente MCP y mantén abierta la app mientras se ejecuten las tareas.',
+  });
+}
+
 async function start() {
   app.setAppUserModelId('com.squirrel.vydra_desktop.vydra-desktop');
   registerSetupHandlers();
   Menu.setApplicationMenu(Menu.buildFromTemplate([
     { label: 'Vydra', submenu: [
       { label: 'Buscar actualizaciones…', click: showUpdateDialog },
+      { label: 'Copiar configuración MCP…', click: copyMcpConfig },
       { label: 'Ver carpeta de datos', click: () => { if (config) shell.openPath(config.root); } },
       { label: 'Configurar almacenamiento y dispositivo', click: async () => {
         if (!engineWindow || !engine) { setup(); return; }

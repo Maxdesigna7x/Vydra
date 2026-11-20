@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import mimetypes
 import os
+import re
 import secrets
 import signal
 import subprocess
@@ -11,6 +12,7 @@ import threading
 import time
 import uuid
 import webbrowser
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -21,6 +23,46 @@ from model_profiles import available_profiles
 BASE = Path(__file__).resolve().parent
 ACTIVE = {'starting', 'running', 'cancelling'}
 STALL_TIMEOUT_SECONDS = 30 * 60
+
+
+ENDPOINT_FILE = '.mcp-endpoint'
+
+
+def default_state_dir():
+    return Path.home() / '.local' / 'share' / 'vydra' / 'gui'
+
+
+@contextmanager
+def queue_session(state_dir):
+    """Only one scheduler may own a run directory at a time."""
+    state_dir = Path(state_dir).expanduser().resolve()
+    state_dir.mkdir(parents=True, exist_ok=True)
+    with (state_dir / '.desktop-queue.lock').open('a+b') as handle:
+        try:
+            if os.name == 'nt':
+                import msvcrt
+                handle.seek(0)
+                if not handle.read(1):
+                    handle.write(b'0')
+                    handle.flush()
+                handle.seek(0)
+                msvcrt.locking(handle.fileno(), msvcrt.LK_NBLCK, 1)
+            else:
+                import fcntl
+                fcntl.flock(handle, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        except OSError as exc:
+            raise RuntimeError('This run directory already has an active scheduler. Connect to its MCP endpoint.') from exc
+        yield
+
+
+@contextmanager
+def publish_endpoint(directory, server):
+    endpoint = directory / ENDPOINT_FILE
+    write_json(endpoint, {'port': server.server_port, 'token': server.vydra_token})
+    try:
+        yield
+    finally:
+        endpoint.unlink(missing_ok=True)
 
 
 class RunManager:
@@ -83,7 +125,19 @@ class RunManager:
                     continue
         return sorted(result, key=lambda row: row['created_at'], reverse=True)
 
-    def start(self, values):
+    def run(self, ident):
+        if not re.fullmatch(r'[0-9a-f]{32}', ident):
+            return None
+        with self.lock:
+            try:
+                state = json.loads((self.directory / (ident + '.json')).read_text(encoding='utf-8'))
+            except FileNotFoundError:
+                return None
+            if ident in self.cancelled and state['status'] in ACTIVE:
+                state.update(status='cancelling', stage='Cancelling')
+            return state
+
+    def start(self, values, *, legacy_classifier=None):
         source = Path(str(values.get('input', ''))).expanduser().resolve()
         output_text = str(values.get('output', '')).strip()
         if not str(values.get('input', '')).strip() or not source.exists():
@@ -100,12 +154,12 @@ class RunManager:
         if device not in ('auto', 'cuda', 'cpu'):
             raise ValueError('Unknown device.')
         profile = values.get('model') or 'prostt5'
-        classifier = values.get('classifier') or 'mlp'
+        classifier = legacy_classifier or 'both'
         available = {item['id']: item for item in available_profiles()}
         if profile not in available or not available[profile]['installed']:
             raise ValueError('Install the selected model profile before starting.')
-        if classifier not in ('mlp', 'faiss') or (classifier == 'faiss' and not available[profile]['faiss']):
-            raise ValueError('The selected classifier requires an installed FAISS M4 bank.')
+        if classifier not in ('both', 'mlp', 'faiss') or (classifier != 'mlp' and not available[profile]['faiss']):
+            raise ValueError('Install the FAISS M4 bank for the selected model to compare MLP and FAISS.')
         batch = values.get('batch_size')
         if batch not in (None, ''):
             try:
@@ -116,7 +170,7 @@ class RunManager:
                 raise ValueError('Batch size must be a positive integer.')
         else:
             batch = None
-        resume = bool(values.get('resume'))
+        resume = legacy_classifier is not None and bool(values.get('resume'))
         with self.lock:
             if self.closing:
                 raise ValueError('Vydra is closing.')
@@ -204,7 +258,7 @@ class RunManager:
                 raise ValueError('Only an interrupted, cancelled or failed run can be resumed.')
             values = {key: state.get(key) for key in ('mode', 'input', 'output', 'device', 'offline', 'report', 'batch_size', 'model', 'classifier')}
             values['resume'] = True
-            return self.start(values)
+            return self.start(values, legacy_classifier=state.get('classifier') or 'mlp')
 
     @staticmethod
     def stalled(state, now=None):
@@ -346,6 +400,11 @@ def make_server(manager, port=0):
                 if request.path == '/api/runs':
                     manager.dispatch()
                     return self.send(200, manager.runs())
+                if request.path.startswith('/api/run/'):
+                    if not self.allowed(mutation=True):
+                        return self.send(403, {'error': 'Local request token required.'})
+                    state = manager.run(request.path.rsplit('/', 1)[-1])
+                    return self.send(200, state) if state else self.send(404, {'error': 'Run not found.'})
                 if request.path == '/api/browse':
                     raw = parse_qs(request.query).get('path', [str(Path.home())])[0]
                     path = Path(raw).expanduser().resolve()
@@ -413,23 +472,27 @@ def make_server(manager, port=0):
             except (OSError, ValueError, subprocess.TimeoutExpired) as exc:
                 self.send(400, {'error': str(exc)})
 
-    return ThreadingHTTPServer(('127.0.0.1', port), Handler)
+    server = ThreadingHTTPServer(('127.0.0.1', port), Handler)
+    server.vydra_token = token
+    return server
 
 
 def serve(port=0, open_browser=True, state_dir=None):
     if not 0 <= port <= 65535:
         raise ValueError('Port must be between 0 and 65535.')
-    manager = RunManager(state_dir or Path.home() / '.local' / 'share' / 'vydra' / 'gui')
-    server = make_server(manager, port)
-    url = f'http://127.0.0.1:{server.server_port}/'
-    print(f'Vydra local interface: {url}\nKeep this terminal open. Press Ctrl+C to stop the server.', flush=True)
-    if open_browser:
-        threading.Timer(.3, lambda: webbrowser.open(url)).start()
-    try:
-        server.serve_forever()
-    except KeyboardInterrupt:
-        pass
-    finally:
-        server.server_close()
-        manager.close()
+    state_dir = state_dir or default_state_dir()
+    with queue_session(state_dir):
+        manager = RunManager(state_dir, queue=True)
+        with make_server(manager, port) as server, publish_endpoint(manager.directory, server):
+            manager.dispatch()
+            url = f'http://127.0.0.1:{server.server_port}/'
+            print(f'Vydra local interface: {url}\nKeep this terminal open. Press Ctrl+C to stop the server.', flush=True)
+            if open_browser:
+                threading.Timer(.3, lambda: webbrowser.open(url)).start()
+            try:
+                server.serve_forever()
+            except KeyboardInterrupt:
+                pass
+            finally:
+                manager.close()
     return 0

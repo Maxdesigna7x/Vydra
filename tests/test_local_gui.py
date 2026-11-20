@@ -13,6 +13,11 @@ from local_gui import RunManager, make_server
 
 class LocalGuiTests(unittest.TestCase):
     def setUp(self):
+        profiles = patch('local_gui.available_profiles', return_value=[
+            {'id': 'prostt5', 'installed': True, 'faiss': True},
+        ])
+        profiles.start()
+        self.addCleanup(profiles.stop)
         self.tmp = tempfile.TemporaryDirectory()
         self.root = Path(self.tmp.name)
         self.source = self.root / 'input.faa'

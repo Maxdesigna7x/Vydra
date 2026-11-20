@@ -39,7 +39,7 @@ function render(){
 }
 async function poll(){if(polling)return;polling=true;try{runs=await api('/api/runs');if(desktopRuns)$('desktop-connection-error').textContent='';render();if(logShown&&activeId){const data=await api('/api/log/'+activeId);$('execution-log').textContent=data.log||'No log output yet.'}}catch(e){if(desktopRuns)$('desktop-connection-error').textContent='Se perdió la conexión con Vydra. '+e.message;else $('form-error').textContent='Connection lost. Keep the Vydra server terminal open. '+e.message}finally{polling=false}}
 $('batch').addEventListener('invalid',()=>{if(!$('advanced').open)$('advanced').showModal()});
-$('run-form').onsubmit=async event=>{event.preventDefault();if(submitting)return;submitting=true;render();$('form-error').textContent='';try{const run=await api('/api/runs',{mode:$('mode').value,input:$('source').value,output:$('output').value,device:$('device').value,model:$('model').value,classifier:$('classifier').value,offline:!$('offline').checked,report:$('report').checked,batch_size:$('batch').value||null});activeId=run.id;logShown=false;$('show-log').textContent='View execution log';$('execution-log').hidden=true;
+$('run-form').onsubmit=async event=>{event.preventDefault();if(submitting)return;submitting=true;render();$('form-error').textContent='';try{const run=await api('/api/runs',{mode:$('mode').value,input:$('source').value,output:$('output').value,device:$('device').value,model:$('model').value,offline:!$('offline').checked,report:$('report').checked,batch_size:$('batch').value||null});activeId=run.id;logShown=false;$('show-log').textContent='View execution log';$('execution-log').hidden=true;
  if(desktopRuns){runs=[run,...runs];$('source').value='';$('output').value='';desktopRuns.closeTask()}
  await poll()}catch(e){$('form-error').textContent=e.message}finally{submitting=false;render()}};
 $('resume').onclick=async()=>{if(submitting)return;submitting=true;render();try{const run=await api('/api/resume/'+activeId,{});activeId=run.id;await poll()}catch(e){$('run-error').textContent=e.message}finally{submitting=false;render()}};
@@ -61,10 +61,9 @@ Object.entries(tips).forEach(([id,tip])=>{const element=$(id);if(!element)return
 window.addEventListener('resize',hideTip);document.addEventListener('keydown',e=>{if(e.key==='Escape')hideTip()});
 function updateClassifier() {
   const selected = config.models.find(model => model.id === $('model').value);
-  const faiss = $('classifier').querySelector('option[value="faiss"]');
-  faiss.disabled = !selected?.faiss;
-  if (faiss.disabled) $('classifier').value = 'mlp';
-  $('model-note').textContent = $('device').value === 'cpu'
+  $('model-note').textContent = !selected?.faiss
+    ? 'Install the FAISS M4 bank for this embedding model before starting.'
+    : $('device').value === 'cpu'
     ? 'No comparable CPU speed measurements. Listed speeds are for the RTX 3060.'
     : 'Encoder speed on RTX 3060 at full batches, 75–1022 aa. Speed varies with length and hardware.';
 }

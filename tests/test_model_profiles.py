@@ -59,6 +59,30 @@ class ModelProfileTests(unittest.TestCase):
             self.assertEqual(runtime.predict_m4.call_count, 1)
             self.assertEqual(runtime.predict.call_count, 5)
 
+    def test_m4_compares_top_classes_and_keeps_mlp_path(self):
+        from types import SimpleNamespace
+        from unittest.mock import Mock
+        import numpy as np
+        from vydra_core import engine
+
+        runtime = SimpleNamespace(id="esm2-8m", classifier="both",
+                                  predict_m4=Mock(side_effect=[("0", .7), ("2", .8)]))
+        for expected, faiss_class in (("agree", "0"), ("disagree", "2")):
+            with patch.object(engine, "active_profile", runtime), patch.object(engine, "EMB_DIM", 320), \
+                 patch.object(engine, "predict_step", side_effect=[("viral", .9), ("eukariota", .9), ("0", .6)]), \
+                 patch.object(engine, "release_prost_t5"):
+                row = engine.run_hierarchy(np.ones(320, dtype=np.float32))
+                self.assertEqual(row["path"][-1], "0")
+                self.assertEqual(row["m4_comparison"]["faiss_class"], faiss_class)
+                self.assertEqual(row["m4_comparison"]["agreement"], expected)
+
+        with patch.object(engine, "active_profile", runtime), patch.object(engine, "EMB_DIM", 320), \
+             patch.object(engine, "predict_step", side_effect=[("cellular", .9), ("bacteria", .9)]), \
+             patch.object(engine, "release_prost_t5"):
+            row = engine.run_hierarchy(np.ones(320, dtype=np.float32))
+            self.assertEqual(row["m4_comparison"], {})
+            self.assertEqual(runtime.predict_m4.call_count, 2)
+
     def test_report_timing_keeps_profile_and_classifier(self):
         from report_payloads import update_report_timing
 

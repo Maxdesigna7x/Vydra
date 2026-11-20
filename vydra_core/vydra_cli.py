@@ -226,7 +226,7 @@ def _command_predict(args, stack):
         eprint("Verifying model and reference fingerprints...")
         identity = identity_for(engine, records, text, args.embedding)
         identity['input_path'] = str((args.fasta or args.embedding).resolve()) if (args.fasta or args.embedding) else None
-        if profile_id != "prostt5" or classifier != "mlp":
+        if getattr(engine, "active_profile", None) is not None:
             identity.update(model_profile=profile_id, classifier=classifier,
                             profile_artifacts=engine.active_profile.manifest,
                             classifier_artifacts=engine.active_profile.train_manifest)
@@ -261,7 +261,13 @@ def _command_predict(args, stack):
     started_at = datetime.now(timezone.utc).isoformat()
     engine = import_engine(args.device, args.offline)
     profile_id = getattr(args, "model", "prostt5")
-    classifier = getattr(args, "classifier", "mlp")
+    classifier = getattr(args, "classifier", None)
+    if classifier is None and getattr(args, "resume", False):
+        directory = getattr(args, "checkpoint_dir", None) or Path(str(args.output) + ".checkpoint")
+        identity_file = Path(directory) / "identity.json"
+        if identity_file.is_file():
+            classifier = json.loads(identity_file.read_text(encoding="utf-8")).get("classifier", "mlp")
+    classifier = classifier or "both"
     if args.embedding and profile_id != "prostt5":
         raise ValueError("Precomputed embeddings are currently supported only with the legacy ProstT5 profile")
     if hasattr(engine, "configure_profile"):
@@ -338,13 +344,16 @@ def _command_predict(args, stack):
     for row in rows:
         row['run_inference_seconds'] = inference_seconds
         row.update(model_profile=profile_id, classifier=classifier, m4_classifier=classifier)
+    comparison = [row.get("m4_comparison", {}).get("agreement") for row in rows]
     runtime_profile = getattr(engine, 'active_profile', None)
     timing = {'started_at': started_at, 'inference_seconds': inference_seconds,
               'model_profile': profile_id, 'classifier': classifier, 'm4_classifier': classifier,
               'profile_artifacts': runtime_profile.manifest if runtime_profile else None,
-              'classifier_artifacts': runtime_profile.train_manifest if runtime_profile and classifier == "faiss" else None,
+              'classifier_artifacts': runtime_profile.train_manifest if runtime_profile and classifier in ("faiss", "both") else None,
               'resumed': bool(getattr(args, 'resume', False)),
               'checkpoint_dir': str(checkpoint.directory) if checkpoint else None,
+              'm4_compared': sum(value in ('agree', 'disagree') for value in comparison),
+              'm4_agree': comparison.count('agree'), 'm4_disagree': comparison.count('disagree'),
               'scope': 'current attempt; model/input loading, embeddings and classification; report time separate'}
     report_dir = None
     metadata_path = None
@@ -569,8 +578,8 @@ def build_parser(language='en') -> argparse.ArgumentParser:
     from model_profiles import PROFILES
     predict.add_argument("--model", choices=tuple(PROFILES), default="prostt5",
                          help="embedding model profile (default: ProstT5)")
-    predict.add_argument("--m4-classifier", "--classifier", dest="classifier", choices=("mlp", "faiss"), default="mlp",
-                         help="classifier for M4 only (default: MLP)")
+    predict.add_argument("--m4-classifier", "--classifier", dest="classifier", choices=("both", "mlp", "faiss"), default=None,
+                         help="M4 methods (default: both; single methods for legacy runs)")
     predict.add_argument("--device", choices=("auto", "cpu", "cuda"), default="auto", help="dispositivo para ProstT5, MLP y FAISS; auto usa GPU compatible o CPU")
     predict.add_argument("--offline", action="store_true", help="prohibir descargas y usar solo archivos locales")
     predict.add_argument("--batch-size", type=int, help="batch fijo inicial; por defecto se calcula automaticamente")
@@ -590,6 +599,10 @@ def build_parser(language='en') -> argparse.ArgumentParser:
     gui.add_argument("--no-browser", action="store_true", help="print the URL without opening a browser")
     gui.add_argument("--state-dir", type=Path, help="directory for local run history")
     gui.set_defaults(func=command_gui)
+
+    from mcp_server import command_mcp, configure_parser
+    mcp = configure_parser(subparsers.add_parser("mcp", help="serve the local queue over MCP stdio"))
+    mcp.set_defaults(func=command_mcp)
 
     doctor = subparsers.add_parser("doctor", help="comprobar dependencias, pesos y artefactos")
     doctor.set_defaults(func=command_doctor)

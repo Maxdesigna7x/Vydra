@@ -8,7 +8,7 @@ const version = require('./package.json').version;
 const runtimeVersion = '0.1.0';
 const windows = process.platform === 'win32';
 const gib = 1024 ** 3;
-const minimum = { cpu: 12 * gib, cuda: (windows ? 22 : 34) * gib };
+const minimum = { cpu: 14 * gib, cuda: (windows ? 24 : 36) * gib };
 
 function layout(root, mode, resources) {
   const environment = path.join(root, 'env', `${runtimeVersion}-${mode}`);
@@ -80,6 +80,7 @@ async function ready(paths) {
       path.join(paths.artifacts, 'Non_Struct_prototype_bank.pt'),
       path.join(paths.env.VYDRA_PROSTT5_PATH, '.vydra-model-ready'),
       path.join(paths.env.VYDRA_PROSTT5_PATH, 'pytorch_model.bin'),
+      path.join(paths.env.VYDRA_PROFILE_ROOT, 'prostt5', 'm4_manifest.json'),
     ].map(file => access(file)));
     return true;
   } catch {
@@ -173,6 +174,9 @@ async function prepare(root, mode, resources, log, { dependenciesOnly = false, s
     await python(['-m', 'pip', 'install', '--retries', '6', '--timeout', '120',
       '-r', path.join(resources, 'requirements.txt')]);
     await writeAtomic(journal, JSON.stringify({ phase: 'dependencies' }));
+  }
+  if (!dependenciesOnly && !await access(path.join(paths.env.VYDRA_PROFILE_ROOT, 'prostt5', 'm4_manifest.json')).then(() => true, () => false)) {
+    await python(['-m', 'pip', 'install', '--retries', '6', '--timeout', '120', 'zstandard==0.25.0']);
   }
   await cp(paths.engine, paths.core, { recursive: true });
   const bootstrap = path.join(paths.core, 'desktop_bootstrap.py');

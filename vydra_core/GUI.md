@@ -45,4 +45,4 @@ Local models are used automatically; Check installation is optional. The Allow m
 
 ## Model profiles
 
-Use **Embedding model** to choose an installed encoder and **M4 classifier** to choose either MLP or FAISS for M4. Sizes are encoder weight sizes. Speed is measured with full batches on an RTX 3060; see the link below for scope. [Profile setup and benchmark scope](../docs/MODEL_PROFILES.md).
+Use **Embedding model** to choose an installed encoder. M4 compares MLP and FAISS using the selected profile’s reference bank. Sizes are encoder weight sizes. Speed is measured with full batches on an RTX 3060; see the link below for scope. [Profile setup and benchmark scope](../docs/MODEL_PROFILES.md).

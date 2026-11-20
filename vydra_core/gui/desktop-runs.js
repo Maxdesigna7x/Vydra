@@ -18,7 +18,11 @@ window.createVydraDesktopRuns = ({ selectRun, showReport }) => {
   const completed = run => ['complete', 'completed'].includes(run.status);
   const name = path => path?.split(/[\\/]/).filter(Boolean).at(-1) || '—';
   const model = run => modelNames.get(run.model || 'prostt5') || run.model || 'ProstT5';
-  const method = run => (run.classifier || 'mlp').toUpperCase();
+  const method = run => run.classifier === 'both' ? 'MLP + FAISS' : (run.classifier || 'mlp').toUpperCase();
+  function comparison(run) {
+    const counts = run.result?.overall;
+    return counts?.m4_compared ? ` · ${counts.m4_agree}/${counts.m4_compared} coinciden` : '';
+  }
   const date = run => run.created_at ? new Date(run.created_at).toLocaleString(undefined, {
     month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
   }) : '';
@@ -144,7 +148,7 @@ window.createVydraDesktopRuns = ({ selectRun, showReport }) => {
     const now = Date.now() / 1000;
     const rows = ordered.map(run => ({
       run, title: name(run.input), state: describe(run, positions.get(run.id)), created: date(run), live: liveProgress(run, now),
-      summary: `${model(run)} · M4: ${method(run)} · ${device(run)} · Salida: ${name(run.output)}`,
+      summary: `${model(run)} · M4: ${method(run)}${comparison(run)} · ${device(run)} · Salida: ${name(run.output)}`,
     }));
     const signature = JSON.stringify(rows.map(({run, title, state, summary, created, live}) =>
       [run.id, run.input, run.output, run.status, run.report_path, title, live ? null : state, summary, created]));
@@ -164,7 +168,7 @@ window.createVydraDesktopRuns = ({ selectRun, showReport }) => {
 
   function showDetails(run) {
     $('desktop-run-title').textContent = name(run.input);
-    $('desktop-run-parameters').textContent = `${model(run)} · M4: ${method(run)} · ${device(run)}`;
+    $('desktop-run-parameters').textContent = `${model(run)} · M4: ${method(run)}${comparison(run)} · ${device(run)}`;
     $('desktop-run-input').textContent = run.input || '—';
     $('desktop-run-date').textContent = run.created_at ? new Date(run.created_at).toLocaleString() : '';
   }

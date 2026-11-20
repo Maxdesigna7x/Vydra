@@ -3,6 +3,7 @@ import sys
 import tempfile
 import time
 import unittest
+from unittest.mock import patch
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'vydra_core'))
@@ -11,6 +12,11 @@ from local_gui import RunManager
 
 class DesktopQueueTests(unittest.TestCase):
     def setUp(self):
+        profiles = patch('local_gui.available_profiles', return_value=[
+            {'id': 'prostt5', 'installed': True, 'faiss': True},
+        ])
+        profiles.start()
+        self.addCleanup(profiles.stop)
         temporary = tempfile.TemporaryDirectory()
         self.addCleanup(temporary.cleanup)
         self.root = Path(temporary.name)

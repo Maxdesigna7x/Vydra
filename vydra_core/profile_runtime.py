@@ -35,7 +35,7 @@ class ProfileRuntime:
                 raise ValueError("Phage prototype vectors differ from the selected encoder or split")
             self.train = np.load(self.directory / "train_vectors.npy", mmap_mode="r", allow_pickle=False)
         self.m4_index = None
-        if classifier == "faiss":
+        if classifier in ("faiss", "both"):
             self.train_manifest = verify_manifest(self.directory, "m4_manifest.json", profile)
             if self.manifest and any(self.manifest[key] != self.train_manifest[key]
                                      for key in ("split_sha256", "source_matrix_sha256")):
@@ -119,8 +119,11 @@ class ProfileRuntime:
                     or matrix.dtype != np.float32 or not len(labels)
                     or labels.min() < 0 or labels.max() >= len(classes)):
                 raise ValueError("Invalid M4 reference bank")
-            if self.classes is not None and self.classes[self.engine.MODEL_NAMES[3]] != classes:
-                raise ValueError("M4 class order differs from the MLP vocabulary")
+            mlp_classes = self.classes
+            if mlp_classes is None and self.classifier == "both":
+                _, mlp_classes = self.engine.load_models()
+            if mlp_classes is not None and set(mlp_classes[self.engine.MODEL_NAMES[3]]) != set(classes):
+                raise ValueError("M4 FAISS and MLP class vocabularies differ")
             self.m4_index = self.engine.build_faiss_index(matrix)
             self.m4_matrix, self.m4_labels, self.m4_classes = matrix, labels, classes
         scores, ids = self.engine.gpu_faiss.search_index(

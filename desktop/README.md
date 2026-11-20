@@ -5,7 +5,7 @@ asistente prepara un entorno privado y los archivos de ProstT5. Las entradas y
 los resultados se eligen en cada análisis. Usa **Atrás** para volver del
 archivo de texto al informe o **Inicio** para regresar a la lista de corridas.
 
-**Nueva tarea** abre las opciones de modelo, método M4, entrada, salida y
+**Nueva tarea** abre las opciones de modelo, entrada, salida y
 dispositivo. Desktop ejecuta una corrida a la vez y atiende las tareas
 pendientes en el orden en que se añadieron. Las tareas en cola se guardan al
 cerrar Vydra y continúan al abrir la misma carpeta de datos. La tarea activa
@@ -25,8 +25,18 @@ Cada computadora con NVIDIA debe tener un controlador compatible con CUDA
 12.9 en Linux o CUDA 12.6 en Windows. El entorno
 de escritorio tiene sus propias dependencias. Para la primera instalación se
 necesita conexión y espacio libre en la carpeta seleccionada. Reserva unos
-34 GiB para una instalación NVIDIA de Linux, incluido el caché de paquetes. Después de la
+36 GiB para una instalación NVIDIA de Linux, incluido el caché de paquetes. Después de la
 preparación se puede ejecutar ProstT5 sin conexión.
+
+Las proteínas que llegan a M4 se clasifican con MLP y FAISS. La tarjeta
+completada muestra cuántas predicciones coinciden. En el informe, usa
+**Proteins → M4 agreement** para ver únicamente coincidencias o discrepancias
+y descargar esa selección. Las dos clases y puntuaciones se guardan en los
+resultados por secuencia.
+
+Para conectar un cliente de IA, usa **Vydra → Copiar configuración MCP…**.
+Selecciona las carpetas de datos que el cliente podrá usar. Las tareas que
+envíe aparecerán en la misma cola. Consulta la [guía MCP](../docs/MCP.md).
 
 ## Antes de descargar pesos
 
@@ -108,6 +118,9 @@ carpeta de datos y el estado de la etapa en `app/<versión-del-entorno>/setup-<m
 - Si se interrumpió ProstT5, se conservan los parciales mantenidos por
   Hugging Face en `models/prostt5-07a6547/`. Los dos bancos y ProstT5 se
   comparten entre los modos de esa misma carpeta.
+- El banco FAISS de M4 de ProstT5 (≈710 MiB comprimidos) se descarga una vez.
+  Los parciales quedan en `cache/profile-downloads/`. El banco verificado
+  queda en `profiles/prostt5/` y se reutiliza al cambiar de versión o modo.
 - Si ya tienes estos archivos de las revisiones publicadas, puedes copiarlos
   al directorio correspondiente antes de preparar la app. El asistente verifica
   los bancos, el peso y el tokenizer antes de aceptarlos. Si hay un error
@@ -121,7 +134,7 @@ carpeta de datos y el estado de la etapa en `app/<versión-del-entorno>/setup-<m
 
 - Base de Vydra `76e36d0`. Implementado el lanzador, el asistente, las dos
   configuraciones de dispositivo y el workflow de construcción y borrador.
-- La preparación inicial instala ProstT5 con MLP. Los perfiles adicionales
+- La preparación inicial instala ProstT5 con MLP y el banco FAISS de M4. Los perfiles adicionales
   que ya estén en `profiles/` se detectan desde la interfaz. La instalación de
   perfiles opcionales desde la app queda pendiente.
 - [Matriz inicial de arranque](https://github.com/Maxdesigna7x/Vydra/actions/runs/44594050844).
