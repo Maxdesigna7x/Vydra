@@ -1,6 +1,6 @@
 'use strict';
 
-window.createVydraDesktopRuns = ({ selectRun, showReport }) => {
+window.createVydraRunQueue = ({ selectRun, showReport }) => {
   const $ = id => document.getElementById(id);
   const modelNames = new Map();
   const statuses = {
@@ -32,9 +32,9 @@ window.createVydraDesktopRuns = ({ selectRun, showReport }) => {
     return `${total}s`;
   };
   const count = (done, total) => `${integers.format(Math.max(0, done || 0))}/${integers.format(total)}`;
-  const details = $('desktop-run-details');
-  const list = $('desktop-run-list');
-  const task = $('desktop-new-task');
+  const details = $('run-details');
+  const list = $('run-list');
+  const task = $('new-task');
   let lastRender;
 
   function describe(run, position) {
@@ -71,10 +71,10 @@ window.createVydraDesktopRuns = ({ selectRun, showReport }) => {
 
   function updateLiveCard(item, row) {
     const { run, state, summary, live } = row;
-    const open = item.querySelector('.desktop-run-summary');
+    const open = item.querySelector('.run-summary');
     open.title = [run.input, run.output, summary, state, live.time, live.metrics].filter(Boolean).join('\n');
-    item.querySelector('.desktop-run-status').textContent = `${state} · ${live.time}`;
-    item.querySelector('.desktop-run-metrics').textContent = live.metrics;
+    item.querySelector('.run-status').textContent = `${state} · ${live.time}`;
+    item.querySelector('.run-metrics').textContent = live.metrics;
     const progress = item.querySelector('progress');
     if (live.total === null) progress.removeAttribute('value');
     else {
@@ -86,24 +86,24 @@ window.createVydraDesktopRuns = ({ selectRun, showReport }) => {
   function card(row) {
     const { run, title, state, summary, created, live } = row;
     const item = document.createElement('li');
-    item.className = 'desktop-run';
+    item.className = 'run';
     item.dataset.status = run.status;
     const open = document.createElement('button');
     open.type = 'button';
-    open.className = 'desktop-run-summary';
+    open.className = 'run-summary';
     open.dataset.action = 'details';
     open.dataset.run = run.id;
     open.title = [run.input, run.output, summary, state].filter(Boolean).join('\n');
     const titleText = document.createElement('strong');
     titleText.textContent = title;
     const stateText = document.createElement('span');
-    stateText.className = 'desktop-run-status';
+    stateText.className = 'run-status';
     stateText.textContent = state;
     const meta = document.createElement('span');
-    meta.className = 'desktop-run-meta';
+    meta.className = 'run-meta';
     meta.textContent = summary;
     const extra = document.createElement(live ? 'span' : 'time');
-    extra.className = live ? 'desktop-run-metrics' : 'desktop-run-time';
+    extra.className = live ? 'run-metrics' : 'run-time';
     if (!live) extra.dateTime = run.created_at || '';
     if (!live) extra.textContent = created;
     open.append(titleText, stateText, meta, extra);
@@ -114,7 +114,7 @@ window.createVydraDesktopRuns = ({ selectRun, showReport }) => {
     item.append(open);
     if (live) {
       const progress = document.createElement('progress');
-      progress.className = 'desktop-run-progress';
+      progress.className = 'run-progress';
       progress.setAttribute('aria-label', 'Stage progress');
       item.append(progress);
       updateLiveCard(item, row);
@@ -123,7 +123,7 @@ window.createVydraDesktopRuns = ({ selectRun, showReport }) => {
     if (completed(run) && run.report_path) {
       const report = document.createElement('button');
       report.type = 'button';
-      report.className = 'button quiet desktop-open-report';
+      report.className = 'button quiet open-report';
       report.textContent = 'Report';
       report.dataset.action = 'report';
       report.dataset.run = run.id;
@@ -151,7 +151,7 @@ window.createVydraDesktopRuns = ({ selectRun, showReport }) => {
     }
     lastRender = signature;
     const focused = list.contains(document.activeElement) ? document.activeElement.dataset : null;
-    $('desktop-empty').hidden = rows.length > 0;
+    $('empty-runs').hidden = rows.length > 0;
     list.replaceChildren(...rows.map(card));
     if (focused) {
       [...list.querySelectorAll('[data-run]')].find(button =>
@@ -160,31 +160,22 @@ window.createVydraDesktopRuns = ({ selectRun, showReport }) => {
   }
 
   function showDetails(run) {
-    $('desktop-run-title').textContent = name(run.input);
-    $('desktop-run-parameters').textContent = `${model(run)} · M4: ${method(run)}${comparison(run)} · ${device(run)}`;
-    $('desktop-run-input').textContent = run.input || '—';
-    $('desktop-run-date').textContent = run.created_at ? new Date(run.created_at).toLocaleString('en-US') : '';
+    $('run-title').textContent = name(run.input);
+    $('run-parameters').textContent = `${model(run)} · M4: ${method(run)}${comparison(run)} · ${device(run)}`;
+    $('run-input').textContent = run.input || '—';
+    $('run-date').textContent = run.created_at ? new Date(run.created_at).toLocaleString('en-US') : '';
   }
 
   function mount(config) {
     for (const entry of config.models) modelNames.set(entry.id, entry.name);
-    document.documentElement.classList.add('desktop-runs');
-    const brand = document.querySelector('main > header > div:first-child');
-    brand.classList.add('desktop-brand');
-    const icon = document.createElement('img');
-    icon.src = '/vydra.png';
-    icon.alt = '';
-    icon.addEventListener('error', () => icon.remove(), { once: true });
-    brand.prepend(icon);
-    task.append($('run-form'));
-    details.append($('status-section'));
-    $('desktop-new').onclick = () => {
+    $('open-new-task').disabled = false;
+    $('open-new-task').onclick = () => {
       $('form-error').textContent = '';
       task.showModal();
       $('source').focus();
     };
-    $('desktop-task-close').onclick = () => task.close();
-    $('desktop-details-close').onclick = () => details.close();
+    $('task-close').onclick = () => task.close();
+    $('details-close').onclick = () => details.close();
   }
 
   return { mount, render, showDetails, closeTask: () => task.close() };

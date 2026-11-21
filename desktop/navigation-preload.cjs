@@ -1,6 +1,6 @@
 const { ipcRenderer } = require('electron');
 
-window.addEventListener('DOMContentLoaded', () => {
+function addNavigationFallback() {
   const toolbar = document.createElement('vydra-navigation');
   const shadow = toolbar.attachShadow({ mode: 'open' });
   shadow.innerHTML = `
@@ -43,6 +43,10 @@ window.addEventListener('DOMContentLoaded', () => {
     document.body.prepend(toolbar);
   }
   ipcRenderer.send('navigation:ready');
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  if (!document.documentElement.hasAttribute('data-shared-navigation')) addNavigationFallback();
 
   const header = document.querySelector('main > header .header-actions');
   if (window.location.pathname !== '/' || !header) return;

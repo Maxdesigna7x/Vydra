@@ -323,24 +323,17 @@ def prepare(mode):
 
 
 def serve(state_dir):
-    from local_gui import RunManager, make_server, publish_endpoint, queue_session
+    from local_gui import run_service
 
-    with queue_session(state_dir):
-        manager = RunManager(Path(state_dir), queue=True)
-        with make_server(manager, 0) as server, publish_endpoint(manager.directory, server):
-            manager.dispatch()
+    with run_service(state_dir) as server:
+        # Electron owns the write end. EOF also covers crashes and forced exits.
+        def watch_parent():
+            sys.stdin.buffer.read()
+            server.shutdown()
 
-            # Electron owns the write end. EOF also covers crashes and forced exits.
-            def watch_parent():
-                sys.stdin.buffer.read()
-                server.shutdown()
-
-            threading.Thread(target=watch_parent, daemon=True).start()
-            print(f"VYDRA_READY http://127.0.0.1:{server.server_port}/", flush=True)
-            try:
-                server.serve_forever()
-            finally:
-                manager.close()
+        threading.Thread(target=watch_parent, daemon=True).start()
+        print(f"VYDRA_READY http://127.0.0.1:{server.server_port}/", flush=True)
+        server.serve_forever()
 
 
 if __name__ == "__main__":

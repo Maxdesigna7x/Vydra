@@ -22,7 +22,12 @@ async function checkService(paths) {
     const response = await fetch(new URL('/api/config', url), { signal: AbortSignal.timeout(10_000) });
     const config = await response.json();
     if (!response.ok || config.desktop?.mode !== process.argv[3]) throw new Error('Unexpected local configuration.');
-    console.log('Local Vydra backend started and answered with the selected device mode.');
+    const pages = await Promise.all(['/', '/run-queue.js', '/run-queue.css'].map(route =>
+      fetch(new URL(route, url), { signal: AbortSignal.timeout(10_000) })));
+    if (pages.some(page => !page.ok) || !(await pages[0].text()).includes('id="run-queue"')) {
+      throw new Error('The local backend did not serve the shared run queue.');
+    }
+    console.log('Local Vydra backend served the shared run queue with the selected device mode.');
   } finally {
     child.stdin.end();
     const timer = setTimeout(() => child.kill(), 5_000);

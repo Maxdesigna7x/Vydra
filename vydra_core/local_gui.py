@@ -393,7 +393,7 @@ def make_server(manager, port=0):
             try:
                 if request.path == '/api/config':
                     config = {'token': token, 'home': str(Path.home()), 'cwd': str(Path.cwd()),
-                              'python': sys.executable, 'models': available_profiles()}
+                              'python': sys.executable, 'windows': os.name == 'nt', 'models': available_profiles()}
                     if desktop_mode := os.environ.get('VYDRA_DESKTOP_MODE'):
                         config['desktop'] = {'mode': desktop_mode, 'windows': os.name == 'nt'}
                     return self.send(200, config)
@@ -440,12 +440,15 @@ def make_server(manager, port=0):
                     mime = mimetypes.guess_type(target.name)[0] or 'application/octet-stream'
                     return self.send(200, target.read_bytes(), mime)
                 static = {'/': ('index.html', 'text/html; charset=utf-8'), '/gui.js': ('gui.js', 'text/javascript; charset=utf-8'), '/gui.css': ('gui.css', 'text/css; charset=utf-8'),
-                          '/desktop-runs.js': ('desktop-runs.js', 'text/javascript; charset=utf-8'),
-                          '/desktop-runs.css': ('desktop-runs.css', 'text/css; charset=utf-8'),
+                          '/run-queue.js': ('run-queue.js', 'text/javascript; charset=utf-8'),
+                          '/run-queue.css': ('run-queue.css', 'text/css; charset=utf-8'),
                           '/vydra.png': ('vydra.png', 'image/png')}
                 if request.path in static:
                     name, mime = static[request.path]
-                    return self.send(200, (BASE / 'gui' / name).read_bytes(), mime)
+                    asset = BASE / 'gui' / name
+                    if name == 'vydra.png' and not asset.is_file():
+                        asset = BASE.parent / 'desktop' / 'assets' / name
+                    return self.send(200, asset.read_bytes(), mime)
                 return self.send(404, {'error': 'Not found.'})
             except (OSError, ValueError) as exc:
                 self.send(400, {'error': str(exc)})
@@ -478,22 +481,29 @@ def make_server(manager, port=0):
     return server
 
 
-def serve(port=0, open_browser=True, state_dir=None):
-    if not 0 <= port <= 65535:
-        raise ValueError('Port must be between 0 and 65535.')
-    state_dir = state_dir or default_state_dir()
+@contextmanager
+def run_service(state_dir, port=0):
+    """Own the local queue and HTTP service for either frontend host."""
     with queue_session(state_dir):
         manager = RunManager(state_dir, queue=True)
         with make_server(manager, port) as server, publish_endpoint(manager.directory, server):
             manager.dispatch()
-            url = f'http://127.0.0.1:{server.server_port}/'
-            print(f'Vydra local interface: {url}\nKeep this terminal open. Press Ctrl+C to stop the server.', flush=True)
-            if open_browser:
-                threading.Timer(.3, lambda: webbrowser.open(url)).start()
             try:
-                server.serve_forever()
-            except KeyboardInterrupt:
-                pass
+                yield server
             finally:
                 manager.close()
+
+
+def serve(port=0, open_browser=True, state_dir=None):
+    if not 0 <= port <= 65535:
+        raise ValueError('Port must be between 0 and 65535.')
+    with run_service(state_dir or default_state_dir(), port) as server:
+        url = f'http://127.0.0.1:{server.server_port}/'
+        print(f'Vydra local interface: {url}\nKeep this terminal open. Press Ctrl+C to stop the server.', flush=True)
+        if open_browser:
+            threading.Timer(.3, lambda: webbrowser.open(url)).start()
+        try:
+            server.serve_forever()
+        except KeyboardInterrupt:
+            pass
     return 0

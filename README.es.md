@@ -99,15 +99,15 @@ Después de instalar, abre una terminal en la carpeta del repositorio. El lanzad
 VYDRA_CONDA_ENV=vydra-cpu ./run_vydra_ui.sh
 ```
 
-![Interfaz local de Vydra para elegir proteínas y carpeta de resultados](docs/images/local-gui-dark.png)
+![Cola de corridas en la interfaz compartida de Vydra](docs/images/local-gui-dark.png)
 
-1. Selecciona un **archivo FASTA de proteínas** o una **carpeta**. Se revisan las subcarpetas; conservar un archivo por muestra permite rastrear su procedencia.
+1. Abre **New task** y selecciona un **archivo FASTA de proteínas** o una **carpeta**. Se revisan las subcarpetas; conservar un archivo por muestra permite rastrear su procedencia.
 2. Elige una **carpeta de salida nueva o vacía, fuera de la carpeta de entrada**.
 3. Mantén activado **Generate inference report**. El dispositivo automático usa una GPU compatible cuando está disponible; en caso contrario, CPU.
-4. Inicia la corrida. Se muestra la etapa de procesamiento, el número de proteínas clasificadas cuando está disponible y el tiempo transcurrido.
-5. Selecciona la corrida completada en el historial para abrir sus resultados. También puedes abrir `informe_inferencia/informe.html` directamente en un navegador.
+4. Pulsa **Start task** o **Add to queue**. La tarjeta activa muestra el progreso, el tiempo transcurrido y el estimado de la etapa.
+5. Pulsa **Report** en una corrida completada para abrir sus resultados. También puedes abrir `informe_inferencia/informe.html` directamente en un navegador.
 
-**Mantén abierta la terminal del servidor.** Cerrar la pestaña deja la inferencia en ejecución; Ctrl+C en la terminal detiene el servidor y su corrida activa. Cancelar conserva archivos parciales: vuelve a intentarlo en una carpeta nueva.
+**Mantén abierta la terminal del servidor.** Cerrar la pestaña deja la inferencia en ejecución; Ctrl+C en la terminal detiene el servidor y su corrida activa. Al cancelar, se conservan los puntos de guardado para **Resume run**.
 
 La interfaz y el informe están actualmente en inglés. La CLI admite mensajes en español e inglés. Las opciones avanzadas incluyen batch, dispositivo, permiso para descargar modelos y generación del informe. **Check installation** es opcional: no hace falta pulsarlo para usar los modelos locales.
 

@@ -21,7 +21,7 @@ module.exports = {
         name: 'vydra_desktop',
         setupExe: 'Vydra-Setup-x64.exe',
         setupIcon: `${icon}.ico`,
-        iconUrl: 'https://raw.githubusercontent.com/Maxdesigna7x/Vydra/refs/heads/desktop/v1/desktop/assets/vydra.ico',
+        iconUrl: 'https://raw.githubusercontent.com/Maxdesigna7x/Vydra/refs/heads/main/desktop/assets/vydra.ico',
       },
     },
   ],

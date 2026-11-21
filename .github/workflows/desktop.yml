@@ -2,7 +2,7 @@ name: Vydra Desktop
 
 on:
   push:
-    branches: ['desktop/**']
+    branches: ['main']
     tags: ['desktop-v*']
     paths: ['desktop/**', 'vydra_core/**', '.github/workflows/desktop.yml']
   pull_request:
@@ -83,7 +83,7 @@ jobs:
           if-no-files-found: error
 
   dependencies:
-    if: (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/desktop/')) || (github.event_name == 'workflow_dispatch' && inputs.check_dependencies)
+    if: (github.event_name == 'push' && github.ref == 'refs/heads/main') || (github.event_name == 'workflow_dispatch' && inputs.check_dependencies)
     strategy:
       fail-fast: false
       matrix:

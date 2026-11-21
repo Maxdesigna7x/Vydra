@@ -40,8 +40,8 @@ envíe aparecerán en la misma cola. Consulta la [guía MCP](../docs/MCP.md).
 
 ## Antes de descargar pesos
 
-1. Trabajar en un checkout separado de la rama `desktop/v1`.
-   La rama principal sigue siendo la base de la herramienta actual.
+1. Desarrollar la interfaz compartida en `main` mediante ramas de trabajo.
+   Tanto `vydra gui` como Desktop sirven `vydra_core/gui/` y usan la misma cola.
 2. Desde la raíz, ejecutar `npm --prefix desktop test`. Estas pruebas usan
    archivos pequeños y un servidor de prueba en la misma máquina.
 3. El workflow **Vydra Desktop** compila los instaladores al actualizar la rama
@@ -80,8 +80,8 @@ envíe aparecerán en la misma cola. Consulta la [guía MCP](../docs/MCP.md).
   `desktop/desktop_bootstrap.py`. La pantalla de análisis reutiliza
   `vydra_core/gui/`. Los iconos de `desktop/assets/` se derivan de
   `docs/images/vydra-icon.webp`, el logo del README.
-- Sube los cambios a una rama con prefijo `desktop/`. Las modificaciones de
-  Desktop o del núcleo disparan la compilación de Linux y Windows. En
+- Integra los cambios en `main`. Las modificaciones de Desktop o del
+  núcleo disparan la compilación de Linux y Windows. En
   **Actions → Vydra Desktop** se pueden descargar ambos instaladores desde
   **Artifacts**. Los pull requests que tocan esos archivos también compilan.
 - Cuando quieras distribuir otra versión, actualiza la versión desde

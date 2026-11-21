@@ -99,15 +99,15 @@ After installation, open a terminal in the repository folder and start the inter
 VYDRA_CONDA_ENV=vydra-cpu ./run_vydra_ui.sh
 ```
 
-![Vydra local interface for choosing protein inputs and an output folder](docs/images/local-gui-dark.png)
+![Vydra run queue in the shared browser and Desktop interface](docs/images/local-gui-dark.png)
 
-1. Select a **protein FASTA file** or a **folder**. Folders are searched recursively; keeping one file per sample preserves sample provenance.
+1. Open **New task** and select a **protein FASTA file** or a **folder**. Folders are searched recursively; keeping one file per sample preserves sample provenance.
 2. Choose a **new or empty output folder outside the input folder**.
 3. Keep **Generate inference report** enabled. Automatic device selection uses a compatible GPU when available, otherwise CPU.
-4. Start the run. Progress shows the processing stage, classified-protein counts when available, and elapsed time.
-5. Select the completed run in the history to open its results. You can also open the saved `informe_inferencia/informe.html` directly in a browser.
+4. Click **Start task** or **Add to queue**. The active card shows progress, elapsed time and an estimate for the current stage.
+5. Click **Report** on a completed run to open its results. You can also open the saved `informe_inferencia/informe.html` directly in a browser.
 
-**Keep the server terminal open.** Closing the browser tab leaves inference running; Ctrl+C in the terminal stops the server and its active run. Cancellation retains partial output, so restart in a new folder.
+**Keep the server terminal open.** Closing the browser tab leaves inference running; Ctrl+C in the terminal stops the server and its active run. Cancellation keeps checkpoints for **Resume run**.
 
 The interface and report are currently in English. The CLI offers English and Spanish messages. Advanced settings include batch size, device, model-download permission, and report generation. **Check installation** is optional; models are used locally without pressing it.
 

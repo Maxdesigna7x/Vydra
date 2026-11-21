@@ -9,7 +9,7 @@ continúen. Sus corridas y las del cliente figuran en la misma cola.
 
 ## Instalación con Python
 
-Usa la rama `desktop/v1` con el [entorno y los perfiles instalados](MODEL_PROFILES.md).
+Usa la rama `main` con el [entorno y los perfiles instalados](MODEL_PROFILES.md).
 La configuración de un cliente que usa el formato `mcpServers` puede ser así:
 
 ```json

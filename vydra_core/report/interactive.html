@@ -21,9 +21,18 @@ footer{border-top:1px solid var(--border);padding-top:18px;margin-top:28px;color
 .reference-table-section .table-responsive{max-height:380px;overflow:auto}.protein-scroll{max-height:460px;overflow:auto}.protein-scroll table{min-width:960px}.protein-scroll thead,.reference-table thead{position:sticky;top:0;background:var(--background);z-index:2}.protein-scroll th{min-width:120px}.protein-scroll th:first-child{min-width:210px}.sort-button{color:var(--muted-foreground);padding:0;background:none;border:0;text-align:left;font-size:12px}.sort-button[data-direction="ascending"]::after{content:' ↑'}.sort-button[data-direction="descending"]::after{content:' ↓'}.column-filters .form-control{font-size:12px;width:100%;min-width:85px}.length-filters{display:flex;gap:4px}.length-filters input{min-width:55px!important;width:65px!important}.table-mode-label{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted-foreground)}.table-mode-label select{width:auto}.protein-scroll th{padding-top:8px;padding-bottom:8px}.protein-scroll .column-filters th{padding-bottom:12px}.protein-scroll td{padding-top:12px;padding-bottom:12px}
 
 .column-heading{display:flex;align-items:center;gap:6px;white-space:nowrap}.filter-icon{display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;padding:4px;border:0;border-radius:5px;background:transparent;color:var(--muted-foreground)}.filter-icon:hover{background:var(--card);color:var(--foreground)}.filter-icon[aria-pressed="true"]{color:var(--viz-series-1);background:var(--card)}.column-filter-menu{position:fixed;inset:auto;margin:0;left:var(--menu-left,12px);top:var(--menu-top,100px);width:min(260px,calc(100vw - 24px));padding:14px;background:var(--card);color:var(--foreground);border:1px solid var(--border);border-radius:9px;box-shadow:0 8px 24px #0003}.column-filter-menu select{margin-top:4px}.protein-scroll th{padding-bottom:12px}
+#runs-home[hidden]{display:none}
+#runs-home{display:inline-grid;place-items:center;width:36px;height:33px;padding:0}
+#runs-home svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
 </style>
 <script>
-try{const saved=localStorage.getItem('vydra-report-theme');if(saved==='light'||saved==='dark')document.documentElement.dataset.theme=saved}catch{}
+const localRunReport = location.protocol === 'http:' && location.hostname === '127.0.0.1'
+  && location.pathname.startsWith('/reports/');
+const reportThemeKey = localRunReport ? 'vydra-gui-theme' : 'vydra-report-theme';
+try {
+  const saved = localStorage.getItem(reportThemeKey) ?? localStorage.getItem('vydra-report-theme');
+  if (saved === 'light' || saved === 'dark') document.documentElement.dataset.theme = saved;
+} catch {}
 </script>
 </head>
 <body><main>
@@ -46,7 +55,7 @@ try{const saved=localStorage.getItem('vydra-report-theme');if(saved==='light'||s
     @media(max-width:700px){#vydra-propuesta .vp-columns{grid-template-columns:1fr}}
     @media(prefers-reduced-motion:reduce){#vydra-propuesta .vp-mark{transition:none}}
   </style>
-  <header class="page-header"><h2>Vydra · Inference results</h2><div class="theme-row"><span class="text-small" id="theme-label">Dark mode</span><button type="button" class="btn" id="theme-toggle" aria-label="Switch to light mode">Switch to light</button></div></header>
+  <header class="page-header"><h2>Vydra · Inference results</h2><div class="theme-row"><span class="text-small" id="theme-label">Dark mode</span><button type="button" class="btn" id="theme-toggle" aria-label="Switch to light mode">Switch to light</button><a id="runs-home" class="btn" href="/" aria-label="Back to runs" title="Back to runs" hidden><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7M5 9v11h5v-6h4v6h5V9"/></svg></a></div></header>
   <div class="text-small">__VYDRA_SUBTITLE__</div><div class="text-small" data-el="timing"></div>
   <div class="viz-controls vp-space">
     <label class="form-label">Folder<select class="form-select" data-el="folder"><option value="all">All folders</option><option value=".">Root (.)</option></select></label>
@@ -354,8 +363,13 @@ try{const saved=localStorage.getItem('vydra-report-theme');if(saved==='light'||s
 
 <footer><p>__VYDRA_DOWNLOADS__</p>Protein counts, not organism abundance. Reference labels provide context and do not confirm query taxonomy.</footer>
 <script>
+if (localRunReport) {
+  const home = document.getElementById('runs-home');
+  home.hidden = false;
+  document.documentElement.setAttribute('data-shared-navigation', '');
+}
 const themeToggle=document.getElementById('theme-toggle');
 function updateTheme(){const dark=document.documentElement.dataset.theme==='dark';document.getElementById('theme-label').textContent=dark?'Dark mode':'Light mode';themeToggle.textContent=dark?'Switch to light':'Switch to dark';themeToggle.setAttribute('aria-label',dark?'Switch to light mode':'Switch to dark mode')}
-themeToggle.addEventListener('click',()=>{document.documentElement.dataset.theme=document.documentElement.dataset.theme==='dark'?'light':'dark';try{localStorage.setItem('vydra-report-theme',document.documentElement.dataset.theme)}catch{}updateTheme()});updateTheme();
+themeToggle.addEventListener('click',()=>{document.documentElement.dataset.theme=document.documentElement.dataset.theme==='dark'?'light':'dark';try{localStorage.setItem(reportThemeKey,document.documentElement.dataset.theme)}catch{}updateTheme()});updateTheme();
 </script>
 </main></body></html>
