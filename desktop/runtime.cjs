@@ -1,6 +1,6 @@
 const { spawn } = require('node:child_process');
 const { createInterface } = require('node:readline');
-const { downloadEstimate } = require('./setup-estimate.cjs');
+const { downloadEstimate, pendingEsmProfiles } = require('./setup-estimate.cjs');
 const { progressReporter, packageArchives, watchArchives, pipProgress } = require('./setup-progress.cjs');
 const { appendFileSync } = require('node:fs');
 const { access, mkdir, readFile, rename, statfs, writeFile, cp } = require('node:fs/promises');
@@ -11,7 +11,7 @@ const version = require('./package.json').version;
 const runtimeVersion = '0.1.0';
 const windows = process.platform === 'win32';
 const gib = 1024 ** 3;
-const minimum = { cpu: 14 * gib, cuda: (windows ? 24 : 36) * gib };
+const minimum = { cpu: 22 * gib, cuda: (windows ? 32 : 44) * gib };
 
 function layout(root, mode, resources) {
   const environment = path.join(root, 'env', `${runtimeVersion}-${mode}`);
@@ -87,7 +87,7 @@ async function ready(paths) {
       path.join(paths.env.VYDRA_PROSTT5_PATH, 'pytorch_model.bin'),
       path.join(paths.env.VYDRA_PROFILE_ROOT, 'prostt5', 'm4_manifest.json'),
     ].map(file => access(file)));
-    return true;
+    return (await pendingEsmProfiles(paths.env.VYDRA_PROFILE_ROOT)).length === 0;
   } catch {
     return false;
   }
@@ -214,7 +214,8 @@ async function prepare(root, mode, resources, log, { dependenciesOnly = false, s
   } else {
     mark('dependencies', 'working', 'Reusing the existing environment');
   }
-  if (!dependenciesOnly && !await access(path.join(paths.env.VYDRA_PROFILE_ROOT, 'prostt5', 'm4_manifest.json')).then(() => true, () => false)) {
+  const missingM4 = !await access(path.join(paths.env.VYDRA_PROFILE_ROOT, 'prostt5', 'm4_manifest.json')).then(() => true, () => false);
+  if (!dependenciesOnly && (missingM4 || (await pendingEsmProfiles(paths.env.VYDRA_PROFILE_ROOT)).length)) {
     mark('dependencies', 'working', 'Preparing the decompression library');
     await pip(['zstandard==0.25.0']);
   }

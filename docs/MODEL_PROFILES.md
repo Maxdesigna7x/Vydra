@@ -17,6 +17,13 @@ On the frozen grouped internal test, exact path accuracy with MLP was 92.08% for
 
 ## Install and use
 
+Vydra Desktop 0.3.5 prepares ProstT5 and all three ESM‑2 profiles in the
+chosen data directory. The **Models** stage downloads the combined ESM‑2
+archives once. The **Data** stage installs and verifies their structural
+phage, non-structural phage, and M4 banks. Open **New task** to switch
+encoders for each run.
+
+
 Use the standard [Vydra installation](../README.md) and install the Python decompression dependency with `python -m pip install zstandard`. The [model profiles release](https://github.com/Maxdesigna7x/Vydra/releases/tag/model-profiles-m4-v1) provides verified archives. The installer downloads only the selected profile and checks the archive and extracted artifacts before activating it.
 
 ```bash

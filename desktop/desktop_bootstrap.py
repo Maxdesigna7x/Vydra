@@ -21,6 +21,7 @@ with Path(__file__).with_name("setup-assets.json").open(encoding="utf-8") as str
 BANK_SIZES = SETUP_ASSETS["referenceBanks"]
 M4_PARTS = SETUP_ASSETS["m4Parts"]
 PROSTT5_FILES = SETUP_ASSETS["prostt5"]
+ESM_PROFILES = SETUP_ASSETS["esmProfiles"]
 
 
 def setup_event(stage, phase, item, **metrics):
@@ -97,9 +98,8 @@ def fetch_verified(url, target, size, digest, report=None):
         time.sleep(5 * (2 ** attempt))
 
 
-def download_stage(stage, items):
-    total = sum(size for _, _, size, _ in items)
-    completed = 0
+def download_stage(stage, items, completed=0):
+    total = completed + sum(size for _, _, size, _ in items)
     for url, target, size, digest in items:
         def update(phase, received):
             if phase == "working":
@@ -114,12 +114,54 @@ def download_stage(stage, items):
         completed += size
 
 
+def archive_items(root, profile, parts):
+    from profile_install import RELEASE
+
+    cache = root.parent / "cache" / "profile-downloads"
+    cache.mkdir(parents=True, exist_ok=True)
+    items = []
+    for index, (size, digest) in enumerate(parts):
+        name = f"{profile}.tar.zst.part-{index:02d}"
+        items.append((f"{RELEASE}/{name}", cache / name, size, digest))
+    return items
+
+
+def missing_download_bytes(items):
+    missing = 0
+    for _, target, size, _ in items:
+        existing = next((p.stat().st_size for p in (target, target.with_name(target.name + ".part"))
+                         if p.is_file()), 0)
+        missing += size - existing if existing <= size else size
+    return missing
+
+
+def pending_model_archives(root):
+    from model_profiles import profile_available
+
+    pending = {}
+    for profile, assets in ESM_PROFILES.items():
+        destination = root / profile
+        if not destination.exists():
+            pending[profile] = archive_items(root, profile, assets["parts"])
+        elif not profile_available(root, profile, require_m4=True):
+            raise ValueError(f"Incomplete model profile at {destination}. Move it aside to install a verified copy.")
+    return pending
+
+
+def install_profile_archive(root, profile, items, limit):
+    from profile_install import install_archive
+
+    parts = [target for _, target, _, _ in items]
+    install_archive(profile, root, parts, limit)
+    for part in parts:
+        part.unlink()
+
+
 def prepare_data():
     from model_profiles import profile_root, verify_manifest
-    from profile_install import RELEASE, install_archive
     from vydra_cli import BANKS_DIR, DOWNLOADABLE_ARTIFACTS, RELEASE_BASE_URL
 
-    setup_event("data", "working", "Looking for embedding banks in the data folder")
+    setup_event("data", "working", "Looking for ProstT5 embedding banks in the data folder")
     BANKS_DIR.mkdir(parents=True, exist_ok=True)
     items = [(f"{RELEASE_BASE_URL}/{name}", BANKS_DIR / name, BANK_SIZES[name], digest)
              for name, digest in DOWNLOADABLE_ARTIFACTS.items()]
@@ -128,30 +170,35 @@ def prepare_data():
     destination = root / "prostt5"
     if destination.exists():
         download_stage("data", items)
-        setup_event("data", "working", "Verifying the installed M4 bank")
+        setup_event("data", "working", "Verifying the installed ProstT5 M4 bank")
         verify_manifest(destination, "m4_manifest.json", "prostt5")
         return
 
-    cache = root.parent / "cache" / "profile-downloads"
-    cache.mkdir(parents=True, exist_ok=True)
     root.mkdir(parents=True, exist_ok=True)
-    parts = [cache / f"prostt5.tar.zst.part-{i:02d}" for i in range(len(M4_PARTS))]
-    items.extend((f"{RELEASE}/{part.name}", part, size, digest)
-                 for part, (size, digest) in zip(parts, M4_PARTS))
+    m4_items = archive_items(root, "prostt5", M4_PARTS)
+    items.extend(m4_items)
     limit = 1024**3
-    missing_bytes = 0
-    for _, target, size, _ in items:
-        existing = next((p.stat().st_size for p in (target, target.with_name(target.name + ".part"))
-                         if p.is_file()), 0)
-        missing_bytes += size - existing if existing <= size else size
-    if shutil.disk_usage(root).free < limit + missing_bytes:
-        raise OSError(f"The embedding banks require {limit + missing_bytes:,} free bytes in {root}.")
+    required = limit + missing_download_bytes(items)
+    if shutil.disk_usage(root).free < required:
+        raise OSError(f"The embedding banks require {required:,} free bytes in {root}.")
 
     download_stage("data", items)
-    setup_event("data", "working", "Extracting and verifying the M4 bank")
-    install_archive("prostt5", root, parts, limit)
-    for part in parts:
-        part.unlink()
+    setup_event("data", "working", "Extracting and verifying the ProstT5 M4 bank")
+    install_profile_archive(root, "prostt5", m4_items, limit)
+
+
+def activate_model_profiles(root, pending):
+    from model_profiles import verify_manifest
+
+    for profile, assets in ESM_PROFILES.items():
+        label = profile.replace("esm2-", "ESM-2 ").upper()
+        if profile in pending:
+            setup_event("data", "working", f"Installing {label} and verifying its three embedding banks")
+            install_profile_archive(root, profile, pending[profile], assets["extractedBytes"] + 1024**2)
+        else:
+            setup_event("data", "working", f"Verifying the installed {label} profile")
+            verify_manifest(root / profile, "manifest.json", profile)
+            verify_manifest(root / profile, "m4_manifest.json", profile)
 
 
 def verify_dependencies(mode, check_gpu):
@@ -209,8 +256,7 @@ def prostt5_bytes(directory, files):
 
 
 @contextmanager
-def model_transfer(directory):
-    total = sum(size for size, _ in PROSTT5_FILES.values())
+def model_transfer(directory, total):
     stop = threading.Event()
 
     def watch():
@@ -234,6 +280,7 @@ def model_transfer(directory):
 
 def prepare(mode):
     from folder_inputs import resolve_model_path
+    from model_profiles import profile_root
     from vydra_cli import main
 
     setup_event("dependencies", "working", "Checking libraries and device")
@@ -241,6 +288,12 @@ def prepare(mode):
     setup_event("dependencies", "done", "Dependencies ready")
 
     setup_event("models", "working", "Looking for the pinned ProstT5 model")
+    root = profile_root()
+    root.mkdir(parents=True, exist_ok=True)
+    pending = pending_model_archives(root)
+    esm_items = [item for items in pending.values() for item in items]
+    prostt5_size = sum(size for size, _ in PROSTT5_FILES.values())
+    model_total = prostt5_size + sum(size for _, _, size, _ in esm_items)
     model_dir = Path(os.environ["VYDRA_PROSTT5_PATH"])
     if not (model_dir / ".vydra-model-ready").is_file() or not (model_dir / "pytorch_model.bin").is_file():
         try:
@@ -248,7 +301,7 @@ def prepare(mode):
             setup_event("models", "working", "Verifying local model weights")
             verify_prostt5(model_dir)
         except (FileNotFoundError, ValueError):
-            with model_transfer(model_dir):
+            with model_transfer(model_dir, model_total):
                 if main(["download-model", "--directory", str(model_dir)]):
                     raise RuntimeError("ProstT5 setup failed.")
             setup_event("models", "working", "Verifying model weights and tokenizer")
@@ -256,9 +309,15 @@ def prepare(mode):
             verify_prostt5(model_dir)
         (model_dir / ".vydra-model-ready").touch()
     resolve_model_path(model_dir, offline=True)
-    setup_event("models", "done", "ProstT5 ready")
+    if esm_items:
+        required = missing_download_bytes(esm_items) + sum(ESM_PROFILES[profile]["extractedBytes"] for profile in pending)
+        if shutil.disk_usage(root).free < required:
+            raise OSError(f"The ESM-2 profiles require {required:,} free bytes in {root}.")
+        download_stage("models", esm_items, completed=prostt5_size)
+    setup_event("models", "done", "Model packages ready")
 
     prepare_data()
+    activate_model_profiles(root, pending)
     setup_event("data", "working", "Running final checks")
     return main(["doctor"])
 

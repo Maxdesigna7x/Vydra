@@ -72,10 +72,12 @@ $('device').onchange = updateClassifier;
 
 (async()=>{try{config=await api('/api/config');
   $('model').replaceChildren(...config.models.map(model => {
-    const option = new Option(`${model.name} · ${model.size} · ${model.speed}${model.installed?'':' · not installed'}`, model.id);
-    option.disabled = !model.installed;
+    const option = new Option(`${model.name} · ${model.size} · ${model.speed}${model.installed?(model.faiss?'':' · M4 bank missing'):' · not installed'}`, model.id);
+    option.disabled = !model.installed || !model.faiss;
     return option;
   }));
+  const firstAvailable = [...$('model').options].find(option => !option.disabled);
+  if (firstAvailable) $('model').value = firstAvailable.value;
   if (config.desktop) {
     desktopRuns=window.createVydraDesktopRuns({selectRun,showReport});
     desktopRuns.mount(config);

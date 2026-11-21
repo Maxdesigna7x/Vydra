@@ -1,7 +1,7 @@
 # Vydra Desktop
 
 Vydra Desktop abre la interfaz local de Vydra en una ventana de Electron. El
-asistente prepara un entorno privado y los archivos de ProstT5. Las entradas y
+asistente prepara un entorno privado, ProstT5 y los perfiles ESM‑2 8M, 35M y 150M. Las entradas y
 los resultados se eligen en cada análisis. Usa **Back** para volver del
 archivo de texto al informe o **Home** para regresar a la lista de corridas.
 
@@ -25,8 +25,8 @@ Cada computadora con NVIDIA debe tener un controlador compatible con CUDA
 12.9 en Linux o CUDA 12.6 en Windows. El entorno
 de escritorio tiene sus propias dependencias. Para la primera instalación se
 necesita conexión y espacio libre en la carpeta seleccionada. Reserva unos
-36 GiB para una instalación NVIDIA de Linux, incluido el caché de paquetes. Después de la
-preparación se puede ejecutar ProstT5 sin conexión.
+44 GiB para una instalación NVIDIA de Linux, incluido el caché de paquetes. Después de la
+preparación se puede ejecutar cualquiera de los cuatro modelos sin conexión.
 
 Las proteínas que llegan a M4 se clasifican con MLP y FAISS. La tarjeta
 completada muestra cuántas predicciones coinciden. En el informe, usa
@@ -107,9 +107,10 @@ puedes seguir usando tu entorno local y volver a buscar más tarde.
 
 El asistente organiza la preparación en tres etapas. **Dependencies** reúne
 el entorno base, las bibliotecas de Python y la comprobación del dispositivo.
-**Models** reúne los pesos y los archivos del modelo. **Data** incluye los
-bancos de embeddings de referencia y de M4, su verificación y las
-comprobaciones finales. Al cambiar de ubicación o dispositivo, se indica
+**Models** descarga ProstT5 y los tres paquetes ESM‑2. Cada paquete ESM‑2
+ya contiene el encoder, las cabezas MLP y los bancos propios de fagos
+estructurales, fagos no estructurales y M4. **Data** descarga los bancos de
+ProstT5 e instala y verifica los bancos de los paquetes ESM‑2. Al cambiar de ubicación o dispositivo, se indica
 el tamaño total y por etapa de la descarga pendiente. La estimación descuenta
 los archivos completos y las descargas parciales detectadas. El espacio
 recomendado para una instalación nueva se muestra aparte. Durante una
@@ -151,9 +152,8 @@ carpeta de datos y el estado de la etapa en `app/<versión-del-entorno>/setup-<m
 
 - Base de Vydra `76e36d0`. Implementado el lanzador, el asistente, las dos
   configuraciones de dispositivo y el workflow de construcción y borrador.
-- La preparación inicial instala ProstT5 con MLP y el banco FAISS de M4. Los perfiles adicionales
-  que ya estén en `profiles/` se detectan desde la interfaz. La instalación de
-  perfiles opcionales desde la app queda pendiente.
+- La preparación crea un catálogo local con ProstT5 y los tres perfiles ESM‑2.
+  Cada modelo aparece disponible cuando está instalado con su banco M4.
 - [Matriz inicial de arranque](https://github.com/Maxdesigna7x/Vydra/actions/runs/44594050844).
   Se generaron ambos instaladores y se importaron las dependencias CPU y CUDA
   de ambos sistemas en una carpeta con espacios. Abrió el asistente instalado

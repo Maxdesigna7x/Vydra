@@ -16,15 +16,34 @@ class ModelProfileTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary, patch.dict(os.environ, {"VYDRA_PROFILE_ROOT": temporary}):
             root = Path(temporary)
             profile = root / "esm2-8m"
-            profile.mkdir()
-            (profile / "manifest.json").write_text("{}")
-            (root / "prostt5").mkdir()
-            (root / "prostt5/m4_manifest.json").write_text("{}")
+            base = [
+                "encoder/model.safetensors", "encoder/config.json", "encoder/vocab.txt", "labels.json",
+                "Struct_prototype_bank.csv", "Non_Struct_prototype_bank.csv", "Struct_prototypes.npy",
+                "Non_Struct_prototypes.npy", *(f"heads/M{number}.pt" for number in range(1, 7)),
+            ]
+            for name in base:
+                target = profile / name
+                target.parent.mkdir(parents=True, exist_ok=True)
+                target.touch()
+            (profile / "manifest.json").write_text(json.dumps(dict(
+                schema=1, profile="esm2-8m", dimension=320, prototypes_from_train=False,
+                files=dict.fromkeys(base, "fixture"),
+            )))
+            m4 = ["m4_vectors.npy", "m4_targets.npy", "m4_classes.json"]
+            prost = root / "prostt5"
+            prost.mkdir()
+            for name in m4:
+                (prost / name).touch()
+            (prost / "m4_manifest.json").write_text(json.dumps(dict(
+                schema=1, profile="prostt5", dimension=1024, files=dict.fromkeys(m4, "fixture"),
+            )))
             models = {model["id"]: model for model in available_profiles()}
             self.assertTrue(models["esm2-8m"]["installed"])
             self.assertFalse(models["esm2-8m"]["faiss"])
             self.assertTrue(models["prostt5"]["faiss"])
             self.assertFalse(models["esm2-35m"]["installed"])
+            (profile / "Non_Struct_prototypes.npy").unlink()
+            self.assertFalse(next(model for model in available_profiles() if model["id"] == "esm2-8m")["installed"])
 
     def test_manifest_rejects_cross_profile_and_altered_reference(self):
         with tempfile.TemporaryDirectory() as temporary:

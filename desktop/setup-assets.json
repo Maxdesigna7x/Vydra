@@ -4,11 +4,68 @@
     "Non_Struct_prototype_bank.pt": 1481684953
   },
   "m4Parts": [
-    [536870912, "5dbf3a24bd66b9fc785641683f0f99ad9d467987fc6de61cfbdab7c8865a37ec"],
-    [207044955, "ba779cc0a80a3504133695fd5153c78ac4f4a377bbd9f2e3729e9a202d89717f"]
+    [
+      536870912,
+      "5dbf3a24bd66b9fc785641683f0f99ad9d467987fc6de61cfbdab7c8865a37ec"
+    ],
+    [
+      207044955,
+      "ba779cc0a80a3504133695fd5153c78ac4f4a377bbd9f2e3729e9a202d89717f"
+    ]
   ],
   "prostt5": {
-    "pytorch_model.bin": [5637876077, "b1a9ffcef73280cc57f090ad6446b4116b574b6c75d83ccc32778282f7f00855"],
-    "spiece.model": [237990, "74da7b4afcde53faa570114b530c726135bdfcdb813dec3abfb27f9d44db7324"]
+    "pytorch_model.bin": [
+      5637876077,
+      "b1a9ffcef73280cc57f090ad6446b4116b574b6c75d83ccc32778282f7f00855"
+    ],
+    "spiece.model": [
+      237990,
+      "74da7b4afcde53faa570114b530c726135bdfcdb813dec3abfb27f9d44db7324"
+    ]
+  },
+  "esmProfiles": {
+    "esm2-8m": {
+      "parts": [
+        [
+          536870912,
+          "367ec08a1175ef0d6859dd85e83de60d8047b5b577806e49c19260937de92bcc"
+        ],
+        [
+          38630879,
+          "2f5245ee410b47e5316b654954b0065463a6217d1634793f1e9e452c0f13e6db"
+        ]
+      ],
+      "extractedBytes": 683352225
+    },
+    "esm2-35m": {
+      "parts": [
+        [
+          536870912,
+          "af669ed4d807bda98ea827e7ef8a4bfb992e5d43e5fe757adf9b6bc52d7d1017"
+        ],
+        [
+          363465093,
+          "87a4d9e06602af156805b839b7c2922acda67065ea2b5fd87aaa8c5cc8acae10"
+        ]
+      ],
+      "extractedBytes": 1070900256
+    },
+    "esm2-150m": {
+      "parts": [
+        [
+          536870912,
+          "b068d6df439bc5578fa7a9d8b235124c034beb3c14ef778f16122f4fb9623fe6"
+        ],
+        [
+          536870912,
+          "45ba17929012b9ea4806b1855ca505de1acf31f1c4a960efb77a3495290d4eaa"
+        ],
+        [
+          366680748,
+          "d17d8ec92b591ca64db75ffdc1cc93e92fb8ddfe08531b4f33e047a249313a57"
+        ]
+      ],
+      "extractedBytes": 1813072687
+    }
   }
 }

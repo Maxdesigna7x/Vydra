@@ -163,3 +163,5 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 170px; overflo
 .stages li::before { grid-column: 1; grid-row: 1; }
 .stage-name, .stage-size { grid-column: 2; }
 .stage-size { font-weight: 400; font-variant-numeric: tabular-nums; }
+
+.estimate-note { margin-top: 7px; color: var(--muted); font-size: 11px; }

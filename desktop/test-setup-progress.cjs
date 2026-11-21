@@ -66,7 +66,9 @@ test('the location estimate adjusts for the device, saved packages, and partial 
     const fresh = await downloadEstimate(cpu, 'cpu');
     const freshCuda = await downloadEstimate(cuda, 'cuda');
     assert.ok(fresh.dependencies > 0 && freshCuda.dependencies > fresh.dependencies);
-    assert.equal(fresh.models, Object.values(assets.prostt5).reduce((sum, [bytes]) => sum + bytes, 0));
+    const esm = Object.values(assets.esmProfiles).flatMap(profile => profile.parts);
+    const weights = Object.values(assets.prostt5);
+    assert.equal(fresh.models, [...weights, ...esm].reduce((sum, [bytes]) => sum + bytes, 0));
     assert.equal(fresh.data, Object.values(assets.referenceBanks).reduce((sum, bytes) => sum + bytes, 0)
       + assets.m4Parts.reduce((sum, [bytes]) => sum + bytes, 0));
 
@@ -75,9 +77,12 @@ test('the location estimate adjusts for the device, saved packages, and partial 
     await writeFile(cpu.python, '');
     await writeFile(cpu.journal, '{"phase":"ready"}');
     await writeFile(path.join(cpu.artifacts, 'Struct_prototype_bank.pt.part'), Buffer.alloc(64));
+    const archiveCache = path.join(cpu.cache, 'profile-downloads');
+    await mkdir(archiveCache, { recursive: true });
+    await writeFile(path.join(archiveCache, 'esm2-8m.tar.zst.part-00.part'), Buffer.alloc(128));
     const resumed = await downloadEstimate(cpu, 'cpu');
     assert.equal(resumed.dependencies, 6e6);
-    assert.equal(resumed.models, fresh.models);
+    assert.equal(resumed.models, fresh.models - 128);
     assert.equal(resumed.data, fresh.data - 64);
   } finally {
     await rm(directory, { recursive: true });

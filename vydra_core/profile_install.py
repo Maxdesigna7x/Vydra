@@ -9,7 +9,7 @@ import tempfile
 from pathlib import Path, PurePosixPath
 from urllib.request import urlopen
 
-from model_profiles import PROFILES, profile_root, sha256, verify_manifest
+from model_profiles import PROFILES, profile_available, profile_root, sha256, verify_manifest
 
 RELEASE = "https://github.com/Maxdesigna7x/Vydra/releases/download/model-profiles-m4-v1"
 LIMITS_GIB = {"esm2-8m": 2, "esm2-35m": 3, "esm2-150m": 4, "prostt5": 5}
@@ -92,6 +92,8 @@ def install_archive(profile, root, parts, limit):
         if profile != "prostt5":
             verify_manifest(package, "manifest.json", profile)
         verify_manifest(package, "m4_manifest.json", profile)
+        if not profile_available(staging, profile, require_m4=True):
+            raise ValueError(f"Required files are missing from the {profile} profile.")
         package.rename(root / profile)
     print(f"Installed {profile}: {root / profile}", flush=True)
 
