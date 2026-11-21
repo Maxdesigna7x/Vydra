@@ -1,9 +1,12 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { packageArchives, pipProgress, progressReporter, watchArchives } = require('./setup-progress.cjs');
-const { mkdtemp, rm, writeFile } = require('node:fs/promises');
+const { mkdir, mkdtemp, rm, writeFile } = require('node:fs/promises');
 const { tmpdir } = require('node:os');
 const path = require('node:path');
+const { layout } = require('./runtime.cjs');
+const { downloadEstimate } = require('./setup-estimate.cjs');
+const assets = require('./setup-assets.json');
 
 test('speed excludes previously saved bytes and resets between downloads', () => {
   const events = [];
@@ -50,6 +53,32 @@ test('conda plan measures only downloaded archives in the managed cache', async 
     stop();
     assert.equal(events[0].received, 40);
     assert.equal(events[0].total, 100);
+  } finally {
+    await rm(directory, { recursive: true });
+  }
+});
+
+test('the location estimate adjusts for the device, saved packages, and partial banks', async () => {
+  const directory = await mkdtemp(path.join(tmpdir(), 'vydra-estimate-'));
+  try {
+    const cpu = layout(directory, 'cpu', directory);
+    const cuda = layout(directory, 'cuda', directory);
+    const fresh = await downloadEstimate(cpu, 'cpu');
+    const freshCuda = await downloadEstimate(cuda, 'cuda');
+    assert.ok(fresh.dependencies > 0 && freshCuda.dependencies > fresh.dependencies);
+    assert.equal(fresh.models, Object.values(assets.prostt5).reduce((sum, [bytes]) => sum + bytes, 0));
+    assert.equal(fresh.data, Object.values(assets.referenceBanks).reduce((sum, bytes) => sum + bytes, 0)
+      + assets.m4Parts.reduce((sum, [bytes]) => sum + bytes, 0));
+
+    await Promise.all([path.dirname(cpu.python), path.dirname(cpu.journal), cpu.artifacts]
+      .map(folder => mkdir(folder, { recursive: true })));
+    await writeFile(cpu.python, '');
+    await writeFile(cpu.journal, '{"phase":"ready"}');
+    await writeFile(path.join(cpu.artifacts, 'Struct_prototype_bank.pt.part'), Buffer.alloc(64));
+    const resumed = await downloadEstimate(cpu, 'cpu');
+    assert.equal(resumed.dependencies, 6e6);
+    assert.equal(resumed.models, fresh.models);
+    assert.equal(resumed.data, fresh.data - 64);
   } finally {
     await rm(directory, { recursive: true });
   }

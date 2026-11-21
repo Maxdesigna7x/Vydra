@@ -152,3 +152,14 @@ pre { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 170px; overflo
   .eyebrow { justify-content: start; }
 }
 @media(max-width: 490px) { .transfer-head { flex-wrap: wrap; } .phase-label { flex-basis: 100%; } .metrics { grid-template-columns: 1fr 1fr; } .metrics > div:first-child { grid-column: 1 / -1; } }
+
+.download-estimate { margin: 0 0 18px; padding: 9px 12px; border: 1px solid var(--border); border-radius: 10px; }
+.estimate-total { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; font-size: 13px; }
+.estimate-total strong { color: var(--amber); font-variant-numeric: tabular-nums; }
+.download-estimate dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 7px 0 0; }
+.download-estimate dt, .stage-size { color: var(--muted); font-size: 11px; }
+.download-estimate dd { margin: 0; font-size: 12px; font-variant-numeric: tabular-nums; }
+.stages li { display: grid; grid-template-columns: auto 1fr; column-gap: 8px; row-gap: 2px; }
+.stages li::before { grid-column: 1; grid-row: 1; }
+.stage-name, .stage-size { grid-column: 2; }
+.stage-size { font-weight: 400; font-variant-numeric: tabular-nums; }

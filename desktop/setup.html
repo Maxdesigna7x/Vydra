@@ -26,10 +26,18 @@
       <form>
         <label for="folder" class="input-label">Installation location</label>
         <div class="folder-row">
-          <input id="folder" required spellcheck="false" aria-describedby="space">
+          <input id="folder" required spellcheck="false" aria-describedby="space download-total">
           <button type="button" id="choose">Change folder</button>
         </div>
         <div class="space-row"><p id="space" role="status"></p><button type="button" id="default-folder" class="link">Use default folder</button></div>
+        <div class="download-estimate" aria-label="Estimated download sizes">
+          <div class="estimate-total"><span>Estimated download</span><strong id="download-total">—</strong></div>
+          <dl>
+            <div><dt>Dependencies</dt><dd id="estimate-dependencies">—</dd></div>
+            <div><dt>Models</dt><dd id="estimate-models">—</dd></div>
+            <div><dt>Data</dt><dd id="estimate-data">—</dd></div>
+          </dl>
+        </div>
         <fieldset class="devices">
           <legend class="visually-hidden">Device</legend>
           <label class="device">
@@ -64,9 +72,9 @@
         </dl>
       </div>
       <ol class="stages" aria-label="Installation stages">
-        <li data-stage="dependencies">Dependencies</li>
-        <li data-stage="models">Models</li>
-        <li data-stage="data">Data</li>
+        <li data-stage="dependencies"><span class="stage-name">Dependencies</span><span class="stage-size" id="stage-size-dependencies">—</span></li>
+        <li data-stage="models"><span class="stage-name">Models</span><span class="stage-size" id="stage-size-models">—</span></li>
+        <li data-stage="data"><span class="stage-name">Data</span><span class="stage-size" id="stage-size-data">—</span></li>
       </ol>
       <div class="actions">
         <span id="device-summary" class="device-summary"></span>

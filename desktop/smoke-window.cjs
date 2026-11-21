@@ -30,7 +30,7 @@ async function smoke() {
   if (!executable) throw new Error('Pass the installed Vydra executable.');
   const resources = path.join(path.dirname(await realpath(executable)), 'resources', 'resources');
   const tools = process.platform === 'win32' ? 'micromamba.exe' : 'micromamba';
-  await Promise.all([tools, 'requirements.txt', 'desktop_bootstrap.py', 'micromamba-LICENSE.txt', 'vydra.png',
+  await Promise.all([tools, 'requirements.txt', 'desktop_bootstrap.py', 'setup-assets.json', 'micromamba-LICENSE.txt', 'vydra.png',
     path.join('vydra_core', 'gui', 'index.html')].map(file => access(path.join(resources, file))));
   const isolated = await mkdtemp(path.join(tmpdir(), 'vydra-window-'));
   const args = ['--setup', '--disable-gpu', '--remote-debugging-port=0', `--user-data-dir=${isolated}`];
@@ -53,13 +53,14 @@ async function smoke() {
           const checks = await evaluate(page.webSocketDebuggerUrl, `({
             title: document.querySelector('#setup-heading')?.textContent,
             brand: document.querySelector('.brand-mark img')?.naturalWidth,
-            stages: Array.from(document.querySelectorAll('[data-stage]')).map(stage => stage.textContent).join(','),
+            stages: Array.from(document.querySelectorAll('[data-stage]')).map(stage => stage.querySelector('.stage-name').textContent).join(','),
             folder: document.querySelector('#folder')?.value,
             devices: Array.from(document.querySelectorAll('[name=mode]')).map(element => element.value),
+            total: document.querySelector('#download-total')?.textContent,
             error: document.querySelector('#status')?.textContent
           })`);
           if (checks?.error) throw new Error(checks.error);
-          if (checks?.folder && checks.title === 'Choose your device and location' && checks.brand > 0 && checks.stages === 'Dependencies,Models,Data' && checks.devices.join(',') === 'cuda,cpu') {
+          if (checks?.folder && checks.title === 'Choose your device and location' && checks.brand > 0 && checks.total?.endsWith(' GB') && checks.stages === 'Dependencies,Models,Data' && checks.devices.join(',') === 'cuda,cpu') {
             console.log('Packaged setup window opened with a default folder and both device choices.');
             return;
           }

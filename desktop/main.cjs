@@ -5,7 +5,7 @@ const { mkdir, readFile } = require('node:fs/promises');
 const path = require('node:path');
 const { pathToFileURL } = require('node:url');
 const { checkForUpdate } = require('./updates.cjs');
-const { layout, minimum, ready, prepare, pythonProcess, writeAtomic, freeSpace } = require('./runtime.cjs');
+const { layout, minimum, ready, prepare, pythonProcess, writeAtomic, estimateSetup } = require('./runtime.cjs');
 
 function handleSquirrelEvent() {
   if (process.platform !== 'win32') return false;
@@ -245,7 +245,7 @@ function registerSetupHandlers() {
     }
     return callback(...args);
   });
-  handle('setup:settings', () => ({ current: config, defaultFolder: defaultFolder(), minimum,
+  handle('setup:settings', () => ({ current: config, defaultFolder: defaultFolder(),
     cudaLabel: process.platform === 'win32' ? 'Models on NVIDIA · FAISS on CPU' : 'Models and FAISS on NVIDIA' }));
   handle('setup:choose', async () => {
     const result = await dialog.showOpenDialog(setupWindow, {
@@ -253,7 +253,12 @@ function registerSetupHandlers() {
     });
     return result.filePaths[0];
   });
-  handle('setup:space', folder => freeSpace(path.resolve(folder)));
+  handle('setup:estimate', (folder, mode) => {
+    if (typeof folder !== 'string' || !path.isAbsolute(folder) || !Object.hasOwn(minimum, mode)) {
+      throw new Error('Choose an absolute folder path and a device mode.');
+    }
+    return estimateSetup(folder, mode, resourceFolder());
+  });
   handle('setup:pause', () => installation?.abort(new Error('Setup paused. Use the same folder and device mode to resume.')));
   handle('setup:install', async (root, mode) => {
     if (installation || engine) throw new Error('A Vydra session is already active.');

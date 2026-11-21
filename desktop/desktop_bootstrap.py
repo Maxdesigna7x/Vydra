@@ -15,10 +15,12 @@ from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 
 
-BANK_SIZES = {
-    "Struct_prototype_bank.pt": 176507073,
-    "Non_Struct_prototype_bank.pt": 1481684953,
-}
+with Path(__file__).with_name("setup-assets.json").open(encoding="utf-8") as stream:
+    SETUP_ASSETS = json.load(stream)
+
+BANK_SIZES = SETUP_ASSETS["referenceBanks"]
+M4_PARTS = SETUP_ASSETS["m4Parts"]
+PROSTT5_FILES = SETUP_ASSETS["prostt5"]
 
 
 def setup_event(stage, phase, item, **metrics):
@@ -93,12 +95,6 @@ def fetch_verified(url, target, size, digest, report=None):
                 raise
         report("retry", partial.stat().st_size if partial.exists() else 0)
         time.sleep(5 * (2 ** attempt))
-
-
-M4_PARTS = (
-    (536870912, "5dbf3a24bd66b9fc785641683f0f99ad9d467987fc6de61cfbdab7c8865a37ec"),
-    (207044955, "ba779cc0a80a3504133695fd5153c78ac4f4a377bbd9f2e3729e9a202d89717f"),
-)
 
 
 def download_stage(stage, items):
@@ -183,12 +179,6 @@ def verify_dependencies(mode, check_gpu):
         if torch.tensor([2.0], device=backend).square().item() != 4:
             raise RuntimeError("The CUDA computation check failed.")
     print(f"Dependency checks passed. PyTorch: {backend}. FAISS: {index_backend}.", flush=True)
-
-
-PROSTT5_FILES = {
-    "pytorch_model.bin": (5637876077, "b1a9ffcef73280cc57f090ad6446b4116b574b6c75d83ccc32778282f7f00855"),
-    "spiece.model": (237990, "74da7b4afcde53faa570114b530c726135bdfcdb813dec3abfb27f9d44db7324"),
-}
 
 
 def verify_prostt5(model_dir):

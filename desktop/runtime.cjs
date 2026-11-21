@@ -1,5 +1,6 @@
 const { spawn } = require('node:child_process');
 const { createInterface } = require('node:readline');
+const { downloadEstimate } = require('./setup-estimate.cjs');
 const { progressReporter, packageArchives, watchArchives, pipProgress } = require('./setup-progress.cjs');
 const { appendFileSync } = require('node:fs');
 const { access, mkdir, readFile, rename, statfs, writeFile, cp } = require('node:fs/promises');
@@ -24,6 +25,7 @@ function layout(root, mode, resources) {
     python: windows ? path.join(environment, 'python.exe') : path.join(environment, 'bin', 'python'),
     engine: path.join(resources, 'vydra_core'),
     state: path.join(root, 'runs'),
+    journal: path.join(root, 'app', runtimeVersion, `setup-${mode}.json`),
     marker: path.join(core, `.vydra-${mode}-ready`),
     env: {
       ...process.env,
@@ -78,6 +80,7 @@ async function ready(paths) {
     await Promise.all([
       paths.python,
       path.join(paths.core, 'desktop_bootstrap.py'),
+      path.join(paths.core, 'setup-assets.json'),
       path.join(paths.artifacts, 'Struct_prototype_bank.pt'),
       path.join(paths.artifacts, 'Non_Struct_prototype_bank.pt'),
       path.join(paths.env.VYDRA_PROSTT5_PATH, '.vydra-model-ready'),
@@ -151,7 +154,7 @@ async function prepare(root, mode, resources, log, { dependenciesOnly = false, s
   }
   const available = await freeSpace(root);
   if (available < gib) throw new Error('At least 1 GiB of free disk space is required to continue.');
-  const journal = path.join(root, 'app', runtimeVersion, `setup-${mode}.json`);
+  const { journal } = paths;
   const previous = await readFile(journal, 'utf8').then(JSON.parse).catch(() => ({}));
   if (!dependenciesOnly && !previous.phase && available < minimum[mode]) {
     throw new Error(`Insufficient disk space. This mode may require ${minimum[mode] / gib} GiB for a fresh installation.`);
@@ -219,6 +222,7 @@ async function prepare(root, mode, resources, log, { dependenciesOnly = false, s
   await cp(path.join(resources, 'vydra.png'), path.join(paths.core, 'gui', 'vydra.png'));
   const bootstrap = path.join(paths.core, 'desktop_bootstrap.py');
   await cp(path.join(resources, 'desktop_bootstrap.py'), bootstrap);
+  await cp(path.join(resources, 'setup-assets.json'), path.join(paths.core, 'setup-assets.json'));
   await python([bootstrap, dependenciesOnly ? 'imports' : 'prepare', mode], line => {
     const prefix = 'VYDRA_SETUP ';
     if (!line.startsWith(prefix)) return;
@@ -233,4 +237,9 @@ async function prepare(root, mode, resources, log, { dependenciesOnly = false, s
   return paths;
 }
 
-module.exports = { layout, minimum, ready, prepare, pythonProcess, writeAtomic, freeSpace };
+async function estimateSetup(root, mode, resources) {
+  const [free, stages] = await Promise.all([freeSpace(root), downloadEstimate(layout(root, mode, resources), mode)]);
+  return { free, minimum: minimum[mode], stages };
+}
+
+module.exports = { layout, minimum, ready, prepare, pythonProcess, writeAtomic, estimateSetup };

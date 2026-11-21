@@ -19,7 +19,7 @@ async function stage() {
     await mkdir(path.dirname(destination), { recursive: true });
     await copyFile(path.join(source, relative), destination);
   }
-  for (const name of ['requirements.txt', 'desktop_bootstrap.py']) {
+  for (const name of ['requirements.txt', 'desktop_bootstrap.py', 'setup-assets.json']) {
     await copyFile(path.join(__dirname, name), path.join(output, name));
   }
   await copyFile(path.join(__dirname, 'third-party', 'micromamba-LICENSE.txt'), path.join(output, 'micromamba-LICENSE.txt'));

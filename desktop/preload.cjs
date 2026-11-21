@@ -3,7 +3,7 @@ const { contextBridge, ipcRenderer } = require('electron');
 contextBridge.exposeInMainWorld('vydraSetup', {
   settings: () => ipcRenderer.invoke('setup:settings'),
   choose: () => ipcRenderer.invoke('setup:choose'),
-  space: folder => ipcRenderer.invoke('setup:space', folder),
+  estimate: (folder, mode) => ipcRenderer.invoke('setup:estimate', folder, mode),
   install: (folder, mode) => ipcRenderer.invoke('setup:install', folder, mode),
   pause: () => ipcRenderer.invoke('setup:pause'),
   updates: callback => {

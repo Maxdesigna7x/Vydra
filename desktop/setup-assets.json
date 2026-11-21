@@ -1,0 +1,14 @@
+{
+  "referenceBanks": {
+    "Struct_prototype_bank.pt": 176507073,
+    "Non_Struct_prototype_bank.pt": 1481684953
+  },
+  "m4Parts": [
+    [536870912, "5dbf3a24bd66b9fc785641683f0f99ad9d467987fc6de61cfbdab7c8865a37ec"],
+    [207044955, "ba779cc0a80a3504133695fd5153c78ac4f4a377bbd9f2e3729e9a202d89717f"]
+  ],
+  "prostt5": {
+    "pytorch_model.bin": [5637876077, "b1a9ffcef73280cc57f090ad6446b4116b574b6c75d83ccc32778282f7f00855"],
+    "spiece.model": [237990, "74da7b4afcde53faa570114b530c726135bdfcdb813dec3abfb27f9d44db7324"]
+  }
+}

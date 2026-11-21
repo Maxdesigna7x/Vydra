@@ -9,25 +9,44 @@ const phaseNames = { transfer: 'Downloading', working: 'In progress', retry: 'Re
 const speed = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
 let settings;
 let timer;
-let spaceRequest = 0;
+let estimateRequest = 0;
+let currentEstimate;
 let selection;
 let running = false;
 let latest;
 let lastUpdate;
 
-async function showSpace() {
-  const requested = ++spaceRequest;
+function formatDownload(bytes) {
+  if (!Number.isFinite(bytes)) return '—';
+  if (!bytes) return '0 MB';
+  if (bytes < 1e6) return '<1 MB';
+  if (bytes < 1e9) return `≈${number.format(bytes / 1e6)} MB`;
+  return `≈${number.format(bytes / 1e9)} GB`;
+}
+
+function showDownloadEstimate(sizes) {
+  const values = sizes ? Object.values(sizes) : [];
+  $('download-total').textContent = values.length ? formatDownload(values.reduce((sum, bytes) => sum + bytes, 0)) : '—';
+  for (const stage of stages.keys()) $('estimate-' + stage).textContent = formatDownload(sizes?.[stage]);
+}
+
+async function showEstimate() {
+  const requested = ++estimateRequest;
   const target = folder.value.trim();
-  if (!target) { $('space').textContent = ''; return; }
+  const device = mode();
+  currentEstimate = undefined;
+  showDownloadEstimate();
+  $('space').textContent = target ? 'Checking the selected folder…' : '';
+  if (!target) return;
   try {
+    const result = await api.estimate(target, device);
+    if (requested !== estimateRequest) return;
+    currentEstimate = { folder: target, mode: device, stages: result.stages };
     const gib = 1024 ** 3;
-    const required = settings.minimum[mode()] / gib;
-    const free = await api.space(target) / gib;
-    if (requested === spaceRequest) {
-      $('space').textContent = `${number.format(free)} GiB free · Up to ${required} GiB for a fresh installation`;
-    }
+    $('space').textContent = `${number.format(result.free / gib)} GiB free · Up to ${result.minimum / gib} GiB for a fresh installation`;
+    showDownloadEstimate(result.stages);
   } catch {
-    if (requested === spaceRequest) $('space').textContent = 'Could not check available disk space.';
+    if (requested === estimateRequest) $('space').textContent = 'Could not estimate downloads and available disk space.';
   }
 }
 
@@ -60,10 +79,11 @@ function renderTransfer() {
 function showProgress(event) {
   const stage = stages.get(event.stage);
   if (!running || !stage) return;
+  const name = stage.querySelector('.stage-name').textContent;
   for (const entry of stages.values()) entry.removeAttribute('aria-current');
   if (event.phase === 'done') {
     stage.dataset.state = 'done';
-    stage.setAttribute('aria-label', `${stage.textContent}, complete`);
+    stage.setAttribute('aria-label', `${name}, complete`);
   } else {
     stage.removeAttribute('data-state');
     stage.removeAttribute('aria-label');
@@ -75,7 +95,7 @@ function showProgress(event) {
   }
   latest = event;
   lastUpdate = performance.now();
-  $('active-stage').textContent = stage.textContent;
+  $('active-stage').textContent = name;
   renderTransfer();
 }
 
@@ -103,20 +123,20 @@ async function initialize() {
   folder.value = settings.current?.root || settings.defaultFolder;
   form.elements.mode.value = settings.current?.mode || 'cuda';
   $('install').disabled = false;
-  await showSpace();
+  await showEstimate();
 }
 
 $('choose').onclick = async () => {
   const chosen = await api.choose();
-  if (chosen) { folder.value = chosen; await showSpace(); }
+  if (chosen) { folder.value = chosen; await showEstimate(); }
 };
 $('default-folder').onclick = () => {
   folder.value = settings.defaultFolder;
-  showSpace();
+  showEstimate();
 };
 form.oninput = () => {
   clearTimeout(timer);
-  timer = setTimeout(showSpace, 300);
+  timer = setTimeout(showEstimate, 300);
 };
 $('pause').onclick = async () => {
   $('pause').disabled = true;
@@ -140,7 +160,8 @@ async function install() {
   $('status').textContent = '';
   $('destination').textContent = selection.folder;
   $('device-summary').textContent = selection.mode === 'cuda' ? 'Device · NVIDIA GPU' : 'Device · CPU';
-  for (const stage of stages.values()) {
+  for (const [key, stage] of stages) {
+    $('stage-size-' + key).textContent = formatDownload(selection.stages?.[key]);
     stage.removeAttribute('data-state');
     stage.removeAttribute('aria-label');
   }
@@ -165,7 +186,10 @@ async function install() {
 }
 form.onsubmit = event => {
   event.preventDefault();
-  selection = { folder: folder.value.trim(), mode: mode() };
+  const target = folder.value.trim();
+  const device = mode();
+  const stages = currentEstimate?.folder === target && currentEstimate.mode === device ? currentEstimate.stages : undefined;
+  selection = { folder: target, mode: device, stages };
   void install();
 };
 
