@@ -10,7 +10,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "vydra_core"))
-from desktop_bootstrap import fetch_verified, prostt5_bytes
+from desktop_bootstrap import BANK_SIZES, M4_PARTS, fetch_verified, prepare_data, prostt5_bytes
 
 
 @contextmanager
@@ -86,3 +86,29 @@ class SetupDownloads(unittest.TestCase):
             self.assertEqual(prostt5_bytes(root, {name: (10, "current")}), 4)
             (root / name).write_bytes(b"0123456789")
             self.assertEqual(prostt5_bytes(root, {name: (10, "current")}), 10)
+
+    def test_data_tracks_reference_and_m4_banks_with_one_total(self):
+        class Disk:
+            free = 100 * 1024**3
+
+        def download(_url, target, size, _digest, report):
+            target.touch()
+            report("transfer", 0)
+            report("working", size)
+
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            with patch("model_profiles.profile_root", return_value=root / "profiles"), \
+                 patch("vydra_cli.BANKS_DIR", root / "artifacts"), \
+                 patch("desktop_bootstrap.shutil.disk_usage", return_value=Disk()), \
+                 patch("desktop_bootstrap.fetch_verified", side_effect=download), \
+                 patch("desktop_bootstrap.setup_event") as events, \
+                 patch("profile_install.install_archive") as extract:
+                prepare_data()
+
+            progress = [call.kwargs for call in events.call_args_list if "total" in call.kwargs]
+            total = sum(BANK_SIZES.values()) + sum(size for size, _ in M4_PARTS)
+            self.assertEqual({sample["total"] for sample in progress}, {total})
+            self.assertEqual(progress[-1]["received"], total)
+            self.assertTrue(all(call.args[0] == "data" for call in events.call_args_list))
+            self.assertEqual(extract.call_args.args[:2], ("prostt5", root / "profiles"))

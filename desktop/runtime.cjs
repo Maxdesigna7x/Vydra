@@ -142,10 +142,10 @@ async function prepare(root, mode, resources, log, { dependenciesOnly = false, s
   const send = progressReporter(onProgress || (() => {}));
   const mark = (stage, phase, item) => send({ stage, phase, item });
   if (!dependenciesOnly && await ready(paths)) {
-    for (const stage of ['environment', 'libraries', 'references', 'model', 'm4', 'verify']) mark(stage, 'done', 'Already prepared');
+    for (const stage of ['dependencies', 'models', 'data']) mark(stage, 'done', 'Already prepared');
     return paths;
   }
-  mark('environment', 'working', 'Checking disk space and device');
+  mark('dependencies', 'working', 'Checking disk space and device');
   if (!windows && mode === 'cuda' && !dependenciesOnly) {
     await run('nvidia-smi', ['--query-gpu=name,driver_version', '--format=csv,noheader'], {}, log, signal);
   }
@@ -170,7 +170,7 @@ async function prepare(root, mode, resources, log, { dependenciesOnly = false, s
     return run(launch.command, launch.args, { env: launch.env }, progress, signal, onLine);
   };
   const pip = async args => {
-    const report = pipProgress(event => send({ stage: 'libraries', ...event }));
+    const report = pipProgress(event => send({ stage: 'dependencies', ...event }));
     await python(['-m', 'pip', 'install', '--retries', '6', '--timeout', '120', '--progress-bar', 'raw', ...args], report);
   };
   const hasPython = await access(paths.python).then(() => true).catch(() => false);
@@ -184,13 +184,13 @@ async function prepare(root, mode, resources, log, { dependenciesOnly = false, s
       '-c', 'conda-forge', '--override-channels', ...packages(mode)];
     let stopWatching = () => {};
     if (onProgress) {
-      mark('environment', 'working', 'Resolving the environment and reading package metadata');
+      mark('dependencies', 'working', 'Resolving the environment and reading package metadata');
       let plan = '';
       try {
         await run(paths.tools, [...args, '--dry-run', '--json'], { env: solveEnv }, chunk => { plan += chunk; }, signal, undefined, progress);
         const archives = packageArchives(JSON.parse(plan), paths.env.MAMBA_ROOT_PREFIX);
-        if (!archives.length) mark('environment', 'working', 'Preparing environment packages');
-        stopWatching = await watchArchives(archives, event => send({ stage: 'environment', ...event }));
+        if (!archives.length) mark('dependencies', 'working', 'Preparing environment packages');
+        stopWatching = await watchArchives(archives, event => send({ stage: 'dependencies', ...event }));
       } catch (error) {
         signal?.throwIfAborted();
         progress(`Environment download progress is unavailable: ${error.message}\n`);
@@ -201,8 +201,7 @@ async function prepare(root, mode, resources, log, { dependenciesOnly = false, s
     } finally {
       stopWatching();
     }
-    mark('environment', 'done', 'Environment ready');
-    mark('libraries', 'working', 'Resolving Python libraries');
+    mark('dependencies', 'working', 'Resolving Python libraries');
     if (windows) {
       const index = mode === 'cuda' ? 'cu126' : 'cpu';
       await pip(['--index-url', `https://download.pytorch.org/whl/${index}`, 'torch==2.10.0']);
@@ -210,10 +209,10 @@ async function prepare(root, mode, resources, log, { dependenciesOnly = false, s
     await pip(['-r', path.join(resources, 'requirements.txt')]);
     await writeAtomic(journal, JSON.stringify({ phase: 'dependencies' }));
   } else {
-    mark('environment', 'done', 'Reusing the existing environment');
+    mark('dependencies', 'working', 'Reusing the existing environment');
   }
   if (!dependenciesOnly && !await access(path.join(paths.env.VYDRA_PROFILE_ROOT, 'prostt5', 'm4_manifest.json')).then(() => true, () => false)) {
-    mark('libraries', 'working', 'Preparing the decompression library');
+    mark('dependencies', 'working', 'Preparing the decompression library');
     await pip(['zstandard==0.25.0']);
   }
   await cp(paths.engine, paths.core, { recursive: true });
@@ -229,7 +228,7 @@ async function prepare(root, mode, resources, log, { dependenciesOnly = false, s
   if (!dependenciesOnly) {
     await writeAtomic(paths.marker, version);
     await writeAtomic(journal, JSON.stringify({ phase: 'ready' }));
-    mark('verify', 'done', 'Vydra is ready');
+    mark('data', 'done', 'Vydra is ready');
   }
   return paths;
 }

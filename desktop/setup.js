@@ -70,7 +70,7 @@ function showProgress(event) {
     stage.setAttribute('aria-current', 'step');
   }
   // Keep the completed byte count during hashing or extraction within this stage.
-  if (event.stage === latest?.stage && event.phase === 'working' && latest.scope !== 'file' && event.received === undefined) {
+  if (event.stage !== 'dependencies' && event.stage === latest?.stage && event.phase === 'working' && latest.scope !== 'file' && event.received === undefined) {
     event = { received: latest.received, total: latest.total, ...event };
   }
   latest = event;
@@ -145,7 +145,7 @@ async function install() {
     stage.removeAttribute('aria-label');
   }
   latest = undefined;
-  showProgress({ stage: 'environment', phase: 'working', item: 'Checking disk space and device' });
+  showProgress({ stage: 'dependencies', phase: 'working', item: 'Checking disk space and device' });
   $('preparation-heading').focus();
   try {
     await api.install(selection.folder, selection.mode);

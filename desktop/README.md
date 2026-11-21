@@ -105,8 +105,11 @@ puedes seguir usando tu entorno local y volver a buscar más tarde.
 
 ## Progreso de la preparación
 
-El asistente muestra el entorno base, las bibliotecas de Python, los bancos
-de referencia, ProstT5, el banco M4 y la comprobación final. Durante una
+El asistente organiza la preparación en tres etapas. **Dependencies** reúne
+el entorno base, las bibliotecas de Python y la comprobación del dispositivo.
+**Models** reúne los pesos y los archivos del modelo. **Data** incluye los
+bancos de embeddings de referencia y de M4, su verificación y las
+comprobaciones finales. Durante una
 transferencia, la velocidad y el tiempo restante se calculan con el movimiento
 reciente de bytes. Los porcentajes abarcan todo el banco o grupo de archivos
 cuando se conoce su tamaño. Para pip se identifica el archivo actual, ya que

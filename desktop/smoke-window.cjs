@@ -53,13 +53,13 @@ async function smoke() {
           const checks = await evaluate(page.webSocketDebuggerUrl, `({
             title: document.querySelector('#setup-heading')?.textContent,
             brand: document.querySelector('.brand-mark img')?.naturalWidth,
-            stages: document.querySelectorAll('[data-stage]').length,
+            stages: Array.from(document.querySelectorAll('[data-stage]')).map(stage => stage.textContent).join(','),
             folder: document.querySelector('#folder')?.value,
             devices: Array.from(document.querySelectorAll('[name=mode]')).map(element => element.value),
             error: document.querySelector('#status')?.textContent
           })`);
           if (checks?.error) throw new Error(checks.error);
-          if (checks?.folder && checks.title === 'Choose your device and location' && checks.brand > 0 && checks.stages === 6 && checks.devices.join(',') === 'cuda,cpu') {
+          if (checks?.folder && checks.title === 'Choose your device and location' && checks.brand > 0 && checks.stages === 'Dependencies,Models,Data' && checks.devices.join(',') === 'cuda,cpu') {
             console.log('Packaged setup window opened with a default folder and both device choices.');
             return;
           }

@@ -7,7 +7,7 @@ const path = require('node:path');
 
 test('speed excludes previously saved bytes and resets between downloads', () => {
   const events = [];
-  const baseline = { stage: 'model', phase: 'transfer', item: 'ProstT5', total: 500 };
+  const baseline = { stage: 'models', phase: 'transfer', item: 'ProstT5', total: 500 };
   let now = 1000;
   const report = progressReporter(event => events.push(event), () => now);
   report({ ...baseline, received: 100 });
@@ -19,7 +19,7 @@ test('speed excludes previously saved bytes and resets between downloads', () =>
   report({ ...baseline, received: 0 });
   assert.equal(events.at(-1).rate, null);
   now += 1000;
-  report({ stage: 'm4', phase: 'transfer', received: 20, total: 50 });
+  report({ stage: 'data', phase: 'transfer', received: 20, total: 50 });
   assert.equal(events.at(-1).rate, null);
 });
 

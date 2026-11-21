@@ -118,37 +118,44 @@ def download_stage(stage, items):
         completed += size
 
 
-def prepare_m4_bank():
+def prepare_data():
     from model_profiles import profile_root, verify_manifest
     from profile_install import RELEASE, install_archive
+    from vydra_cli import BANKS_DIR, DOWNLOADABLE_ARTIFACTS, RELEASE_BASE_URL
 
-    setup_event("m4", "working", "Looking for the M4 bank in this folder")
+    setup_event("data", "working", "Looking for embedding banks in the data folder")
+    BANKS_DIR.mkdir(parents=True, exist_ok=True)
+    items = [(f"{RELEASE_BASE_URL}/{name}", BANKS_DIR / name, BANK_SIZES[name], digest)
+             for name, digest in DOWNLOADABLE_ARTIFACTS.items()]
+
     root = profile_root()
     destination = root / "prostt5"
     if destination.exists():
+        download_stage("data", items)
+        setup_event("data", "working", "Verifying the installed M4 bank")
         verify_manifest(destination, "m4_manifest.json", "prostt5")
-        setup_event("m4", "done", "Reusing the M4 bank")
         return
+
     cache = root.parent / "cache" / "profile-downloads"
     cache.mkdir(parents=True, exist_ok=True)
     root.mkdir(parents=True, exist_ok=True)
     parts = [cache / f"prostt5.tar.zst.part-{i:02d}" for i in range(len(M4_PARTS))]
+    items.extend((f"{RELEASE}/{part.name}", part, size, digest)
+                 for part, (size, digest) in zip(parts, M4_PARTS))
     limit = 1024**3
     missing_bytes = 0
-    for part, (size, _) in zip(parts, M4_PARTS):
-        existing = next((p.stat().st_size for p in (part, part.with_name(part.name + ".part"))
+    for _, target, size, _ in items:
+        existing = next((p.stat().st_size for p in (target, target.with_name(target.name + ".part"))
                          if p.is_file()), 0)
         missing_bytes += size - existing if existing <= size else size
     if shutil.disk_usage(root).free < limit + missing_bytes:
-        raise OSError(f"The M4 bank requires {limit + missing_bytes:,} free bytes in {root}.")
-    print("Preparing the ProstT5 M4 FAISS bank…", flush=True)
-    download_stage("m4", [(f"{RELEASE}/{part.name}", part, size, digest)
-                          for part, (size, digest) in zip(parts, M4_PARTS)])
-    setup_event("m4", "working", "Extracting and verifying the M4 bank")
+        raise OSError(f"The embedding banks require {limit + missing_bytes:,} free bytes in {root}.")
+
+    download_stage("data", items)
+    setup_event("data", "working", "Extracting and verifying the M4 bank")
     install_archive("prostt5", root, parts, limit)
     for part in parts:
         part.unlink()
-    setup_event("m4", "done", "M4 bank ready")
 
 
 def verify_dependencies(mode, check_gpu):
@@ -221,7 +228,7 @@ def model_transfer(directory):
         while not stop.is_set():
             received = prostt5_bytes(directory, PROSTT5_FILES)
             if received != previous:
-                setup_event("model", "transfer", "ProstT5 weights and tokenizer",
+                setup_event("models", "transfer", "ProstT5 weights and tokenizer",
                             total=total, received=received)
                 previous = received
             stop.wait(.8)
@@ -237,37 +244,32 @@ def model_transfer(directory):
 
 def prepare(mode):
     from folder_inputs import resolve_model_path
-    from vydra_cli import BANKS_DIR, DOWNLOADABLE_ARTIFACTS, RELEASE_BASE_URL, main
+    from vydra_cli import main
 
-    setup_event("libraries", "working", "Checking libraries and device")
+    setup_event("dependencies", "working", "Checking libraries and device")
     verify_dependencies(mode, check_gpu=True)
-    setup_event("libraries", "done", "Libraries ready")
-    setup_event("references", "working", "Looking for reference banks in the data folder")
-    BANKS_DIR.mkdir(parents=True, exist_ok=True)
-    download_stage("references", [(f"{RELEASE_BASE_URL}/{name}", BANKS_DIR / name, BANK_SIZES[name], digest)
-                                  for name, digest in DOWNLOADABLE_ARTIFACTS.items()])
-    setup_event("references", "done", "Reference banks ready")
+    setup_event("dependencies", "done", "Dependencies ready")
 
-    setup_event("model", "working", "Looking for the pinned ProstT5 model")
+    setup_event("models", "working", "Looking for the pinned ProstT5 model")
     model_dir = Path(os.environ["VYDRA_PROSTT5_PATH"])
     if not (model_dir / ".vydra-model-ready").is_file() or not (model_dir / "pytorch_model.bin").is_file():
         try:
             resolve_model_path(model_dir, offline=True)
-            setup_event("model", "working", "Verifying local model weights")
+            setup_event("models", "working", "Verifying local model weights")
             verify_prostt5(model_dir)
         except (FileNotFoundError, ValueError):
             with model_transfer(model_dir):
                 if main(["download-model", "--directory", str(model_dir)]):
                     raise RuntimeError("ProstT5 setup failed.")
-            setup_event("model", "working", "Verifying model weights and tokenizer")
+            setup_event("models", "working", "Verifying model weights and tokenizer")
             resolve_model_path(model_dir, offline=True)
             verify_prostt5(model_dir)
         (model_dir / ".vydra-model-ready").touch()
     resolve_model_path(model_dir, offline=True)
-    setup_event("model", "done", "ProstT5 ready")
+    setup_event("models", "done", "ProstT5 ready")
 
-    prepare_m4_bank()
-    setup_event("verify", "working", "Checking models and files")
+    prepare_data()
+    setup_event("data", "working", "Running final checks")
     return main(["doctor"])
 
 
