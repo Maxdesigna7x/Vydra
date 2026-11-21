@@ -63,8 +63,8 @@ test('the location estimate adjusts for the device, saved packages, and partial 
   try {
     const cpu = layout(directory, 'cpu', directory);
     const cuda = layout(directory, 'cuda', directory);
-    const fresh = await downloadEstimate(cpu, 'cpu');
-    const freshCuda = await downloadEstimate(cuda, 'cuda');
+    const { stages: fresh, models: freshModels } = await downloadEstimate(cpu, 'cpu');
+    const { stages: freshCuda } = await downloadEstimate(cuda, 'cuda');
     assert.ok(fresh.dependencies > 0 && freshCuda.dependencies > fresh.dependencies);
     const esm = Object.values(assets.esmProfiles).flatMap(profile => profile.parts);
     const weights = Object.values(assets.prostt5);
@@ -80,7 +80,13 @@ test('the location estimate adjusts for the device, saved packages, and partial 
     const archiveCache = path.join(cpu.cache, 'profile-downloads');
     await mkdir(archiveCache, { recursive: true });
     await writeFile(path.join(archiveCache, 'esm2-8m.tar.zst.part-00.part'), Buffer.alloc(128));
-    const resumed = await downloadEstimate(cpu, 'cpu');
+    const { stages: resumed, models: resumedModels } = await downloadEstimate(cpu, 'cpu');
+    assert.deepEqual(Object.keys(resumedModels), ['prostt5', 'esm2-8m', 'esm2-35m', 'esm2-150m']);
+    for (const [id, model] of Object.entries(freshModels)) {
+      assert.equal(model.bytes, model.remaining);
+      assert.equal(resumedModels[id].bytes, model.bytes);
+      assert.equal(resumedModels[id].remaining, model.bytes - (id === 'esm2-8m' ? 128 : 0));
+    }
     assert.equal(resumed.dependencies, 6e6);
     assert.equal(resumed.models, fresh.models - 128);
     assert.equal(resumed.data, fresh.data - 64);

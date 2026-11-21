@@ -57,10 +57,13 @@ async function smoke() {
             folder: document.querySelector('#folder')?.value,
             devices: Array.from(document.querySelectorAll('[name=mode]')).map(element => element.value),
             total: document.querySelector('#download-total')?.textContent,
+            models: Array.from(document.querySelectorAll('[data-model]')).map(row => [row.dataset.model, row.cells[1].textContent]),
             error: document.querySelector('#status')?.textContent
           })`);
           if (checks?.error) throw new Error(checks.error);
-          if (checks?.folder && checks.title === 'Choose your device and location' && checks.brand > 0 && checks.total?.endsWith(' GB') && checks.stages === 'Dependencies,Models,Data' && checks.devices.join(',') === 'cuda,cpu') {
+          const hasModelSizes = checks?.models?.map(([id]) => id).join(',') === 'prostt5,esm2-8m,esm2-35m,esm2-150m'
+            && checks.models.every(([, size]) => size.startsWith('≈'));
+          if (hasModelSizes && checks?.folder && checks.title === 'Choose your device and location' && checks.brand > 0 && checks.total?.endsWith(' GB') && checks.stages === 'Dependencies,Models,Data' && checks.devices.join(',') === 'cuda,cpu') {
             console.log('Packaged setup window opened with a default folder and both device choices.');
             return;
           }

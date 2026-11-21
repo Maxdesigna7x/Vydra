@@ -111,7 +111,7 @@ el entorno base, las bibliotecas de Python y la comprobación del dispositivo.
 ya contiene el encoder, las cabezas MLP y los bancos propios de fagos
 estructurales, fagos no estructurales y M4. **Data** descarga los bancos de
 ProstT5 e instala y verifica los bancos de los paquetes ESM‑2. Al cambiar de ubicación o dispositivo, se indica
-el tamaño total y por etapa de la descarga pendiente. La estimación descuenta
+el tamaño total y por etapa de la descarga pendiente. La tabla de modelos muestra el tamaño completo y la descarga restante para cada perfil. La estimación descuenta
 los archivos completos y las descargas parciales detectadas. El espacio
 recomendado para una instalación nueva se muestra aparte. Durante una
 transferencia, la velocidad y el tiempo restante se calculan con el movimiento

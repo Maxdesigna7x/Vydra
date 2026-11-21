@@ -4,6 +4,7 @@ const form = document.querySelector('form');
 const folder = $('folder');
 const mode = () => new FormData(form).get('mode');
 const stages = new Map([...document.querySelectorAll('[data-stage]')].map(stage => [stage.dataset.stage, stage]));
+const modelRows = [...document.querySelectorAll('[data-model]')];
 const number = new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
 const phaseNames = { transfer: 'Downloading', working: 'In progress', retry: 'Retrying', done: 'Complete', stopped: 'Stopped' };
 const speed = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
@@ -16,18 +17,24 @@ let running = false;
 let latest;
 let lastUpdate;
 
-function formatDownload(bytes) {
+function formatDownload(bytes, gbFormat = number) {
   if (!Number.isFinite(bytes)) return '—';
   if (!bytes) return '0 MB';
   if (bytes < 1e6) return '<1 MB';
   if (bytes < 1e9) return `≈${number.format(bytes / 1e6)} MB`;
-  return `≈${number.format(bytes / 1e9)} GB`;
+  return `≈${gbFormat.format(bytes / 1e9)} GB`;
 }
 
-function showDownloadEstimate(sizes) {
-  const values = sizes ? Object.values(sizes) : [];
+function showDownloadEstimate(result) {
+  const stagesEstimate = result?.stages;
+  const values = stagesEstimate ? Object.values(stagesEstimate) : [];
   $('download-total').textContent = values.length ? formatDownload(values.reduce((sum, bytes) => sum + bytes, 0)) : '—';
-  for (const stage of stages.keys()) $('estimate-' + stage).textContent = formatDownload(sizes?.[stage]);
+  for (const stage of stages.keys()) $('estimate-' + stage).textContent = formatDownload(stagesEstimate?.[stage]);
+  for (const row of modelRows) {
+    const model = result?.models?.[row.dataset.model];
+    row.cells[1].textContent = formatDownload(model?.bytes, speed);
+    row.cells[2].textContent = formatDownload(model?.remaining, speed);
+  }
 }
 
 async function showEstimate() {
@@ -44,7 +51,7 @@ async function showEstimate() {
     currentEstimate = { folder: target, mode: device, stages: result.stages };
     const gib = 1024 ** 3;
     $('space').textContent = `${number.format(result.free / gib)} GiB free · Up to ${result.minimum / gib} GiB for a fresh installation`;
-    showDownloadEstimate(result.stages);
+    showDownloadEstimate(result);
   } catch {
     if (requested === estimateRequest) $('space').textContent = 'Could not estimate downloads and available disk space.';
   }

@@ -239,8 +239,8 @@ async function prepare(root, mode, resources, log, { dependenciesOnly = false, s
 }
 
 async function estimateSetup(root, mode, resources) {
-  const [free, stages] = await Promise.all([freeSpace(root), downloadEstimate(layout(root, mode, resources), mode)]);
-  return { free, minimum: minimum[mode], stages };
+  const [free, downloads] = await Promise.all([freeSpace(root), downloadEstimate(layout(root, mode, resources), mode)]);
+  return { free, minimum: minimum[mode], ...downloads };
 }
 
 module.exports = { layout, minimum, ready, prepare, pythonProcess, writeAtomic, estimateSetup };
